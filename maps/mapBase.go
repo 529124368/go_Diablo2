@@ -19,7 +19,7 @@ type MapBase struct {
 	BgImage *ebiten.Image
 }
 
-//init
+//Create Map Class
 func NewMap(images *embed.FS) *MapBase {
 	maps := &MapBase{
 		image: images,
@@ -27,7 +27,7 @@ func NewMap(images *embed.FS) *MapBase {
 	return maps
 }
 
-//load images
+//Load Images
 func (m *MapBase) LoadMap() {
 	//BG
 	go func() {

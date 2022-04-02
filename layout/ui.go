@@ -13,7 +13,7 @@ import (
 var plist_png *image.Paletted
 var plist_sheet *texturepacker.SpriteSheet
 
-//UI
+//Create UI Class
 type UI struct {
 	image    *embed.FS
 	compents []*icon
@@ -131,16 +131,20 @@ func (u *UI) LoadImages() {
 // func (u *UI) GetAnimator(name string) (*ebiten.Image, int, int) {
 // 	return ebiten.NewImageFromImage(plist_png.SubImage(plist_sheet.Sprites[name].Frame)), plist_sheet.Sprites[name].SpriteSourceSize.Min.X, plist_sheet.Sprites[name].SpriteSourceSize.Min.Y
 // }
+
+//Add Component
 func (u *UI) AddComponent(s *icon) {
 	u.compents = append(u.compents, s)
 }
 
-//render Ui
+//Render UI
 func (u *UI) DrawUI(screen *ebiten.Image) {
 	for _, v := range u.compents {
 		screen.DrawImage(v.images, v.op)
 	}
 }
+
+//Event Listen
 func (u *UI) EventLoop() {
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
 		//x, y := ebiten.CursorPosition()

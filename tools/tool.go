@@ -17,6 +17,7 @@ const (
 	SPEED  float64 = 2
 )
 
+//Calculate Direction
 func CaluteDir(x, y, x_tar, y_tar int64) int {
 	len := Distance(x, y, x_tar, y_tar)
 	//TODO  242 is PLAYERCENTERY
@@ -83,7 +84,7 @@ func CaluteDir(x, y, x_tar, y_tar int64) int {
 	return 0
 }
 
-//read images from bytes
+//Get Images From Byte
 func GetEbitenImage(data []byte) *ebiten.Image {
 	img, _, err := image.Decode(bytes.NewReader(data))
 	if err != nil {
@@ -92,7 +93,7 @@ func GetEbitenImage(data []byte) *ebiten.Image {
 	return ebiten.NewImageFromImage(img)
 }
 
-//read images from plist
+//Get NRGBA Plist Images
 func GetImageFromPlist(s []byte, json []byte) (*texturepacker.SpriteSheet, *image.NRGBA) {
 	sheet, err := texturepacker.SheetFromData(json, texturepacker.FormatJSONHash{})
 
@@ -104,7 +105,7 @@ func GetImageFromPlist(s []byte, json []byte) (*texturepacker.SpriteSheet, *imag
 	return sheet, sheetImage
 }
 
-//read images from plist
+//Get Paletted Plist Images
 func GetImageFromPlistPaletted(s []byte, json []byte) (*texturepacker.SpriteSheet, *image.Paletted) {
 	sheet, err := texturepacker.SheetFromData(json, texturepacker.FormatJSONHash{})
 
@@ -116,14 +117,14 @@ func GetImageFromPlistPaletted(s []byte, json []byte) (*texturepacker.SpriteShee
 	return sheet, sheetImage
 }
 
-//cal distance
+//Calculate Distance
 func Distance(xa, ya, xb, yb int64) float64 {
 	x := math.Abs(float64(xa - xb))
 	y := math.Abs(float64(ya - yb))
 	return math.Sqrt(x*x + y*y)
 }
 
-// cal angle
+//Calculate Angle
 func Angle(y float64, len float64) float64 {
 	return math.Asin(y/len) * 180 / math.Pi
 }

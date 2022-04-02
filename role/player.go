@@ -31,6 +31,7 @@ type Player struct {
 	map_c     *maps.MapBase
 }
 
+//Create Player Class
 func NewPlayer(x, y float64, state, dir, mx, my int, images *embed.FS, m *maps.MapBase) *Player {
 	play := &Player{
 		X:         x,
@@ -45,6 +46,8 @@ func NewPlayer(x, y float64, state, dir, mx, my int, images *embed.FS, m *maps.M
 	}
 	return play
 }
+
+//Load Images
 func (p *Player) LoadImages() {
 	wg := sync.WaitGroup{}
 	wg.Add(1)
@@ -72,6 +75,7 @@ func (p *Player) LoadImages() {
 	}()
 }
 
+//Load Skill Images
 func (p *Player) loadSkillImages(name string) {
 	go func() {
 		loadedSkill = name
@@ -82,7 +86,7 @@ func (p *Player) loadSkillImages(name string) {
 	}()
 }
 
-//set state
+//Set Player Status
 func (p *Player) SetPlayerState(s, d int) {
 	p.State = s
 	p.Direction = d
@@ -98,6 +102,7 @@ func (p *Player) DeadEvent() {
 
 }
 
+//Get Animator
 func (p *Player) GetAnimator(flg, name string) (*ebiten.Image, int, int) {
 	if flg == "man" {
 		return ebiten.NewImageFromImage(plist_png.SubImage(plist_sheet.Sprites[name].Frame)), plist_sheet.Sprites[name].SpriteSourceSize.Min.X, plist_sheet.Sprites[name].SpriteSourceSize.Min.Y
@@ -112,6 +117,7 @@ func (p *Player) GetAnimator(flg, name string) (*ebiten.Image, int, int) {
 	}
 }
 
+//Mouse Controller For 16 Direction
 func (p *Player) GetMouseController(dir int, flg bool) bool {
 	if dir == 2 && flg {
 		if p.Direction != dir || p.State != tools.RUN {

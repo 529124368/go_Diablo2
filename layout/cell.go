@@ -9,6 +9,7 @@ type icon struct {
 	f      func(i *icon)
 }
 
+//Create Icon Class
 func newIcon() *icon {
 	i := &icon{
 		op:  new(ebiten.DrawImageOptions),
@@ -18,17 +19,17 @@ func newIcon() *icon {
 	return i
 }
 
-//set images position
+//Set Images Position
 func (i *icon) pos(x, y float64) {
 	i.op.GeoM.Translate(x, y)
 }
 
-//add imges
+//Add Imges
 func (i *icon) addImage(m *ebiten.Image) {
 	i.images = m
 }
 
-//register event to Ui
+//Register Event To Ui
 func (i *icon) addEvnet(fu func(i *icon)) {
 	i.flg = 1
 	i.f = fu
