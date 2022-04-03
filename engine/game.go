@@ -18,16 +18,20 @@ import (
 
 //config
 const (
-	SCREENWIDTH   int   = 490
-	SCREENHEIGHT  int   = 300
-	OFFSETX       int   = -30
-	OFFSETY       int   = -30
-	LAYOUTX       int   = 790
-	LAYOUTY       int   = 480
-	PLAYERCENTERX int64 = 388 //LAYOUTX/2
-	PLAYERCENTERY int64 = 242 //LAYOUTY/2
-	WEOFFSETX     int   = 127
-	WEOFFSETY     int   = 14
+	SCREENWIDTH         int   = 490
+	SCREENHEIGHT        int   = 300
+	OFFSETX             int   = -30
+	OFFSETY             int   = -30
+	LAYOUTX             int   = 790
+	LAYOUTY             int   = 480
+	PLAYERCENTERX       int64 = 388 //LAYOUTX/2
+	PLAYERCENTERY       int64 = 242 //LAYOUTY/2
+	WEOFFSETX           int   = 127
+	WEOFFSETY           int   = 14
+	GAMESCENELOGIN      int   = 1
+	GAMESCENESELECTROLE int   = 2
+	GAMESCENEOPENDOOR   int   = 3
+	GAMESCENESTART      int   = 4
 )
 
 type Game struct {
@@ -51,6 +55,8 @@ var mouseX, mouseY int
 var mouseIcon *ebiten.Image
 
 var images *embed.FS
+
+var gameSceneType int = 0
 
 //factory
 func NewGame(img *embed.FS) *Game {
@@ -79,17 +85,20 @@ func (g *Game) StartEngine() {
 	mouseIcon = tools.GetEbitenImage(s)
 	opS = &ebiten.DrawImageOptions{}
 	op = &ebiten.DrawImageOptions{}
+	//
 	w := sync.WaitGroup{}
 	w.Add(3)
 	//Palyer Init
 	go func() {
-		g.player.LoadImages()
+		//g.player.LoadImages()
 		runtime.GC()
 		w.Done()
 	}()
 	//UI Init
 	go func() {
-		g.ui.LoadImages()
+		//g.ui.LoadGameImages()
+		g.ui.LoadGameLoginImages()
+		runtime.GC()
 		w.Done()
 	}()
 	//Map Init
@@ -105,6 +114,22 @@ func (g *Game) StartEngine() {
 
 func (g *Game) Update() error {
 	g.count++
+	//g.changeScenceGameUpdate()
+	g.ChangeScenceLoginUpdate()
+	return nil
+}
+
+func (g *Game) Draw(screen *ebiten.Image) {
+	//g.ChangeScenceGameDraw(screen)
+	g.ChangeScenceLoginDraw(screen)
+}
+
+func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
+	return LAYOUTX, LAYOUTY
+}
+
+//Draw Game Update
+func (g *Game) changeScenceGameUpdate() {
 	mouseX, mouseY = ebiten.CursorPosition()
 	if g.player.State != tools.ATTACK {
 		g.player.State = tools.IDLE
@@ -150,10 +175,10 @@ func (g *Game) Update() error {
 		frameNums = 8
 		frameSpeed = 5
 	}
-	return nil
 }
 
-func (g *Game) Draw(screen *ebiten.Image) {
+//Draw Game Draw
+func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println("has error is :", r)
@@ -241,14 +266,49 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 }
 
-func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return LAYOUTX, LAYOUTY
+func (g *Game) ChangeScenceLoginUpdate() {
+	g.count++
+	mouseX, mouseY = ebiten.CursorPosition()
 }
 
-func (g *Game) ChangeScence01() {
+func (g *Game) ChangeScenceLoginDraw(screen *ebiten.Image) {
+	//Draw UI
+	g.ui.DrawUI(screen)
 
-}
+	//Draw Mouse Icon
+	opMouse.GeoM.Reset()
+	opMouse.GeoM.Rotate(-0.5)
+	opMouse.Filter = ebiten.FilterLinear
+	opMouse.GeoM.Translate(float64(mouseX), float64(mouseY))
+	screen.DrawImage(mouseIcon, opMouse)
+	//Draw Logo Left
+	name := "logoFireLeft_" + strconv.Itoa(counts) + ".png"
+	left, _, _ := g.ui.GetAnimator(name)
+	opLo := &ebiten.DrawImageOptions{}
+	opLo.Filter = ebiten.FilterLinear
+	opLo.GeoM.Translate(220, 0)
+	opLo.CompositeMode = ebiten.CompositeModeLighter
+	opLo.GeoM.Scale(1, 0.7)
+	screen.DrawImage(left, opLo)
+	//Draw Logo Right
+	name = "logoFireRight_" + strconv.Itoa(counts) + ".png"
+	right, _, _ := g.ui.GetAnimator(name)
+	opRo := &ebiten.DrawImageOptions{}
+	opRo.Filter = ebiten.FilterLinear
+	opRo.GeoM.Translate(float64(220+right.Bounds().Max.X), 0)
+	opRo.CompositeMode = ebiten.CompositeModeLighter
+	opRo.GeoM.Scale(1, 0.7)
+	screen.DrawImage(right, opRo)
+	//Draw Debug
+	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nmouse position %d,%d",
+		int64(ebiten.CurrentFPS()), mouseX, mouseY))
 
-func (g *Game) ChangeScence02() {
-
+	//Change Frame
+	if g.count > frameSpeed {
+		counts++
+		g.count = 0
+		if counts >= 30 {
+			counts = 0
+		}
+	}
 }
