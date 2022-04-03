@@ -35,18 +35,20 @@ const (
 )
 
 type Game struct {
-	count  int
-	player *role.Player
-	maps   *maps.MapBase
-	ui     *layout.UI
+	count             int
+	player            *role.Player
+	maps              *maps.MapBase
+	ui                *layout.UI
+	currentGameScence int
 	//monster *role.Monster
 }
 
 var (
-	counts     int  = 0
-	frameNums  int  = 4
-	flg        bool = false
-	frameSpeed int  = 5
+	counts          int  = 0
+	frameNums       int  = 4
+	flg             bool = false
+	frameSpeed      int  = 5
+	changeScenceFlg bool = false
 )
 var op, opS, opMouse, opWea, opSkill *ebiten.DrawImageOptions
 
@@ -69,10 +71,11 @@ func NewGame(img *embed.FS) *Game {
 	u := layout.NewUI(img)
 
 	gameEngine := &Game{
-		count:  0,
-		player: r,
-		maps:   m,
-		ui:     u,
+		count:             0,
+		player:            r,
+		maps:              m,
+		ui:                u,
+		currentGameScence: GAMESCENELOGIN,
 	}
 	return gameEngine
 }
@@ -87,23 +90,11 @@ func (g *Game) StartEngine() {
 	op = &ebiten.DrawImageOptions{}
 	//
 	w := sync.WaitGroup{}
-	w.Add(3)
-	//Palyer Init
-	go func() {
-		//g.player.LoadImages()
-		runtime.GC()
-		w.Done()
-	}()
+	w.Add(1)
 	//UI Init
 	go func() {
-		//g.ui.LoadGameImages()
 		g.ui.LoadGameLoginImages()
 		runtime.GC()
-		w.Done()
-	}()
-	//Map Init
-	go func() {
-		g.maps.LoadMap()
 		w.Done()
 	}()
 	w.Wait()
@@ -112,16 +103,105 @@ func (g *Game) StartEngine() {
 	}()
 }
 
+//Change Load
+func (g *Game) ChangeScene(name string) {
+	if name == "select" {
+		g.currentGameScence = GAMESCENESELECTROLE
+		g.ui.LoadGameCharaSelectImages()
+		runtime.GC()
+
+	} else if name == "game" {
+		g.currentGameScence = GAMESCENESTART
+		w := sync.WaitGroup{}
+		w.Add(3)
+		//Palyer Init
+		go func() {
+			g.player.LoadImages()
+			runtime.GC()
+			w.Done()
+		}()
+		//Ui
+		go func() {
+			g.ui.LoadGameImages()
+			runtime.GC()
+			w.Done()
+		}()
+		//Map Init
+		go func() {
+			g.maps.LoadMap()
+			w.Done()
+		}()
+		w.Wait()
+		go func() {
+			runtime.GC()
+		}()
+	}
+
+}
 func (g *Game) Update() error {
 	g.count++
-	//g.changeScenceGameUpdate()
-	g.ChangeScenceLoginUpdate()
+	mouseX, mouseY = ebiten.CursorPosition()
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) && changeScenceFlg == false {
+
+		if g.currentGameScence == GAMESCENELOGIN {
+			if mouseX > 134 && mouseX < 148 && mouseY > 273 && mouseY < 287 {
+				g.currentGameScence = GAMESCENESELECTROLE
+				changeScenceFlg = true
+				w := sync.WaitGroup{}
+				w.Add(1)
+				go func() {
+					g.ChangeScene("select")
+					w.Done()
+				}()
+				w.Wait()
+				changeScenceFlg = false
+			}
+
+		} else if g.currentGameScence == GAMESCENESELECTROLE {
+			if mouseX > 359 && mouseX < 432 && mouseY > 149 && mouseY < 218 {
+				changeScenceFlg = true
+				g.currentGameScence = GAMESCENESTART
+				w := sync.WaitGroup{}
+				w.Add(1)
+				go func() {
+					g.ChangeScene("game")
+					w.Done()
+				}()
+				w.Wait()
+				changeScenceFlg = false
+			}
+		}
+	}
+	if changeScenceFlg == false {
+		//Judge Scence
+		if g.currentGameScence == GAMESCENESTART {
+			g.changeScenceGameUpdate()
+		} else {
+			g.ChangeScenceLoginUpdate()
+		}
+	}
+
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	//g.ChangeScenceGameDraw(screen)
-	g.ChangeScenceLoginDraw(screen)
+
+	//Is Change Scence ?
+	if changeScenceFlg == false {
+		if g.currentGameScence == GAMESCENESTART {
+			g.ChangeScenceGameDraw(screen)
+		} else if g.currentGameScence == GAMESCENESELECTROLE {
+			g.ChangeScenceSelectDraw(screen)
+		} else {
+			g.ChangeScenceLoginDraw(screen)
+		}
+	}
+	//Draw Mouse Icon
+	opMouse.GeoM.Reset()
+	opMouse.GeoM.Rotate(-0.5)
+	opMouse.Filter = ebiten.FilterLinear
+	opMouse.GeoM.Translate(float64(mouseX), float64(mouseY))
+	screen.DrawImage(mouseIcon, opMouse)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
@@ -130,7 +210,6 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 
 //Draw Game Update
 func (g *Game) changeScenceGameUpdate() {
-	mouseX, mouseY = ebiten.CursorPosition()
 	if g.player.State != tools.ATTACK {
 		g.player.State = tools.IDLE
 	}
@@ -177,7 +256,7 @@ func (g *Game) changeScenceGameUpdate() {
 	}
 }
 
-//Draw Game Draw
+//Draw Game Scence
 func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -231,13 +310,6 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	//Draw UI
 	g.ui.DrawUI(screen)
 
-	//Draw Mouse Icon
-	opMouse.GeoM.Reset()
-	opMouse.GeoM.Rotate(-0.5)
-	opMouse.Filter = ebiten.FilterLinear
-	opMouse.GeoM.Translate(float64(mouseX), float64(mouseY))
-	screen.DrawImage(mouseIcon, opMouse)
-
 	//Draw Skill
 	// if g.player.State == ATTACK {
 	// 	imagey, x, y := g.player.GetAnimator("skill", nameSkill)
@@ -266,24 +338,28 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	}
 }
 
+//Draw Login Update
 func (g *Game) ChangeScenceLoginUpdate() {
 	g.count++
-	mouseX, mouseY = ebiten.CursorPosition()
+
+	//Change Frame
+	if g.count > frameSpeed {
+		counts++
+		g.count = 0
+		if counts >= 30 {
+			counts = 0
+		}
+	}
 }
 
+//Draw Login Scence
 func (g *Game) ChangeScenceLoginDraw(screen *ebiten.Image) {
 	//Draw UI
 	g.ui.DrawUI(screen)
 
-	//Draw Mouse Icon
-	opMouse.GeoM.Reset()
-	opMouse.GeoM.Rotate(-0.5)
-	opMouse.Filter = ebiten.FilterLinear
-	opMouse.GeoM.Translate(float64(mouseX), float64(mouseY))
-	screen.DrawImage(mouseIcon, opMouse)
 	//Draw Logo Left
 	name := "logoFireLeft_" + strconv.Itoa(counts) + ".png"
-	left, _, _ := g.ui.GetAnimator(name)
+	left, _, _ := g.ui.GetAnimator("logo", name)
 	opLo := &ebiten.DrawImageOptions{}
 	opLo.Filter = ebiten.FilterLinear
 	opLo.GeoM.Translate(220, 0)
@@ -292,7 +368,7 @@ func (g *Game) ChangeScenceLoginDraw(screen *ebiten.Image) {
 	screen.DrawImage(left, opLo)
 	//Draw Logo Right
 	name = "logoFireRight_" + strconv.Itoa(counts) + ".png"
-	right, _, _ := g.ui.GetAnimator(name)
+	right, _, _ := g.ui.GetAnimator("logo", name)
 	opRo := &ebiten.DrawImageOptions{}
 	opRo.Filter = ebiten.FilterLinear
 	opRo.GeoM.Translate(float64(220+right.Bounds().Max.X), 0)
@@ -311,4 +387,34 @@ func (g *Game) ChangeScenceLoginDraw(screen *ebiten.Image) {
 			counts = 0
 		}
 	}
+}
+
+//Draw Select Scence
+func (g *Game) ChangeScenceSelectDraw(screen *ebiten.Image) {
+	//Draw UI
+	g.ui.DrawUI(screen)
+
+	//Draw Fire
+	name := "fire_" + strconv.Itoa(counts) + ".png"
+	fire, _, _ := g.ui.GetAnimator("logo", name)
+	opf := &ebiten.DrawImageOptions{}
+	opf.Filter = ebiten.FilterLinear
+	opf.GeoM.Translate(350, 375)
+	opf.CompositeMode = ebiten.CompositeModeLighter
+	opf.GeoM.Scale(1, 0.7)
+	screen.DrawImage(fire, opf)
+
+	//Draw Role Ba
+	name = "ba_" + strconv.Itoa(counts) + ".png"
+	ba, _, _ := g.ui.GetAnimator("role", name)
+	opBa := &ebiten.DrawImageOptions{}
+	opBa.Filter = ebiten.FilterLinear
+	opBa.GeoM.Translate(356, 120)
+	opBa.CompositeMode = ebiten.CompositeModeLighter
+	opf.GeoM.Scale(1, 0.7)
+	screen.DrawImage(ba, opBa)
+
+	//Draw Debug
+	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nmouse position %d,%d",
+		int64(ebiten.CurrentFPS()), mouseX, mouseY))
 }
