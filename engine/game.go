@@ -141,8 +141,7 @@ func (g *Game) ChangeScene(name string) {
 func (g *Game) Update() error {
 	g.count++
 	mouseX, mouseY = ebiten.CursorPosition()
-	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) && changeScenceFlg == false {
-
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && changeScenceFlg == false {
 		if g.currentGameScence == GAMESCENELOGIN {
 			if mouseX > 134 && mouseX < 148 && mouseY > 273 && mouseY < 287 {
 				g.currentGameScence = GAMESCENESELECTROLE
@@ -172,8 +171,8 @@ func (g *Game) Update() error {
 			}
 		}
 	}
+	//check
 	if changeScenceFlg == false {
-		//Judge Scence
 		if g.currentGameScence == GAMESCENESTART {
 			g.changeScenceGameUpdate()
 		} else {
@@ -266,7 +265,7 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	//Draw Background
 	screen.DrawImage(g.maps.BgImage, g.maps.OpBg)
 	//
-	name := ""
+	var name string
 	//nameSkill := ""
 	switch g.player.State {
 	case tools.ATTACK:

@@ -3,7 +3,6 @@ package maps
 import (
 	"embed"
 	"game/tools"
-	"runtime"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -30,13 +29,10 @@ func NewMap(images *embed.FS) *MapBase {
 //Load Images
 func (m *MapBase) LoadMap() {
 	//BG
-	go func() {
-		s2, _ := m.image.ReadFile("resource/bg/campsite.png")
-		img := tools.GetEbitenImage(s2)
-		m.BgImage = img
-		m.OpBg = &ebiten.DrawImageOptions{}
-		m.OpBg.Filter = ebiten.FilterLinear
-		m.OpBg.GeoM.Translate(MAPOFFSETX, MAPOFFSETY)
-		runtime.GC()
-	}()
+	s2, _ := m.image.ReadFile("resource/bg/campsite.png")
+	img := tools.GetEbitenImage(s2)
+	m.BgImage = img
+	m.OpBg = &ebiten.DrawImageOptions{}
+	m.OpBg.Filter = ebiten.FilterLinear
+	m.OpBg.GeoM.Translate(MAPOFFSETX, MAPOFFSETY)
 }
