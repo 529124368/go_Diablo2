@@ -49,6 +49,8 @@ var (
 	flg             bool = false
 	frameSpeed      int  = 5
 	changeScenceFlg bool = false
+	doorCountFlg    bool = false
+	loadingFlg      bool = false
 )
 var op, opS, opMouse, opWea, opSkill *ebiten.DrawImageOptions
 
@@ -110,6 +112,12 @@ func (g *Game) ChangeScene(name string) {
 		g.ui.LoadGameCharaSelectImages()
 		runtime.GC()
 
+	} else if name == "loading" {
+		g.currentGameScence = GAMESCENEOPENDOOR
+		//GC
+		g.ui.ClearSlice(0)
+		g.ui.ClearGlobalVariable()
+
 	} else if name == "game" {
 		g.currentGameScence = GAMESCENESTART
 		w := sync.WaitGroup{}
@@ -139,11 +147,10 @@ func (g *Game) ChangeScene(name string) {
 
 }
 func (g *Game) Update() error {
-	g.count++
 	mouseX, mouseY = ebiten.CursorPosition()
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && changeScenceFlg == false {
 		if g.currentGameScence == GAMESCENELOGIN {
-			if mouseX > 134 && mouseX < 148 && mouseY > 273 && mouseY < 287 {
+			if mouseX > 286 && mouseX < 503 && mouseY > 150 && mouseY < 218 {
 				g.currentGameScence = GAMESCENESELECTROLE
 				changeScenceFlg = true
 				w := sync.WaitGroup{}
@@ -157,24 +164,20 @@ func (g *Game) Update() error {
 			}
 
 		} else if g.currentGameScence == GAMESCENESELECTROLE {
-			if mouseX > 359 && mouseX < 432 && mouseY > 149 && mouseY < 218 {
+			if mouseX > 684 && mouseX < 759 && mouseY > 390 && mouseY < 470 {
 				changeScenceFlg = true
-				g.currentGameScence = GAMESCENESTART
-				w := sync.WaitGroup{}
-				w.Add(1)
-				go func() {
-					g.ChangeScene("game")
-					w.Done()
-				}()
-				w.Wait()
+				g.currentGameScence = GAMESCENEOPENDOOR
 				changeScenceFlg = false
 			}
 		}
 	}
+
 	//check
 	if changeScenceFlg == false {
 		if g.currentGameScence == GAMESCENESTART {
 			g.changeScenceGameUpdate()
+		} else if g.currentGameScence == GAMESCENEOPENDOOR {
+			g.ChangeScenceOpenDoorUpdate()
 		} else {
 			g.ChangeScenceLoginUpdate()
 		}
@@ -191,6 +194,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			g.ChangeScenceGameDraw(screen)
 		} else if g.currentGameScence == GAMESCENESELECTROLE {
 			g.ChangeScenceSelectDraw(screen)
+		} else if g.currentGameScence == GAMESCENEOPENDOOR {
+			g.ChangeScenceOpenDoorDraw(screen)
 		} else {
 			g.ChangeScenceLoginDraw(screen)
 		}
@@ -209,6 +214,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 
 //Draw Game Update
 func (g *Game) changeScenceGameUpdate() {
+	g.count++
 	if g.player.State != tools.ATTACK {
 		g.player.State = tools.IDLE
 	}
@@ -340,7 +346,6 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 //Draw Login Update
 func (g *Game) ChangeScenceLoginUpdate() {
 	g.count++
-
 	//Change Frame
 	if g.count > frameSpeed {
 		counts++
@@ -409,11 +414,50 @@ func (g *Game) ChangeScenceSelectDraw(screen *ebiten.Image) {
 	opBa := &ebiten.DrawImageOptions{}
 	opBa.Filter = ebiten.FilterLinear
 	opBa.GeoM.Translate(356, 120)
-	opBa.CompositeMode = ebiten.CompositeModeLighter
-	opf.GeoM.Scale(1, 0.7)
 	screen.DrawImage(ba, opBa)
 
 	//Draw Debug
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nmouse position %d,%d",
-		int64(ebiten.CurrentFPS()), mouseX, mouseY))
+	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nmouse position %d,%d", int64(ebiten.CurrentFPS()), mouseX, mouseY))
+}
+
+//Draw OpenDoor Scence
+func (g *Game) ChangeScenceOpenDoorDraw(screen *ebiten.Image) {
+	//Draw Open Door
+	name := "loading_" + strconv.Itoa(counts) + ".png"
+	door, _, _ := g.ui.GetAnimator("logo", name)
+	op := &ebiten.DrawImageOptions{}
+	op.Filter = ebiten.FilterLinear
+	op.GeoM.Translate(268, 120)
+	screen.DrawImage(door, op)
+
+	//Draw Debug
+	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nmouse position %d,%d", int64(ebiten.CurrentFPS()), mouseX, mouseY))
+}
+
+//Draw OpenDoor Update
+func (g *Game) ChangeScenceOpenDoorUpdate() {
+	if doorCountFlg == false {
+		counts = 0
+		doorCountFlg = true
+	}
+	g.count++
+	//Change Frame
+	if g.count > 10 && counts != 9 {
+		counts++
+		g.count = 0
+	}
+
+	// Change Scence
+	if counts == 9 && loadingFlg == false {
+		loadingFlg = true
+		g.currentGameScence = GAMESCENESTART
+		w := sync.WaitGroup{}
+		w.Add(1)
+		go func() {
+			g.ChangeScene("game")
+			w.Done()
+		}()
+		w.Wait()
+		changeScenceFlg = false
+	}
 }

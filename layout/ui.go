@@ -12,8 +12,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-var plist_png *image.NRGBA
-var plist_R_png *image.Paletted
+var plist_png, plist_R_png *image.NRGBA
 var plist_sheet, plist_R_sheet *texturepacker.SpriteSheet
 
 //Create UI Class
@@ -289,7 +288,7 @@ func (u *UI) LoadGameCharaSelectImages() {
 	go func() {
 		plist, _ := u.image.ReadFile("resource/UI/selectRoles.png")
 		plist_json, _ := u.image.ReadFile("resource/UI/selectRoles.json")
-		plist_R_sheet, plist_R_png = tools.GetImageFromPlistPaletted(plist, plist_json)
+		plist_R_sheet, plist_R_png = tools.GetImageFromPlist(plist, plist_json)
 		w.Done()
 	}()
 	w.Wait()
@@ -300,10 +299,17 @@ func (u *UI) LoadGameCharaSelectImages() {
 }
 
 func (u *UI) GetAnimator(flg, name string) (*ebiten.Image, int, int) {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println(r)
+		}
+	}()
 	if flg == "role" {
+
 		return ebiten.NewImageFromImage(plist_R_png.SubImage(plist_R_sheet.Sprites[name].Frame)), plist_R_sheet.Sprites[name].SpriteSourceSize.Min.X, plist_R_sheet.Sprites[name].SpriteSourceSize.Min.Y
 
 	} else {
+
 		return ebiten.NewImageFromImage(plist_png.SubImage(plist_sheet.Sprites[name].Frame)), plist_sheet.Sprites[name].SpriteSourceSize.Min.X, plist_sheet.Sprites[name].SpriteSourceSize.Min.Y
 	}
 }
@@ -336,4 +342,10 @@ func (u *UI) EventLoop() {
 		}
 	}
 
+}
+
+//GC for loading
+func (u *UI) ClearGlobalVariable() {
+	plist_R_sheet = nil
+	plist_R_png = nil
 }
