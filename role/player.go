@@ -8,7 +8,6 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
-	"sync"
 
 	"github.com/fzipp/texturepacker"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -49,16 +48,11 @@ func NewPlayer(x, y float64, state, dir, mx, my int, images *embed.FS, m *maps.M
 
 //Load Images
 func (p *Player) LoadImages() {
-	wg := sync.WaitGroup{}
-	wg.Add(1)
+
 	//player load
-	go func() {
-		plist, _ := p.image.ReadFile("resource/man/warrior/ba.png")
-		plist_json, _ := p.image.ReadFile("resource/man/warrior/ba.json")
-		plist_sheet, plist_png = tools.GetImageFromPlistPaletted(plist, plist_json)
-		runtime.GC()
-		wg.Done()
-	}()
+	plist, _ := p.image.ReadFile("resource/man/warrior/ba.png")
+	plist_json, _ := p.image.ReadFile("resource/man/warrior/ba.json")
+	plist_sheet, plist_png = tools.GetImageFromPlistPaletted(plist, plist_json)
 	//skill load
 	// go func() {
 	// 	loadedSkill = "liehuo"
@@ -68,11 +62,7 @@ func (p *Player) LoadImages() {
 	// 	runtime.GC()
 	// 	wg.Done()
 	// }()
-	wg.Wait()
 	p.SetPlayerState(0, 0)
-	go func() {
-		runtime.GC()
-	}()
 }
 
 //Load Skill Images

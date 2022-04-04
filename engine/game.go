@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"bytes"
 	"embed"
 	"fmt"
 	"game/layout"
@@ -13,6 +14,9 @@ import (
 	"sync"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
+	"github.com/hajimehoshi/ebiten/v2/audio/mp3"
+	"github.com/hajimehoshi/ebiten/v2/audio/wav"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
@@ -40,6 +44,7 @@ type Game struct {
 	maps              *maps.MapBase
 	ui                *layout.UI
 	currentGameScence int
+	audioContext      *audio.Player
 	//monster *role.Monster
 }
 
@@ -51,6 +56,7 @@ var (
 	changeScenceFlg bool = false
 	doorCountFlg    bool = false
 	loadingFlg      bool = false
+	musicIsPlay     bool = false
 )
 var op, opS, opMouse, opWea, opSkill *ebiten.DrawImageOptions
 
@@ -61,10 +67,12 @@ var mouseIcon *ebiten.Image
 var images *embed.FS
 
 var gameSceneType int = 0
+var cont *audio.Context
 
 //factory
 func NewGame(img *embed.FS) *Game {
 	images = img
+	cont = audio.NewContext(48000)
 	//map
 	m := maps.NewMap(img)
 	//palayer
@@ -78,6 +86,7 @@ func NewGame(img *embed.FS) *Game {
 		maps:              m,
 		ui:                u,
 		currentGameScence: GAMESCENELOGIN,
+		audioContext:      nil,
 	}
 	return gameEngine
 }
@@ -201,6 +210,15 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		}
 	}
 	//Draw Mouse Icon
+	g.DrawMouseIcon(screen)
+}
+
+func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
+	return LAYOUTX, LAYOUTY
+}
+
+//Draw Mouse Icon
+func (g *Game) DrawMouseIcon(screen *ebiten.Image) {
 	opMouse.GeoM.Reset()
 	opMouse.GeoM.Rotate(-0.5)
 	opMouse.Filter = ebiten.FilterLinear
@@ -208,12 +226,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	screen.DrawImage(mouseIcon, opMouse)
 }
 
-func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return LAYOUTX, LAYOUTY
-}
-
 //Draw Game Update
 func (g *Game) changeScenceGameUpdate() {
+	if musicIsPlay == false {
+		g.PlayMusic("Bar_act2_complete_tombs.wav", "wav")
+	}
 	g.count++
 	if g.player.State != tools.ATTACK {
 		g.player.State = tools.IDLE
@@ -222,7 +239,15 @@ func (g *Game) changeScenceGameUpdate() {
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
 		g.player.MouseX = mouseX
 		g.player.MouseY = mouseY
-		flg = true
+		//防止点击UI界面也移动
+		if mouseY < 436 {
+			flg = true
+		}
+		//for test
+		if mouseX > 201 && mouseX < 228 && mouseY > 446 && mouseY < 468 {
+			g.ui.SetDisplay()
+		}
+
 	}
 
 	//Calculate direction
@@ -345,9 +370,18 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 
 //Draw Login Update
 func (g *Game) ChangeScenceLoginUpdate() {
+	if musicIsPlay == false {
+		g.PlayMusic("Act0-Intro.mp3", "mp3")
+	}
+	frameSpeed_clone := 0
+	if g.currentGameScence == GAMESCENELOGIN {
+		frameSpeed_clone = 2
+	} else {
+		frameSpeed_clone = 5
+	}
 	g.count++
 	//Change Frame
-	if g.count > frameSpeed {
+	if g.count > frameSpeed_clone {
 		counts++
 		g.count = 0
 		if counts >= 30 {
@@ -454,10 +488,43 @@ func (g *Game) ChangeScenceOpenDoorUpdate() {
 		w := sync.WaitGroup{}
 		w.Add(1)
 		go func() {
+			//close music
+			g.CloseMusic()
 			g.ChangeScene("game")
 			w.Done()
 		}()
 		w.Wait()
 		changeScenceFlg = false
 	}
+}
+
+//Play Music
+func (g *Game) PlayMusic(name, ty string) {
+	musicIsPlay = true
+	switch ty {
+	case "mp3":
+		go func() {
+			bgm, _ := images.ReadFile("resource/BGM/" + name)
+			ss, _ := mp3.Decode(cont, bytes.NewReader(bgm))
+			g.audioContext = nil
+			g.audioContext, _ = cont.NewPlayer(ss)
+			g.audioContext.Play()
+		}()
+	case "wav":
+		go func() {
+			bgm, _ := images.ReadFile("resource/BGM/" + name)
+			ss, _ := wav.Decode(cont, bytes.NewReader(bgm))
+			g.audioContext = nil
+			g.audioContext, _ = cont.NewPlayer(ss)
+			g.audioContext.Play()
+		}()
+	}
+}
+
+//Close Music
+func (g *Game) CloseMusic() {
+	musicIsPlay = false
+	go func() {
+		g.audioContext.Close()
+	}()
 }

@@ -21,7 +21,8 @@ var images embed.FS
 
 func main() {
 	ebiten.SetWindowSize(SCREENWIDTH*2, SCREENHEIGHT*2)
-	ebiten.SetWindowTitle("golang Dibalo2")
+	ebiten.SetWindowTitle("Go_DibaloⅡ")
+	ebiten.SetMaxTPS(80)
 	gameStart := engine.NewGame(&images)
 	gameStart.StartEngine()
 	if err := ebiten.RunGame(gameStart); err != nil {
