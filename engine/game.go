@@ -1,12 +1,13 @@
 package engine
 
 import (
-	"bytes"
 	"embed"
 	"fmt"
 	"game/layout"
 	"game/maps"
+	"game/music"
 	"game/role"
+	"game/runTime"
 	"game/tools"
 	"math"
 	"runtime"
@@ -14,9 +15,6 @@ import (
 	"sync"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/audio"
-	"github.com/hajimehoshi/ebiten/v2/audio/mp3"
-	"github.com/hajimehoshi/ebiten/v2/audio/wav"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
@@ -44,41 +42,40 @@ type Game struct {
 	maps              *maps.MapBase
 	ui                *layout.UI
 	currentGameScence int
-	audioContext      *audio.Player
+	music             music.MusicInterface
+	status            *runTime.StatusManage
 	//monster *role.Monster
 }
 
 var (
-	counts          int  = 0
-	frameNums       int  = 4
-	flg             bool = false
-	frameSpeed      int  = 5
-	changeScenceFlg bool = false
-	doorCountFlg    bool = false
-	loadingFlg      bool = false
-	musicIsPlay     bool = false
+	counts        int = 0
+	frameNums     int = 4
+	frameSpeed    int = 5
+	op            *ebiten.DrawImageOptions
+	opS           *ebiten.DrawImageOptions
+	opMouse       *ebiten.DrawImageOptions
+	opWea         *ebiten.DrawImageOptions
+	opSkill       *ebiten.DrawImageOptions
+	images        *embed.FS
+	gameSceneType int = 0
+	mouseIcon     *ebiten.Image
+	mouseX        int
+	mouseY        int
 )
-var op, opS, opMouse, opWea, opSkill *ebiten.DrawImageOptions
 
-var mouseX, mouseY int
-
-var mouseIcon *ebiten.Image
-
-var images *embed.FS
-
-var gameSceneType int = 0
-var cont *audio.Context
-
-//factory
+//GameEngine
 func NewGame(img *embed.FS) *Game {
 	images = img
-	cont = audio.NewContext(48000)
-	//map
+	//statueManage
+	sta := runTime.NewStatusManage()
+	//Map
 	m := maps.NewMap(img)
-	//palayer
-	r := role.NewPlayer(float64(LAYOUTX/2), float64(LAYOUTY/2), tools.IDLE, 0, 0, 0, img, m)
+	//Player
+	r := role.NewPlayer(float64(LAYOUTX/2), float64(LAYOUTY/2), tools.IDLE, 0, 0, 0, img, m, sta)
 	//UI
 	u := layout.NewUI(img)
+	//BGM
+	bgm := music.NewMusicBGM(images)
 
 	gameEngine := &Game{
 		count:             0,
@@ -86,7 +83,8 @@ func NewGame(img *embed.FS) *Game {
 		maps:              m,
 		ui:                u,
 		currentGameScence: GAMESCENELOGIN,
-		audioContext:      nil,
+		music:             bgm,
+		status:            sta,
 	}
 	return gameEngine
 }
@@ -157,11 +155,11 @@ func (g *Game) ChangeScene(name string) {
 }
 func (g *Game) Update() error {
 	mouseX, mouseY = ebiten.CursorPosition()
-	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && changeScenceFlg == false {
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && g.status.ChangeScenceFlg == false {
 		if g.currentGameScence == GAMESCENELOGIN {
 			if mouseX > 286 && mouseX < 503 && mouseY > 150 && mouseY < 218 {
 				g.currentGameScence = GAMESCENESELECTROLE
-				changeScenceFlg = true
+				g.status.ChangeScenceFlg = true
 				w := sync.WaitGroup{}
 				w.Add(1)
 				go func() {
@@ -169,20 +167,20 @@ func (g *Game) Update() error {
 					w.Done()
 				}()
 				w.Wait()
-				changeScenceFlg = false
+				g.status.ChangeScenceFlg = false
 			}
 
 		} else if g.currentGameScence == GAMESCENESELECTROLE {
 			if mouseX > 684 && mouseX < 759 && mouseY > 390 && mouseY < 470 {
-				changeScenceFlg = true
+				g.status.ChangeScenceFlg = true
 				g.currentGameScence = GAMESCENEOPENDOOR
-				changeScenceFlg = false
+				g.status.ChangeScenceFlg = false
 			}
 		}
 	}
 
 	//check
-	if changeScenceFlg == false {
+	if g.status.ChangeScenceFlg == false {
 		if g.currentGameScence == GAMESCENESTART {
 			g.changeScenceGameUpdate()
 		} else if g.currentGameScence == GAMESCENEOPENDOOR {
@@ -198,7 +196,7 @@ func (g *Game) Update() error {
 func (g *Game) Draw(screen *ebiten.Image) {
 
 	//Is Change Scence ?
-	if changeScenceFlg == false {
+	if g.status.ChangeScenceFlg == false {
 		if g.currentGameScence == GAMESCENESTART {
 			g.ChangeScenceGameDraw(screen)
 		} else if g.currentGameScence == GAMESCENESELECTROLE {
@@ -228,8 +226,10 @@ func (g *Game) DrawMouseIcon(screen *ebiten.Image) {
 
 //Draw Game Update
 func (g *Game) changeScenceGameUpdate() {
-	if musicIsPlay == false {
-		g.PlayMusic("Bar_act2_complete_tombs.wav", "wav")
+	if g.status.MusicIsPlay == false {
+		//Play  voice
+		g.status.MusicIsPlay = true
+		g.music.PlayMusic("Bar_act2_complete_tombs.wav", "wav")
 	}
 	g.count++
 	if g.player.State != tools.ATTACK {
@@ -241,7 +241,7 @@ func (g *Game) changeScenceGameUpdate() {
 		g.player.MouseY = mouseY
 		//防止点击UI界面也移动
 		if mouseY < 436 {
-			flg = true
+			g.status.Flg = true
 		}
 		//for test
 		if mouseX > 201 && mouseX < 228 && mouseY > 446 && mouseY < 468 {
@@ -262,7 +262,7 @@ func (g *Game) changeScenceGameUpdate() {
 		if g.player.State != tools.ATTACK {
 			counts = 0
 		}
-		flg = false
+		g.status.Flg = false
 		if g.player.Direction != dir || g.player.State != tools.ATTACK {
 			g.player.SetPlayerState(tools.ATTACK, dir)
 
@@ -270,7 +270,7 @@ func (g *Game) changeScenceGameUpdate() {
 	}
 
 	//mouse controll
-	flg = g.player.GetMouseController(dir, flg)
+	g.player.GetMouseController(dir)
 	//states
 	if g.player.State == tools.IDLE {
 		frameNums = 16
@@ -370,8 +370,9 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 
 //Draw Login Update
 func (g *Game) ChangeScenceLoginUpdate() {
-	if musicIsPlay == false {
-		g.PlayMusic("Act0-Intro.mp3", "mp3")
+	if g.status.MusicIsPlay == false {
+		g.status.MusicIsPlay = true
+		g.music.PlayMusic("Act0-Intro.mp3", "mp3")
 	}
 	frameSpeed_clone := 0
 	if g.currentGameScence == GAMESCENELOGIN {
@@ -470,9 +471,9 @@ func (g *Game) ChangeScenceOpenDoorDraw(screen *ebiten.Image) {
 
 //Draw OpenDoor Update
 func (g *Game) ChangeScenceOpenDoorUpdate() {
-	if doorCountFlg == false {
+	if g.status.DoorCountFlg == false {
 		counts = 0
-		doorCountFlg = true
+		g.status.DoorCountFlg = true
 	}
 	g.count++
 	//Change Frame
@@ -482,49 +483,19 @@ func (g *Game) ChangeScenceOpenDoorUpdate() {
 	}
 
 	// Change Scence
-	if counts == 9 && loadingFlg == false {
-		loadingFlg = true
+	if counts == 9 && g.status.LoadingFlg == false {
+		g.status.LoadingFlg = true
 		g.currentGameScence = GAMESCENESTART
 		w := sync.WaitGroup{}
 		w.Add(1)
 		go func() {
 			//close music
-			g.CloseMusic()
+			g.status.MusicIsPlay = false
+			g.music.CloseMusic()
 			g.ChangeScene("game")
 			w.Done()
 		}()
 		w.Wait()
-		changeScenceFlg = false
+		g.status.ChangeScenceFlg = false
 	}
-}
-
-//Play Music
-func (g *Game) PlayMusic(name, ty string) {
-	musicIsPlay = true
-	switch ty {
-	case "mp3":
-		go func() {
-			bgm, _ := images.ReadFile("resource/BGM/" + name)
-			ss, _ := mp3.Decode(cont, bytes.NewReader(bgm))
-			g.audioContext = nil
-			g.audioContext, _ = cont.NewPlayer(ss)
-			g.audioContext.Play()
-		}()
-	case "wav":
-		go func() {
-			bgm, _ := images.ReadFile("resource/BGM/" + name)
-			ss, _ := wav.Decode(cont, bytes.NewReader(bgm))
-			g.audioContext = nil
-			g.audioContext, _ = cont.NewPlayer(ss)
-			g.audioContext.Play()
-		}()
-	}
-}
-
-//Close Music
-func (g *Game) CloseMusic() {
-	musicIsPlay = false
-	go func() {
-		g.audioContext.Close()
-	}()
 }

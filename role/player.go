@@ -3,6 +3,7 @@ package role
 import (
 	"embed"
 	"game/maps"
+	"game/runTime"
 	"game/tools"
 	"image"
 	"runtime"
@@ -13,10 +14,13 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-var plist_sheet, plist_skill_sheet *texturepacker.SpriteSheet
-var plist_skill_png *image.NRGBA
-var plist_png *image.Paletted
-var loadedSkill string
+var (
+	plist_sheet       *texturepacker.SpriteSheet
+	plist_skill_sheet *texturepacker.SpriteSheet
+	plist_skill_png   *image.NRGBA
+	plist_png         *image.Paletted
+	loadedSkill       string
+)
 
 type Player struct {
 	X         float64
@@ -28,10 +32,11 @@ type Player struct {
 	SkillName string
 	image     *embed.FS
 	map_c     *maps.MapBase
+	status    *runTime.StatusManage
 }
 
 //Create Player Class
-func NewPlayer(x, y float64, state, dir, mx, my int, images *embed.FS, m *maps.MapBase) *Player {
+func NewPlayer(x, y float64, state, dir, mx, my int, images *embed.FS, m *maps.MapBase, s *runTime.StatusManage) *Player {
 	play := &Player{
 		X:         x,
 		Y:         y,
@@ -42,6 +47,7 @@ func NewPlayer(x, y float64, state, dir, mx, my int, images *embed.FS, m *maps.M
 		SkillName: "",
 		image:     images,
 		map_c:     m,
+		status:    s,
 	}
 	return play
 }
@@ -108,18 +114,18 @@ func (p *Player) GetAnimator(flg, name string) (*ebiten.Image, int, int) {
 }
 
 //Mouse Controller For 16 Direction
-func (p *Player) GetMouseController(dir int, flg bool) bool {
-	if dir == 2 && flg {
+func (p *Player) GetMouseController(dir int) {
+	if dir == 2 && p.status.Flg {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
 		p.map_c.OpBg.GeoM.Translate(-tools.SPEED, tools.SPEED)
 		p.Y -= tools.SPEED
 		p.X += tools.SPEED
-		flg = false
+		p.status.Flg = false
 	}
 
-	if dir == 3 && flg {
+	if dir == 3 && p.status.Flg {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 
@@ -127,169 +133,168 @@ func (p *Player) GetMouseController(dir int, flg bool) bool {
 		p.map_c.OpBg.GeoM.Translate(-tools.SPEED, -tools.SPEED)
 		p.Y += tools.SPEED
 		p.X += tools.SPEED
-		flg = false
+		p.status.Flg = false
 	}
-	if dir == 0 && flg {
+	if dir == 0 && p.status.Flg {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
 		p.map_c.OpBg.GeoM.Translate(tools.SPEED, -tools.SPEED)
 		p.Y += tools.SPEED
 		p.X -= tools.SPEED
-		flg = false
+		p.status.Flg = false
 	}
-	if dir == 1 && flg {
+	if dir == 1 && p.status.Flg {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
 		p.map_c.OpBg.GeoM.Translate(tools.SPEED, tools.SPEED)
 		p.Y -= tools.SPEED
 		p.X -= tools.SPEED
-		flg = false
+		p.status.Flg = false
 	}
-	if dir == 5 && flg {
+	if dir == 5 && p.status.Flg {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
 		p.map_c.OpBg.GeoM.Translate(tools.SPEED, 0)
 		p.X -= tools.SPEED
-		flg = false
+		p.status.Flg = false
 	}
 
-	if dir == 6 && flg {
+	if dir == 6 && p.status.Flg {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
 		p.map_c.OpBg.GeoM.Translate(0, tools.SPEED)
 		p.Y -= tools.SPEED
-		flg = false
+		p.status.Flg = false
 	}
 
-	if dir == 7 && flg {
+	if dir == 7 && p.status.Flg {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
 		p.map_c.OpBg.GeoM.Translate(-tools.SPEED, 0)
 		p.X += tools.SPEED
-		flg = false
+		p.status.Flg = false
 	}
 
-	if dir == 4 && flg {
+	if dir == 4 && p.status.Flg {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
 		p.map_c.OpBg.GeoM.Translate(0, -tools.SPEED)
 		p.Y += tools.SPEED
-		flg = false
+		p.status.Flg = false
 	}
-	if dir == 12 && flg {
+	if dir == 12 && p.status.Flg {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
 		p.map_c.OpBg.GeoM.Translate(1-tools.SPEED, tools.SPEED)
 		p.Y -= tools.SPEED
 		p.X += tools.SPEED - 1
-		flg = false
+		p.status.Flg = false
 	}
-	if dir == 2 && flg {
+	if dir == 2 && p.status.Flg {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
 		p.map_c.OpBg.GeoM.Translate(-tools.SPEED, tools.SPEED)
 		p.Y -= tools.SPEED
 		p.X += tools.SPEED
-		flg = false
+		p.status.Flg = false
 	}
-	if dir == 13 && flg {
+	if dir == 13 && p.status.Flg {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
 		p.map_c.OpBg.GeoM.Translate(-tools.SPEED, tools.SPEED-1)
 		p.Y -= tools.SPEED - 1
 		p.X += tools.SPEED
-		flg = false
+		p.status.Flg = false
 	}
-	if dir == 10 && flg {
+	if dir == 10 && p.status.Flg {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
 		p.map_c.OpBg.GeoM.Translate(tools.SPEED, tools.SPEED-1)
 		p.Y -= tools.SPEED - 1
 		p.X -= tools.SPEED
-		flg = false
+		p.status.Flg = false
 	}
-	if dir == 1 && flg {
+	if dir == 1 && p.status.Flg {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
 		p.map_c.OpBg.GeoM.Translate(tools.SPEED, tools.SPEED)
 		p.Y -= tools.SPEED
 		p.X -= tools.SPEED
-		flg = false
+		p.status.Flg = false
 	}
-	if dir == 11 && flg {
+	if dir == 11 && p.status.Flg {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
 		p.map_c.OpBg.GeoM.Translate(tools.SPEED-1, tools.SPEED)
 		p.Y -= tools.SPEED
 		p.X -= tools.SPEED - 1
-		flg = false
+		p.status.Flg = false
 	}
-	if dir == 9 && flg {
+	if dir == 9 && p.status.Flg {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
 		p.map_c.OpBg.GeoM.Translate(tools.SPEED, 1-tools.SPEED)
 		p.Y += tools.SPEED - 1
 		p.X -= tools.SPEED
-		flg = false
+		p.status.Flg = false
 	}
-	if dir == 0 && flg {
+	if dir == 0 && p.status.Flg {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
 		p.map_c.OpBg.GeoM.Translate(tools.SPEED, -tools.SPEED)
 		p.Y += tools.SPEED
 		p.X -= tools.SPEED
-		flg = false
+		p.status.Flg = false
 	}
-	if dir == 8 && flg {
+	if dir == 8 && p.status.Flg {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
 		p.map_c.OpBg.GeoM.Translate(tools.SPEED-1, -tools.SPEED)
 		p.Y += tools.SPEED
 		p.X -= tools.SPEED - 1
-		flg = false
+		p.status.Flg = false
 	}
 	//
-	if dir == 15 && flg {
+	if dir == 15 && p.status.Flg {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
 		p.map_c.OpBg.GeoM.Translate(1-tools.SPEED, -tools.SPEED)
 		p.Y += tools.SPEED
 		p.X += tools.SPEED - 1
-		flg = false
+		p.status.Flg = false
 	}
-	if dir == 3 && flg {
+	if dir == 3 && p.status.Flg {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
 		p.map_c.OpBg.GeoM.Translate(-tools.SPEED, -tools.SPEED)
 		p.Y += tools.SPEED
 		p.X += tools.SPEED
-		flg = false
+		p.status.Flg = false
 	}
-	if dir == 14 && flg {
+	if dir == 14 && p.status.Flg {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
 		p.map_c.OpBg.GeoM.Translate(-tools.SPEED, 1-tools.SPEED)
 		p.Y += tools.SPEED - 1
 		p.X += tools.SPEED
-		flg = false
+		p.status.Flg = false
 	}
-	return flg
 }

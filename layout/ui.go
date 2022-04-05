@@ -12,8 +12,12 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-var plist_png, plist_R_png *image.NRGBA
-var plist_sheet, plist_R_sheet *texturepacker.SpriteSheet
+var (
+	plist_png     *image.NRGBA
+	plist_R_png   *image.NRGBA
+	plist_sheet   *texturepacker.SpriteSheet
+	plist_R_sheet *texturepacker.SpriteSheet
+)
 
 //Create UI Class
 type UI struct {
