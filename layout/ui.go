@@ -52,7 +52,7 @@ func (u *UI) LoadGameImages() {
 
 	s, _ = u.image.ReadFile("resource/UI/HP.png")
 	mgUI = tools.GetEbitenImage(s)
-	u.AddComponent(QuickCreate(len, 480-float64(mgUI.Bounds().Max.Y), mgUI, 0, func(i *icon) {
+	u.AddComponent(QuickCreate(28, 480-float64(mgUI.Bounds().Max.Y+13), mgUI, 0, func(i *icon) {
 		fmt.Println("click me!!!!!!!!!")
 	}), false)
 
