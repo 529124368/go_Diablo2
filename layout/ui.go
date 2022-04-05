@@ -6,6 +6,8 @@ import (
 	"game/tools"
 	"image"
 	"runtime"
+	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/fzipp/texturepacker"
@@ -46,46 +48,45 @@ func (u *UI) LoadGameImages() {
 	// }()
 	s, _ := u.image.ReadFile("resource/UI/0000.png")
 	mgUI := tools.GetEbitenImage(s)
-	u.AddComponent(QuickCreate(len, 480-float64(mgUI.Bounds().Max.Y), mgUI, 0, func(i *icon) {
-		fmt.Println("click me!!!!!!!!!")
-	}), false)
+	u.AddComponent(QuickCreate(len, 480-float64(mgUI.Bounds().Max.Y), mgUI, 0, nil), false)
 
 	s, _ = u.image.ReadFile("resource/UI/HP.png")
 	mgUI = tools.GetEbitenImage(s)
-	u.AddComponent(QuickCreate(28, 480-float64(mgUI.Bounds().Max.Y+13), mgUI, 0, func(i *icon) {
-		fmt.Println("click me!!!!!!!!!")
-	}), false)
+	u.AddComponent(QuickCreate(28, 480-float64(mgUI.Bounds().Max.Y+13), mgUI, 0, nil), false)
 
 	len += 115
 
 	s, _ = u.image.ReadFile("resource/UI/chisha.png")
 	mgUI = tools.GetEbitenImage(s)
-	u.AddComponent(QuickCreate(len, 480-float64(mgUI.Bounds().Max.Y), mgUI, 0, func(i *icon) {
-		fmt.Println("click me!!!!!!!!!")
-	}), false)
+
+	u.AddComponent(QuickCreate(len, 480-float64(mgUI.Bounds().Max.Y), mgUI, 0, nil), false)
 
 	len += float64(mgUI.Bounds().Max.X)
 
 	s, _ = u.image.ReadFile("resource/UI/0001.png")
 	mgUI = tools.GetEbitenImage(s)
+
 	u.AddComponent(QuickCreate(len, 480-float64(mgUI.Bounds().Max.Y), mgUI, 0, nil), false)
 
 	len += float64(mgUI.Bounds().Max.X)
 
 	s, _ = u.image.ReadFile("resource/UI/0002.png")
 	mgUI = tools.GetEbitenImage(s)
+
 	u.AddComponent(QuickCreate(len, 480-float64(mgUI.Bounds().Max.Y), mgUI, 0, nil), false)
 
 	len += float64(mgUI.Bounds().Max.X)
 
 	s, _ = u.image.ReadFile("resource/UI/0003.png")
 	mgUI = tools.GetEbitenImage(s)
+
 	u.AddComponent(QuickCreate(len, 480-float64(mgUI.Bounds().Max.Y), mgUI, 0, nil), false)
 
 	len += float64(mgUI.Bounds().Max.X)
 
 	s, _ = u.image.ReadFile("resource/UI/0004.png")
 	mgUI = tools.GetEbitenImage(s)
+
 	u.AddComponent(QuickCreate(len, 480-float64(mgUI.Bounds().Max.Y), mgUI, 0, nil), false)
 
 	s, _ = u.image.ReadFile("resource/UI/liehuo.png")
@@ -96,28 +97,18 @@ func (u *UI) LoadGameImages() {
 
 	s, _ = u.image.ReadFile("resource/UI/0005.png")
 	mgUI = tools.GetEbitenImage(s)
+
 	u.AddComponent(QuickCreate(len, 480-float64(mgUI.Bounds().Max.Y), mgUI, 0, nil), false)
 
 	s, _ = u.image.ReadFile("resource/UI/MP.png")
 	mgUI = tools.GetEbitenImage(s)
+
 	u.AddComponent(QuickCreate(684, 480-float64(mgUI.Bounds().Max.Y+13), mgUI, 1, nil), false)
 
 	s, _ = u.image.ReadFile("resource/UI/skill_btn.png")
 	mgUI = tools.GetEbitenImage(s)
 	u.AddComponent(QuickCreate(204, 441, mgUI, 0, nil), false)
 	u.AddComponent(QuickCreate(562, 441, mgUI, 0, nil), false)
-
-	//TODO item Start
-	s, _ = u.image.ReadFile("resource/UI/HP0.png")
-	mgUI = tools.GetEbitenImage(s)
-	u.AddComponent(QuickCreate(421, 441, mgUI, 0, nil), false)
-
-	u.AddComponent(QuickCreate(452, 441, mgUI, 0, nil), false)
-
-	u.AddComponent(QuickCreate(415+28*2, 316-62, mgUI, 1, nil), true)
-	u.AddComponent(QuickCreate(415+28*3, 316-62, mgUI, 1, nil), true)
-	u.AddComponent(QuickCreate(415+28*4, 316-62, mgUI, 1, nil), true)
-	//TODO End
 
 	//Draw Eq
 	s, _ = u.image.ReadFile("resource/UI/eq_0.png")
@@ -145,19 +136,28 @@ func (u *UI) LoadGameImages() {
 	u.AddComponent(QuickCreate(414, 384, mgUI, 0, func(i *icon) {
 		fmt.Println("close button !!!!!!!!!")
 		u.setHidden()
-	}), true)
+	}, 412, 388, 439, 416), true)
 
-	s, _ = u.image.ReadFile("resource/UI/head.png")
-	mgUI = tools.GetEbitenImage(s)
-	u.AddComponent(QuickCreate(531, 0, mgUI, 0, nil), true)
-
-	s, _ = u.image.ReadFile("resource/UI/futou.png")
-	mgUI = tools.GetEbitenImage(s)
-	u.AddComponent(QuickCreate(413, 120-70, mgUI, 0, nil), true)
-
-	s, _ = u.image.ReadFile("resource/UI/body.png")
-	mgUI = tools.GetEbitenImage(s)
-	u.AddComponent(QuickCreate(528, 130-63, mgUI, 0, nil), true)
+	//Item add Start
+	items := getItems()
+	for k, v := range items {
+		s, _ = u.image.ReadFile("resource/UI/" + k + ".png")
+		mgUI = tools.GetEbitenImage(s)
+		for _, b := range v {
+			res := strings.Split(b, "_")
+			x, _ := strconv.ParseFloat(res[0], 64)
+			y, _ := strconv.ParseFloat(res[1], 64)
+			lay, _ := strconv.Atoi(res[2])
+			var isH bool
+			if res[3] == "1" {
+				isH = true
+			} else {
+				isH = false
+			}
+			u.AddComponent(QuickCreate(x, y, mgUI, uint8(lay), nil), isH)
+		}
+	}
+	//
 
 	u.setHidden()
 
@@ -388,11 +388,12 @@ func (u *UI) DrawUI(screen *ebiten.Image) {
 //Event Listen
 func (u *UI) EventLoop() {
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
-		//x, y := ebiten.CursorPosition()
 		for _, v := range u.compents {
 			if v.hasEvent == 1 && v.isDisplay {
-				fmt.Println(v.images.Size())
-				v.f(v)
+				x, y := ebiten.CursorPosition()
+				if x >= v.clickMinX && x <= v.clickMaxX && y >= v.clickMinY && y <= v.clickMaxY {
+					v.f(v)
+				}
 			}
 		}
 	}

@@ -11,6 +11,10 @@ type icon struct {
 	layer     uint8
 	isDisplay bool
 	f         func(i *icon)
+	clickMinX int
+	clickMinY int
+	clickMaxX int
+	clickMaxY int
 }
 
 //Create Icon Class
@@ -39,14 +43,23 @@ func (i *icon) addImage(m *ebiten.Image) {
 func (i *icon) addEvnet(fu func(i *icon)) {
 	i.hasEvent = 1
 	i.f = fu
+
+}
+
+func (i *icon) addEvnetRange(minX, minY, maxX, maxY int) {
+	//Event range
+	i.clickMinX = minX
+	i.clickMinY = minY
+	i.clickMaxX = maxX
+	i.clickMaxY = maxY
 }
 
 //Quick Create icon
-func QuickCreate(x, y float64, img *ebiten.Image, layer uint8, callBack func(i *icon), s ...float64) *icon {
+func QuickCreate(x, y float64, img *ebiten.Image, layer uint8, callBack func(i *icon), s ...int) *icon {
 	op := newIcon()
 	op.pos(x, y)
-	if len(s) == 2 {
-		op.op.GeoM.Scale(s[0], s[1])
+	if len(s) == 4 {
+		op.addEvnetRange(s[0], s[1], s[2], s[3])
 	}
 	if callBack != nil {
 		op.addEvnet(callBack)
