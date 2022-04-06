@@ -3,12 +3,14 @@ package layout
 import (
 	"embed"
 	"fmt"
+	"game/runTime"
 	"game/tools"
 	"image"
 	"runtime"
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/fzipp/texturepacker"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -19,20 +21,25 @@ var (
 	plist_R_png   *image.NRGBA
 	plist_sheet   *texturepacker.SpriteSheet
 	plist_R_sheet *texturepacker.SpriteSheet
+	isClick       bool = false
 )
 
 //Create UI Class
 type UI struct {
-	image         *embed.FS
-	compents      []*icon
-	Hiddenompents []*icon
+	image          *embed.FS
+	Compents       []*icon
+	HiddenCompents []*icon
+	OpenBag        bool
+	status         *runTime.StatusManage
 }
 
-func NewUI(images *embed.FS) *UI {
+func NewUI(images *embed.FS, s *runTime.StatusManage) *UI {
 	ui := &UI{
-		image:         images,
-		compents:      make([]*icon, 0, 12),
-		Hiddenompents: make([]*icon, 0, 6),
+		image:          images,
+		Compents:       make([]*icon, 0, 12),
+		HiddenCompents: make([]*icon, 0, 6),
+		OpenBag:        false,
+		status:         s,
 	}
 	return ui
 }
@@ -107,8 +114,38 @@ func (u *UI) LoadGameImages() {
 
 	s, _ = u.image.ReadFile("resource/UI/skill_btn.png")
 	mgUI = tools.GetEbitenImage(s)
-	u.AddComponent(QuickCreate(204, 441, mgUI, 0, nil), false)
-	u.AddComponent(QuickCreate(562, 441, mgUI, 0, nil), false)
+	u.AddComponent(QuickCreate(204, 441, mgUI, 0, func(i *icon) {
+		if isClick == false {
+			go func() {
+				isClick = true
+				u.SetDisplay()
+				on := *i.images
+				s, _ = u.image.ReadFile("resource/UI/skill_btn_down.png")
+				mgUI = tools.GetEbitenImage(s)
+				i.images = mgUI
+				time.Sleep(1000000000 / 2)
+				i.images = &on
+				runtime.GC()
+				isClick = false
+			}()
+		}
+	}, 201, 446, 228, 468), false)
+	u.AddComponent(QuickCreate(562, 441, mgUI, 0, func(i *icon) {
+		if isClick == false {
+			go func() {
+				isClick = true
+				u.SetDisplay()
+				on := *i.images
+				s, _ = u.image.ReadFile("resource/UI/skill_btn_down.png")
+				mgUI = tools.GetEbitenImage(s)
+				i.images = mgUI
+				time.Sleep(1000000000 / 2)
+				i.images = &on
+				runtime.GC()
+				isClick = false
+			}()
+		}
+	}, 559, 443, 586, 472), false)
 
 	//Draw Eq
 	s, _ = u.image.ReadFile("resource/UI/eq_0.png")
@@ -131,11 +168,24 @@ func (u *UI) LoadGameImages() {
 	mgUI = tools.GetEbitenImage(s)
 	u.AddComponent(QuickCreate(395+255, 176, mgUI, 0, nil), true)
 
-	s, _ = u.image.ReadFile("resource/UI/close_btn.png")
+	//Close btn
+	s, _ = u.image.ReadFile("resource/UI/close_btn_on.png")
 	mgUI = tools.GetEbitenImage(s)
 	u.AddComponent(QuickCreate(414, 384, mgUI, 0, func(i *icon) {
-		fmt.Println("close button !!!!!!!!!")
-		u.setHidden()
+		if isClick == false {
+			go func() {
+				isClick = true
+				on := *i.images
+				s, _ = u.image.ReadFile("resource/UI/close_btn_down.png")
+				mgUI = tools.GetEbitenImage(s)
+				i.images = mgUI
+				time.Sleep(500000000 / 2)
+				i.images = &on
+				u.setHidden()
+				runtime.GC()
+				isClick = false
+			}()
+		}
 	}, 412, 388, 439, 416), true)
 
 	//Item add Start
@@ -157,7 +207,6 @@ func (u *UI) LoadGameImages() {
 			u.AddComponent(QuickCreate(x, y, mgUI, uint8(lay), nil), isH)
 		}
 	}
-	//
 
 	u.setHidden()
 
@@ -346,39 +395,41 @@ func (u *UI) GetAnimator(flg, name string) (*ebiten.Image, int, int) {
 
 //Add Component
 func (u *UI) AddComponent(s *icon, hasHidden bool) {
-	u.compents = append(u.compents, s)
+	u.Compents = append(u.Compents, s)
 	if hasHidden {
-		u.Hiddenompents = append(u.Hiddenompents, s)
+		u.HiddenCompents = append(u.HiddenCompents, s)
 	}
 }
 
 //
 func (u *UI) SetDisplay() {
-	for _, v := range u.Hiddenompents {
+	u.OpenBag = true
+	for _, v := range u.HiddenCompents {
 		v.isDisplay = true
 	}
 }
 
 //
 func (u *UI) setHidden() {
-	for _, v := range u.Hiddenompents {
+	u.OpenBag = false
+	for _, v := range u.HiddenCompents {
 		v.isDisplay = false
 	}
 }
 
 func (u *UI) ClearSlice(cap int) {
-	u.compents = make([]*icon, 0, cap)
-	u.Hiddenompents = make([]*icon, 0, cap/2)
+	u.Compents = make([]*icon, 0, cap)
+	u.HiddenCompents = make([]*icon, 0, cap/2)
 }
 
 //Render UI
 func (u *UI) DrawUI(screen *ebiten.Image) {
-	for _, v := range u.compents {
+	for _, v := range u.Compents {
 		if v.layer == 0 && v.isDisplay {
 			screen.DrawImage(v.images, v.op)
 		}
 	}
-	for _, v := range u.compents {
+	for _, v := range u.Compents {
 		if v.layer == 1 && v.isDisplay {
 			screen.DrawImage(v.images, v.op)
 		}
@@ -387,11 +438,14 @@ func (u *UI) DrawUI(screen *ebiten.Image) {
 
 //Event Listen
 func (u *UI) EventLoop() {
-	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
-		for _, v := range u.compents {
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
+		for _, v := range u.Compents {
 			if v.hasEvent == 1 && v.isDisplay {
 				x, y := ebiten.CursorPosition()
 				if x >= v.clickMinX && x <= v.clickMaxX && y >= v.clickMinY && y <= v.clickMaxY {
+					//can't touch Ui
+					u.status.Flg = false
+					//call back func
 					v.f(v)
 				}
 			}

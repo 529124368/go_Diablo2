@@ -40,7 +40,7 @@ func (i *icon) addImage(m *ebiten.Image) {
 }
 
 //Register Event To Ui
-func (i *icon) addEvnet(fu func(i *icon)) {
+func (i *icon) addEvent(fu func(i *icon)) {
 	i.hasEvent = 1
 	i.f = fu
 
@@ -62,7 +62,7 @@ func QuickCreate(x, y float64, img *ebiten.Image, layer uint8, callBack func(i *
 		op.addEvnetRange(s[0], s[1], s[2], s[3])
 	}
 	if callBack != nil {
-		op.addEvnet(callBack)
+		op.addEvent(callBack)
 	}
 	op.layer = layer
 	op.addImage(img)

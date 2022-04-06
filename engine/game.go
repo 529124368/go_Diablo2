@@ -70,10 +70,11 @@ func NewGame(img *embed.FS) *Game {
 	sta := runTime.NewStatusManage()
 	//Map
 	m := maps.NewMap(img)
+	//UI
+	u := layout.NewUI(img, sta)
 	//Player
 	r := role.NewPlayer(float64(LAYOUTX/2), float64(LAYOUTY/2), tools.IDLE, 0, 0, 0, img, m, sta)
-	//UI
-	u := layout.NewUI(img)
+
 	//BGM
 	bgm := music.NewMusicBGM(images)
 
@@ -243,18 +244,14 @@ func (g *Game) changeScenceGameUpdate() {
 		if mouseY < 436 {
 			g.status.Flg = true
 		}
-		//for test
-		if mouseX > 201 && mouseX < 228 && mouseY > 446 && mouseY < 468 {
-			g.ui.SetDisplay()
+		if g.ui.OpenBag && mouseX >= LAYOUTX/2 {
+			g.status.Flg = false
 		}
 
 	}
 
 	//Calculate direction
 	dir := tools.CaluteDir(PLAYERCENTERX, PLAYERCENTERY, int64(g.player.MouseX), int64(g.player.MouseY))
-
-	//EVENT Listen
-	g.ui.EventLoop()
 
 	//attack
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
@@ -268,9 +265,12 @@ func (g *Game) changeScenceGameUpdate() {
 
 		}
 	}
-
+	//Event Listen
+	g.ui.EventLoop()
 	//mouse controll
-	g.player.GetMouseController(dir)
+	if g.ui.OpenBag == false || g.ui.OpenBag == true && mouseX <= LAYOUTX/2 {
+		g.player.GetMouseController(dir)
+	}
 	//states
 	if g.player.State == tools.IDLE {
 		frameNums = 16
@@ -288,6 +288,7 @@ func (g *Game) changeScenceGameUpdate() {
 
 //Draw Game Scence
 func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
+
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println("has error is :", r)

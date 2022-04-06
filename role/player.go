@@ -85,16 +85,9 @@ func (p *Player) loadSkillImages(name string) {
 //Set Player Status
 func (p *Player) SetPlayerState(s, d int) {
 	p.State = s
-	p.Direction = d
-}
-
-//TODO
-func (p *Player) Attack() {
-
-}
-
-//TODO
-func (p *Player) DeadEvent() {
+	if p.status.Flg {
+		p.Direction = d
+	}
 
 }
 
@@ -297,4 +290,14 @@ func (p *Player) GetMouseController(dir int) {
 		p.X += tools.SPEED
 		p.status.Flg = false
 	}
+}
+
+//TODO
+func (p *Player) Attack() {
+
+}
+
+//TODO
+func (p *Player) DeadEvent() {
+
 }
