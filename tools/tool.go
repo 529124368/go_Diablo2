@@ -5,20 +5,27 @@ import (
 	"image"
 	"log"
 	"math"
+	"time"
 
 	"github.com/fzipp/texturepacker"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 const (
-	IDLE   int     = 0
-	RUN    int     = 1
-	ATTACK int     = 2
-	SPEED  float64 = 2
+	IDLE          uint8         = 0
+	RUN           uint8         = 1
+	ATTACK        uint8         = 2
+	SPEED         float64       = 2
+	ISHIDDENCOM   uint8         = 1
+	ISMINICOM     uint8         = 2
+	ISNORCOM      uint8         = 3
+	LAYOUTX       int           = 790
+	LAYOUTY       int           = 480
+	CLOSEBTNSLEEP time.Duration = 200000000
 )
 
 //Calculate Direction
-func CaluteDir(x, y, x_tar, y_tar int64) int {
+func CaluteDir(x, y, x_tar, y_tar int64) uint8 {
 	len := Distance(x, y, x_tar, y_tar)
 	//TODO  242 is PLAYERCENTERY
 	a := Angle(math.Abs(float64(int64(y_tar)-242)), len)

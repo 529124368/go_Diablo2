@@ -3,7 +3,7 @@ package role
 import (
 	"embed"
 	"game/maps"
-	"game/runTime"
+	"game/status"
 	"game/tools"
 	"image"
 	"runtime"
@@ -25,18 +25,18 @@ var (
 type Player struct {
 	X         float64
 	Y         float64
-	State     int
-	Direction int
+	State     uint8
+	Direction uint8
 	MouseX    int
 	MouseY    int
 	SkillName string
 	image     *embed.FS
 	map_c     *maps.MapBase
-	status    *runTime.StatusManage
+	status    *status.StatusManage
 }
 
 //Create Player Class
-func NewPlayer(x, y float64, state, dir, mx, my int, images *embed.FS, m *maps.MapBase, s *runTime.StatusManage) *Player {
+func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m *maps.MapBase, s *status.StatusManage) *Player {
 	play := &Player{
 		X:         x,
 		Y:         y,
@@ -83,7 +83,7 @@ func (p *Player) loadSkillImages(name string) {
 }
 
 //Set Player Status
-func (p *Player) SetPlayerState(s, d int) {
+func (p *Player) SetPlayerState(s, d uint8) {
 	p.State = s
 	if p.status.Flg {
 		p.Direction = d
@@ -107,7 +107,7 @@ func (p *Player) GetAnimator(flg, name string) (*ebiten.Image, int, int) {
 }
 
 //Mouse Controller For 16 Direction
-func (p *Player) GetMouseController(dir int) {
+func (p *Player) GetMouseController(dir uint8) {
 	if dir == 2 && p.status.Flg {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)

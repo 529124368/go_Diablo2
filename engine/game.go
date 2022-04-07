@@ -7,7 +7,7 @@ import (
 	"game/maps"
 	"game/music"
 	"game/role"
-	"game/runTime"
+	"game/status"
 	"game/tools"
 	"math"
 	"runtime"
@@ -24,8 +24,6 @@ const (
 	SCREENHEIGHT        int   = 300
 	OFFSETX             int   = -30
 	OFFSETY             int   = -30
-	LAYOUTX             int   = 790
-	LAYOUTY             int   = 480
 	PLAYERCENTERX       int64 = 388 //LAYOUTX/2
 	PLAYERCENTERY       int64 = 242 //LAYOUTY/2
 	WEOFFSETX           int   = 127
@@ -43,7 +41,7 @@ type Game struct {
 	ui                *layout.UI
 	currentGameScence int
 	music             music.MusicInterface
-	status            *runTime.StatusManage
+	status            *status.StatusManage
 	//monster *role.Monster
 }
 
@@ -67,13 +65,13 @@ var (
 func NewGame(img *embed.FS) *Game {
 	images = img
 	//statueManage
-	sta := runTime.NewStatusManage()
+	sta := status.NewStatusManage()
 	//Map
 	m := maps.NewMap(img)
 	//UI
 	u := layout.NewUI(img, sta)
 	//Player
-	r := role.NewPlayer(float64(LAYOUTX/2), float64(LAYOUTY/2), tools.IDLE, 0, 0, 0, img, m, sta)
+	r := role.NewPlayer(float64(tools.LAYOUTX/2), float64(tools.LAYOUTY/2), tools.IDLE, 0, 0, 0, img, m, sta)
 
 	//BGM
 	bgm := music.NewMusicBGM(images)
@@ -213,7 +211,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return LAYOUTX, LAYOUTY
+	return tools.LAYOUTX, tools.LAYOUTY
 }
 
 //Draw Mouse Icon
@@ -244,7 +242,7 @@ func (g *Game) changeScenceGameUpdate() {
 		if mouseY < 436 {
 			g.status.Flg = true
 		}
-		if g.ui.OpenBag && mouseX >= LAYOUTX/2 {
+		if g.status.OpenBag && mouseX >= tools.LAYOUTX/2 {
 			g.status.Flg = false
 		}
 
@@ -268,7 +266,7 @@ func (g *Game) changeScenceGameUpdate() {
 	//Event Listen
 	g.ui.EventLoop()
 	//mouse controll
-	if g.ui.OpenBag == false || g.ui.OpenBag == true && mouseX <= LAYOUTX/2 {
+	if g.status.OpenBag == false || g.status.OpenBag == true && mouseX <= tools.LAYOUTX/2 {
 		g.player.GetMouseController(dir)
 	}
 	//states
@@ -301,15 +299,15 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	//nameSkill := ""
 	switch g.player.State {
 	case tools.ATTACK:
-		name = strconv.Itoa(g.player.Direction) + "_attack_" + strconv.Itoa(counts) + ".png"
+		name = strconv.Itoa(int(g.player.Direction)) + "_attack_" + strconv.Itoa(counts) + ".png"
 		//nameSkill = strconv.Itoa(g.player.Direction) + "_skill_" + strconv.Itoa(counts) + ".png"
 	case tools.IDLE:
-		name = strconv.Itoa(g.player.Direction) + "_stand_" + strconv.Itoa(counts) + ".png"
+		name = strconv.Itoa(int(g.player.Direction)) + "_stand_" + strconv.Itoa(counts) + ".png"
 	default:
 		if counts >= 8 {
 			counts = 0
 		}
-		name = strconv.Itoa(g.player.Direction) + "_run_" + strconv.Itoa(counts) + ".png"
+		name = strconv.Itoa(int(g.player.Direction)) + "_run_" + strconv.Itoa(counts) + ".png"
 	}
 	imagess, x, y := g.player.GetAnimator("man", name)
 	//Idel -> Walk Offset
@@ -325,7 +323,7 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	}
 	//Draw Shadow
 	opS.GeoM.Reset()
-	opS.GeoM.Translate(float64(LAYOUTX/2+x-350), float64(LAYOUTY/2+y+365))
+	opS.GeoM.Translate(float64(tools.LAYOUTX/2+x-350), float64(tools.LAYOUTY/2+y+365))
 	opS.Filter = ebiten.FilterLinear
 	opS.GeoM.Rotate(-0.5)
 	opS.GeoM.Scale(1, 0.5)
@@ -334,7 +332,7 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	screen.DrawImage(imagess, opS)
 	//Draw Player
 	op.GeoM.Reset()
-	op.GeoM.Translate(float64(LAYOUTX/2+OFFSETX+x), float64(LAYOUTY/2+OFFSETY+y))
+	op.GeoM.Translate(float64(tools.LAYOUTX/2+OFFSETX+x), float64(tools.LAYOUTY/2+OFFSETY+y))
 	op.Filter = ebiten.FilterLinear
 	screen.DrawImage(imagess, op)
 
