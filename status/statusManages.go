@@ -8,6 +8,8 @@ type StatusManage struct {
 	MusicIsPlay     bool
 	OpenBag         bool
 	OpenMiniPanel   bool
+	CalculateEnd    bool
+	ForCalculateEnd bool
 }
 
 func NewStatusManage() *StatusManage {
@@ -19,6 +21,8 @@ func NewStatusManage() *StatusManage {
 		MusicIsPlay:     false,
 		OpenBag:         false,
 		OpenMiniPanel:   false,
+		CalculateEnd:    false,
+		ForCalculateEnd: false,
 	}
 	return n
 }

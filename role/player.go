@@ -23,31 +23,33 @@ var (
 )
 
 type Player struct {
-	X         float64
-	Y         float64
-	State     uint8
-	Direction uint8
-	MouseX    int
-	MouseY    int
-	SkillName string
-	image     *embed.FS
-	map_c     *maps.MapBase
-	status    *status.StatusManage
+	X            float64
+	Y            float64
+	State        uint8
+	Direction    uint8
+	OldDirection uint8
+	MouseX       int
+	MouseY       int
+	SkillName    string
+	image        *embed.FS
+	map_c        *maps.MapBase
+	status       *status.StatusManage
 }
 
 //Create Player Class
 func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m *maps.MapBase, s *status.StatusManage) *Player {
 	play := &Player{
-		X:         x,
-		Y:         y,
-		State:     state,
-		Direction: dir,
-		MouseX:    mx,
-		MouseY:    my,
-		SkillName: "",
-		image:     images,
-		map_c:     m,
-		status:    s,
+		X:            x,
+		Y:            y,
+		State:        state,
+		Direction:    dir,
+		OldDirection: dir,
+		MouseX:       mx,
+		MouseY:       my,
+		SkillName:    "",
+		image:        images,
+		map_c:        m,
+		status:       s,
 	}
 	return play
 }
@@ -56,8 +58,8 @@ func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m *
 func (p *Player) LoadImages() {
 
 	//player load
-	plist, _ := p.image.ReadFile("resource/man/warrior/ba.png")
-	plist_json, _ := p.image.ReadFile("resource/man/warrior/ba.json")
+	plist, _ := p.image.ReadFile("resource/man/warrior/ba1.png")
+	plist_json, _ := p.image.ReadFile("resource/man/warrior/ba1.json")
 	plist_sheet, plist_png = tools.GetImageFromPlistPaletted(plist, plist_json)
 	//skill load
 	// go func() {
@@ -91,6 +93,11 @@ func (p *Player) SetPlayerState(s, d uint8) {
 
 }
 
+//Update Player old direaction
+func (p *Player) UpdateOldPlayerDir(d uint8) {
+	p.OldDirection = d
+}
+
 //Get Animator
 func (p *Player) GetAnimator(flg, name string) (*ebiten.Image, int, int) {
 	if flg == "man" {
@@ -108,6 +115,9 @@ func (p *Player) GetAnimator(flg, name string) (*ebiten.Image, int, int) {
 
 //Mouse Controller For 16 Direction
 func (p *Player) GetMouseController(dir uint8) {
+	// if true {
+	// 	return
+	// }
 	if dir == 2 && p.status.Flg {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)

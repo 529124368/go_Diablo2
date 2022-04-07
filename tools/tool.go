@@ -135,3 +135,66 @@ func Distance(xa, ya, xb, yb int64) float64 {
 func Angle(y float64, len float64) float64 {
 	return math.Asin(y/len) * 180 / math.Pi
 }
+
+func CalculateDirPath(oldDir, newDir uint8) []uint8 {
+	newPath := make([]uint8, 0, 16)
+	dirList := []uint8{1, 11, 6, 12, 2, 13, 7, 14, 3, 15, 4, 8, 0, 9, 5, 10}
+	newDirIndex := 17
+	oldDirIndex := 17
+	for k, v := range dirList {
+		if v == newDir {
+			newDirIndex = k
+		}
+		if v == oldDir {
+			oldDirIndex = k
+		}
+	}
+	if math.Abs(float64(newDirIndex-oldDirIndex)) < 16-math.Abs(float64(newDirIndex-oldDirIndex)) {
+		if oldDirIndex < newDirIndex {
+			for i := oldDirIndex; i <= newDirIndex; i++ {
+				newPath = append(newPath, dirList[i])
+			}
+		} else {
+			for i := oldDirIndex; i >= newDirIndex; i-- {
+
+				newPath = append(newPath, dirList[i])
+			}
+		}
+
+	} else {
+		if oldDirIndex < newDirIndex {
+			if oldDirIndex == 0 {
+				newPath = append(newPath, dirList[oldDirIndex])
+				i := 15
+				for i >= newDirIndex {
+					newPath = append(newPath, dirList[i])
+					i--
+				}
+			} else {
+				i := oldDirIndex
+				for i >= 0 {
+					newPath = append(newPath, dirList[i])
+					i--
+				}
+				j := 15
+				for j >= newDirIndex {
+					newPath = append(newPath, dirList[j])
+					j--
+				}
+			}
+		} else {
+			i := oldDirIndex
+			for i <= 15 {
+				newPath = append(newPath, dirList[i])
+				i++
+			}
+			j := 0
+			for j <= newDirIndex {
+				newPath = append(newPath, dirList[j])
+				j++
+			}
+		}
+
+	}
+	return newPath[1 : len(newPath)-1]
+}

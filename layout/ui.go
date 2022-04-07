@@ -245,18 +245,25 @@ func (u *UI) LoadGameImages() {
 	//
 	s, _ = u.image.ReadFile("resource/UI/mini_menu_man.png")
 	mgUI = tools.GetEbitenImage(s)
+	u.AddComponent(QuickCreate(baseX, 410, mgUI, 0, nil), tools.ISMINICOM)
+	//
+	baseX += float64(mgUI.Bounds().Max.X) + 4
+	s, _ = u.image.ReadFile("resource/UI/mini_menu_wea.png")
+	mgUI = tools.GetEbitenImage(s)
 	u.AddComponent(QuickCreate(baseX, 410, mgUI, 0, func(i *icon) {
 		if isClick == false {
 			go func() {
 				isClick = true
-				go func() {
-					for _, v := range u.MiniPanelCompents {
-						v.op.GeoM.Translate(-100, 0)
-					}
-				}()
 				on := *i.images
-				s, _ = u.image.ReadFile("resource/UI/mini_menu_man_down.png")
+				s, _ = u.image.ReadFile("resource/UI/mini_menu_wea_down.png")
 				mgUI = tools.GetEbitenImage(s)
+				if !u.status.OpenBag {
+					go func() {
+						for _, v := range u.MiniPanelCompents {
+							v.op.GeoM.Translate(-100, 0)
+						}
+					}()
+				}
 				i.images = mgUI
 				time.Sleep(tools.CLOSEBTNSLEEP)
 				i.images = &on
@@ -265,12 +272,7 @@ func (u *UI) LoadGameImages() {
 				isClick = false
 			}()
 		}
-	}, 311, 414, 325, 429), tools.ISMINICOM)
-	//
-	baseX += float64(mgUI.Bounds().Max.X) + 4
-	s, _ = u.image.ReadFile("resource/UI/mini_menu_wea.png")
-	mgUI = tools.GetEbitenImage(s)
-	u.AddComponent(QuickCreate(baseX, 410, mgUI, 0, nil), tools.ISMINICOM)
+	}, 337, 416, 350, 429), tools.ISMINICOM)
 	baseX += float64(mgUI.Bounds().Max.X) + 4
 	s, _ = u.image.ReadFile("resource/UI/mini_menu_j.png")
 	mgUI = tools.GetEbitenImage(s)

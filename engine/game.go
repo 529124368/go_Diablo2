@@ -13,6 +13,7 @@ import (
 	"runtime"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -59,6 +60,8 @@ var (
 	mouseIcon     *ebiten.Image
 	mouseX        int
 	mouseY        int
+	newPath       []uint8
+	turnLoop      uint8 = 0
 )
 
 //GameEngine
@@ -267,7 +270,46 @@ func (g *Game) changeScenceGameUpdate() {
 	g.ui.EventLoop()
 	//mouse controll
 	if g.status.OpenBag == false || g.status.OpenBag == true && mouseX <= tools.LAYOUTX/2 {
-		g.player.GetMouseController(dir)
+		//
+		if g.player.OldDirection != g.player.Direction && !ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
+			if !g.status.CalculateEnd {
+				newPath = tools.CalculateDirPath(g.player.OldDirection, g.player.Direction)
+				g.status.CalculateEnd = true
+			}
+			if len(newPath) >= 3 {
+				if turnLoop >= uint8(len(newPath)) {
+					turnLoop = uint8(len(newPath) - 1)
+					dir = newPath[turnLoop]
+					g.player.UpdateOldPlayerDir(g.player.Direction)
+				} else {
+					dir = newPath[turnLoop]
+				}
+				if !g.status.ForCalculateEnd {
+					g.status.ForCalculateEnd = true
+					go func() {
+						for g.status.CalculateEnd {
+							time.Sleep(19000000)
+							turnLoop++
+						}
+					}()
+				}
+
+				g.player.SetPlayerState(tools.IDLE, dir)
+			} else {
+				g.status.CalculateEnd = false
+				turnLoop = 0
+				g.status.ForCalculateEnd = false
+				g.player.UpdateOldPlayerDir(g.player.Direction)
+				g.player.GetMouseController(dir)
+			}
+
+		} else {
+			g.status.CalculateEnd = false
+			turnLoop = 0
+			g.player.UpdateOldPlayerDir(g.player.Direction)
+			g.player.GetMouseController(dir)
+		}
+
 	}
 	//states
 	if g.player.State == tools.IDLE {
@@ -282,6 +324,7 @@ func (g *Game) changeScenceGameUpdate() {
 		frameNums = 8
 		frameSpeed = 5
 	}
+
 }
 
 //Draw Game Scence
@@ -312,8 +355,10 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	imagess, x, y := g.player.GetAnimator("man", name)
 	//Idel -> Walk Offset
 	if g.player.State == tools.RUN {
-		x += -4
-		y += -3
+		// x += -4
+		// y += -3
+		x += 4
+		y += -18
 	}
 
 	//Idel -> Walk -> Attack Offset
