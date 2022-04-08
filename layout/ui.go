@@ -342,7 +342,7 @@ func (u *UI) LoadGameLoginImages() {
 	var scales float64 = 0.8
 	s, _ := u.image.ReadFile("resource/UI/login0.png")
 	mgUI := tools.GetEbitenImage(s)
-	op := newIcon()
+	op := newSprite()
 	op.SetPosition(len, 0)
 	op.op.GeoM.Scale(1, scales)
 	op.addImage(mgUI)
@@ -352,7 +352,7 @@ func (u *UI) LoadGameLoginImages() {
 
 	s, _ = u.image.ReadFile("resource/UI/login1.png")
 	mgUI = tools.GetEbitenImage(s)
-	op1 := newIcon()
+	op1 := newSprite()
 	op1.SetPosition(len, 0)
 	op1.op.GeoM.Scale(1, scales)
 	op1.addImage(mgUI)
@@ -362,7 +362,7 @@ func (u *UI) LoadGameLoginImages() {
 
 	s, _ = u.image.ReadFile("resource/UI/login2.png")
 	mgUI = tools.GetEbitenImage(s)
-	op2 := newIcon()
+	op2 := newSprite()
 	op2.SetPosition(len, 0)
 	op2.op.GeoM.Scale(1, scales)
 	op2.addImage(mgUI)
@@ -372,7 +372,7 @@ func (u *UI) LoadGameLoginImages() {
 
 	s, _ = u.image.ReadFile("resource/UI/login3.png")
 	mgUI = tools.GetEbitenImage(s)
-	op3 := newIcon()
+	op3 := newSprite()
 	op3.SetPosition(len, 0)
 	op3.op.GeoM.Scale(1, scales)
 	op3.addImage(mgUI)
@@ -382,7 +382,7 @@ func (u *UI) LoadGameLoginImages() {
 	var offset float64 = 340
 	s, _ = u.image.ReadFile("resource/UI/login8.png")
 	mgUI = tools.GetEbitenImage(s)
-	op8 := newIcon()
+	op8 := newSprite()
 	op8.SetPosition(len, offset)
 	op8.op.GeoM.Scale(1, scales)
 	op8.addImage(mgUI)
@@ -392,7 +392,7 @@ func (u *UI) LoadGameLoginImages() {
 
 	s, _ = u.image.ReadFile("resource/UI/login9.png")
 	mgUI = tools.GetEbitenImage(s)
-	op9 := newIcon()
+	op9 := newSprite()
 	op9.SetPosition(len, offset)
 	op9.op.GeoM.Scale(1, scales)
 	op9.addImage(mgUI)
@@ -402,7 +402,7 @@ func (u *UI) LoadGameLoginImages() {
 
 	s, _ = u.image.ReadFile("resource/UI/login10.png")
 	mgUI = tools.GetEbitenImage(s)
-	op10 := newIcon()
+	op10 := newSprite()
 	op10.SetPosition(len, offset)
 	op10.op.GeoM.Scale(1, scales)
 	op10.addImage(mgUI)
@@ -412,7 +412,7 @@ func (u *UI) LoadGameLoginImages() {
 
 	s, _ = u.image.ReadFile("resource/UI/login11.png")
 	mgUI = tools.GetEbitenImage(s)
-	op11 := newIcon()
+	op11 := newSprite()
 	op11.SetPosition(len, offset)
 	op11.op.GeoM.Scale(1, scales)
 	op11.addImage(mgUI)
@@ -422,7 +422,7 @@ func (u *UI) LoadGameLoginImages() {
 
 	s, _ = u.image.ReadFile("resource/UI/login4.png")
 	mgUI = tools.GetEbitenImage(s)
-	op4 := newIcon()
+	op4 := newSprite()
 	op4.SetPosition(len, float64(mgUI.Bounds().Max.Y))
 	op4.op.GeoM.Scale(1, scales)
 	op4.addImage(mgUI)
@@ -432,7 +432,7 @@ func (u *UI) LoadGameLoginImages() {
 
 	s, _ = u.image.ReadFile("resource/UI/login5.png")
 	mgUI = tools.GetEbitenImage(s)
-	op5 := newIcon()
+	op5 := newSprite()
 	op5.SetPosition(len, float64(mgUI.Bounds().Max.Y))
 	op5.op.GeoM.Scale(1, scales)
 	op5.addImage(mgUI)
@@ -442,7 +442,7 @@ func (u *UI) LoadGameLoginImages() {
 
 	s, _ = u.image.ReadFile("resource/UI/login6.png")
 	mgUI = tools.GetEbitenImage(s)
-	op6 := newIcon()
+	op6 := newSprite()
 	op6.SetPosition(len, float64(mgUI.Bounds().Max.Y))
 	op6.op.GeoM.Scale(1, scales)
 	op6.addImage(mgUI)
@@ -452,7 +452,7 @@ func (u *UI) LoadGameLoginImages() {
 
 	s, _ = u.image.ReadFile("resource/UI/login7.png")
 	mgUI = tools.GetEbitenImage(s)
-	op7 := newIcon()
+	op7 := newSprite()
 	op7.SetPosition(len, float64(mgUI.Bounds().Max.Y))
 	op7.op.GeoM.Scale(1, scales)
 	op7.addImage(mgUI)
@@ -471,7 +471,7 @@ func (u *UI) LoadGameCharaSelectImages() {
 	u.ClearSlice(1)
 	s, _ := u.image.ReadFile("resource/UI/charactSelect.png")
 	mgUI := tools.GetEbitenImage(s)
-	op := newIcon()
+	op := newSprite()
 	op.SetPosition(0, 0)
 	op.op.GeoM.Scale(1, 0.8)
 	op.addImage(mgUI)

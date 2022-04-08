@@ -21,7 +21,7 @@ const (
 	ISNORCOM      uint8         = 3
 	LAYOUTX       int           = 790
 	LAYOUTY       int           = 480
-	CLOSEBTNSLEEP time.Duration = 200000000
+	CLOSEBTNSLEEP time.Duration = 200000000 //按钮按下弹起动画sleep时间
 	MUSICWAV      int           = 1
 	MUSICMP3      int           = 2
 )
