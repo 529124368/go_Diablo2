@@ -9,7 +9,9 @@ type StatusManage struct {
 	OpenBag         bool
 	OpenMiniPanel   bool
 	CalculateEnd    bool
-	ForCalculateEnd bool
+	UIOFFSETX       int
+	ShadowOffsetX   int
+	ShadowOffsetY   int
 }
 
 func NewStatusManage() *StatusManage {
@@ -22,7 +24,9 @@ func NewStatusManage() *StatusManage {
 		OpenBag:         false,
 		OpenMiniPanel:   false,
 		CalculateEnd:    false,
-		ForCalculateEnd: false,
+		UIOFFSETX:       0,
+		ShadowOffsetX:   -350,
+		ShadowOffsetY:   365,
 	}
 	return n
 }

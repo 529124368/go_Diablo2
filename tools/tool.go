@@ -22,6 +22,8 @@ const (
 	LAYOUTX       int           = 790
 	LAYOUTY       int           = 480
 	CLOSEBTNSLEEP time.Duration = 200000000
+	MUSICWAV      int           = 1
+	MUSICMP3      int           = 2
 )
 
 //Calculate Direction

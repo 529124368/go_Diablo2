@@ -3,6 +3,7 @@ package layout
 import (
 	"embed"
 	"fmt"
+	"game/maps"
 	"game/status"
 	"game/tools"
 	"image"
@@ -31,15 +32,17 @@ type UI struct {
 	HiddenCompents    []*icon
 	MiniPanelCompents []*icon
 	status            *status.StatusManage
+	maps              *maps.MapBase
 }
 
-func NewUI(images *embed.FS, s *status.StatusManage) *UI {
+func NewUI(images *embed.FS, s *status.StatusManage, m *maps.MapBase) *UI {
 	ui := &UI{
 		image:             images,
 		Compents:          make([]*icon, 0, 12),
 		HiddenCompents:    make([]*icon, 0, 6),
 		MiniPanelCompents: make([]*icon, 0, 6),
 		status:            s,
+		maps:              m,
 	}
 	return ui
 }
@@ -116,8 +119,8 @@ func (u *UI) LoadGameImages() {
 	mgUI = tools.GetEbitenImage(s)
 	u.AddComponent(QuickCreate(204, 441, mgUI, 0, func(i *icon) {
 		if isClick == false {
+			isClick = true
 			go func() {
-				isClick = true
 				on := *i.images
 				s, _ = u.image.ReadFile("resource/UI/skill_btn_down.png")
 				mgUI = tools.GetEbitenImage(s)
@@ -131,8 +134,8 @@ func (u *UI) LoadGameImages() {
 	}, 201, 446, 228, 468), tools.ISNORCOM)
 	u.AddComponent(QuickCreate(562, 441, mgUI, 0, func(i *icon) {
 		if isClick == false {
+			isClick = true
 			go func() {
-				isClick = true
 				on := *i.images
 				s, _ = u.image.ReadFile("resource/UI/skill_btn_down.png")
 				mgUI = tools.GetEbitenImage(s)
@@ -154,7 +157,7 @@ func (u *UI) LoadGameImages() {
 
 	s, _ = u.image.ReadFile("resource/UI/eq_1.png")
 	mgUI = tools.GetEbitenImage(s)
-	u.AddComponent(QuickCreate(395+255, 0, mgUI, 0, nil), tools.ISHIDDENCOM)
+	u.AddComponent(QuickCreate(395+256, 0, mgUI, 0, nil), tools.ISHIDDENCOM)
 
 	len = 395
 	s, _ = u.image.ReadFile("resource/UI/bag_0.png")
@@ -164,15 +167,15 @@ func (u *UI) LoadGameImages() {
 	len += float64(mgUI.Bounds().Max.X)
 	s, _ = u.image.ReadFile("resource/UI/bag_1.png")
 	mgUI = tools.GetEbitenImage(s)
-	u.AddComponent(QuickCreate(395+255, 176, mgUI, 0, nil), tools.ISHIDDENCOM)
+	u.AddComponent(QuickCreate(395+256, 176, mgUI, 0, nil), tools.ISHIDDENCOM)
 
 	//Close btn
 	s, _ = u.image.ReadFile("resource/UI/close_btn_on.png")
 	mgUI = tools.GetEbitenImage(s)
 	u.AddComponent(QuickCreate(414, 384, mgUI, 0, func(i *icon) {
 		if isClick == false {
+			isClick = true
 			go func() {
-				isClick = true
 				on := *i.images
 				s, _ = u.image.ReadFile("resource/UI/close_btn_down.png")
 				mgUI = tools.GetEbitenImage(s)
@@ -182,16 +185,27 @@ func (u *UI) LoadGameImages() {
 				u.setHidden(tools.ISHIDDENCOM)
 				go func() {
 					for _, v := range u.MiniPanelCompents {
-						v.op.GeoM.Translate(100, 0)
+						v.SetPosition(100, 0)
+						if v.clickMaxX != 0 {
+							v.clickMaxX += 100
+							v.clickMinX += 100
+						}
 					}
 				}()
 				runtime.GC()
+				//恢复因打开包裹导致的人物偏移
+				u.status.UIOFFSETX = 0
+				//恢复影子偏移
+				u.status.ShadowOffsetX = -350
+				u.status.ShadowOffsetY = 365
+				//恢复地图偏移
+				u.maps.ChangeMapTranslate(200, 0)
 				isClick = false
 			}()
 		}
 	}, 412, 388, 439, 416), tools.ISHIDDENCOM)
 
-	//Item add Start
+	//循环获取uixy.go 里登录的物品信息
 	items := getItems()
 	for k, v := range items {
 		s, _ = u.image.ReadFile("resource/UI/" + k + ".png")
@@ -205,13 +219,13 @@ func (u *UI) LoadGameImages() {
 			u.AddComponent(QuickCreate(x, y, mgUI, uint8(lay), nil), uint8(re))
 		}
 	}
-	//Load Mini Close Button
+	//注册mini板打开按钮
 	s, _ = u.image.ReadFile("resource/UI/open_minipanel_btn.png")
 	mgUI = tools.GetEbitenImage(s)
 	u.AddComponent(QuickCreate(390, 443, mgUI, 0, func(i *icon) {
 		if isClick == false {
+			isClick = true
 			go func() {
-				isClick = true
 				if u.status.OpenMiniPanel {
 					u.setHidden(tools.ISMINICOM)
 					s, _ = u.image.ReadFile("resource/UI/open_minipanel_down.png")
@@ -236,7 +250,7 @@ func (u *UI) LoadGameImages() {
 			}()
 		}
 	}, 387, 448, 397, 467), tools.ISNORCOM)
-	//
+	//注册mini板
 	s, _ = u.image.ReadFile("resource/UI/miniPanel.png")
 	mgUI = tools.GetEbitenImage(s)
 	baseX := float64(tools.LAYOUTX/2 - mgUI.Bounds().Max.X/2)
@@ -252,17 +266,31 @@ func (u *UI) LoadGameImages() {
 	mgUI = tools.GetEbitenImage(s)
 	u.AddComponent(QuickCreate(baseX, 410, mgUI, 0, func(i *icon) {
 		if isClick == false {
+			isClick = true
 			go func() {
-				isClick = true
 				on := *i.images
 				s, _ = u.image.ReadFile("resource/UI/mini_menu_wea_down.png")
 				mgUI = tools.GetEbitenImage(s)
 				if !u.status.OpenBag {
-					go func() {
-						for _, v := range u.MiniPanelCompents {
-							v.op.GeoM.Translate(-100, 0)
-						}
-					}()
+					if x, _ := u.MiniPanelCompents[0].GetPosition(); x > 209 {
+						go func() {
+							//设置因打开包裹导致的人物偏移
+							u.status.UIOFFSETX = -200
+							//修改地图偏移
+							u.maps.ChangeMapTranslate(-200, 0)
+							//修改人物影子偏移
+							u.status.ShadowOffsetX = u.status.ShadowOffsetX + 14
+							u.status.ShadowOffsetY = u.status.ShadowOffsetY - 79
+							for _, v := range u.MiniPanelCompents {
+								v.SetPosition(-100, 0)
+								if v.clickMaxX != 0 {
+									//按钮点击范围偏移
+									v.clickMaxX -= 100
+									v.clickMinX -= 100
+								}
+							}
+						}()
+					}
 				}
 				i.images = mgUI
 				time.Sleep(tools.CLOSEBTNSLEEP)
@@ -310,7 +338,7 @@ func (u *UI) LoadGameLoginImages() {
 	s, _ := u.image.ReadFile("resource/UI/login0.png")
 	mgUI := tools.GetEbitenImage(s)
 	op := newIcon()
-	op.pos(len, 0)
+	op.SetPosition(len, 0)
 	op.op.GeoM.Scale(1, scales)
 	op.addImage(mgUI)
 	u.AddComponent(op, tools.ISNORCOM)
@@ -320,7 +348,7 @@ func (u *UI) LoadGameLoginImages() {
 	s, _ = u.image.ReadFile("resource/UI/login1.png")
 	mgUI = tools.GetEbitenImage(s)
 	op1 := newIcon()
-	op1.pos(len, 0)
+	op1.SetPosition(len, 0)
 	op1.op.GeoM.Scale(1, scales)
 	op1.addImage(mgUI)
 	u.AddComponent(op1, tools.ISNORCOM)
@@ -330,7 +358,7 @@ func (u *UI) LoadGameLoginImages() {
 	s, _ = u.image.ReadFile("resource/UI/login2.png")
 	mgUI = tools.GetEbitenImage(s)
 	op2 := newIcon()
-	op2.pos(len, 0)
+	op2.SetPosition(len, 0)
 	op2.op.GeoM.Scale(1, scales)
 	op2.addImage(mgUI)
 	u.AddComponent(op2, tools.ISNORCOM)
@@ -340,7 +368,7 @@ func (u *UI) LoadGameLoginImages() {
 	s, _ = u.image.ReadFile("resource/UI/login3.png")
 	mgUI = tools.GetEbitenImage(s)
 	op3 := newIcon()
-	op3.pos(len, 0)
+	op3.SetPosition(len, 0)
 	op3.op.GeoM.Scale(1, scales)
 	op3.addImage(mgUI)
 	u.AddComponent(op3, tools.ISNORCOM)
@@ -350,7 +378,7 @@ func (u *UI) LoadGameLoginImages() {
 	s, _ = u.image.ReadFile("resource/UI/login8.png")
 	mgUI = tools.GetEbitenImage(s)
 	op8 := newIcon()
-	op8.pos(len, offset)
+	op8.SetPosition(len, offset)
 	op8.op.GeoM.Scale(1, scales)
 	op8.addImage(mgUI)
 	u.AddComponent(op8, tools.ISNORCOM)
@@ -360,7 +388,7 @@ func (u *UI) LoadGameLoginImages() {
 	s, _ = u.image.ReadFile("resource/UI/login9.png")
 	mgUI = tools.GetEbitenImage(s)
 	op9 := newIcon()
-	op9.pos(len, offset)
+	op9.SetPosition(len, offset)
 	op9.op.GeoM.Scale(1, scales)
 	op9.addImage(mgUI)
 	u.AddComponent(op9, tools.ISNORCOM)
@@ -370,7 +398,7 @@ func (u *UI) LoadGameLoginImages() {
 	s, _ = u.image.ReadFile("resource/UI/login10.png")
 	mgUI = tools.GetEbitenImage(s)
 	op10 := newIcon()
-	op10.pos(len, offset)
+	op10.SetPosition(len, offset)
 	op10.op.GeoM.Scale(1, scales)
 	op10.addImage(mgUI)
 	u.AddComponent(op10, tools.ISNORCOM)
@@ -380,7 +408,7 @@ func (u *UI) LoadGameLoginImages() {
 	s, _ = u.image.ReadFile("resource/UI/login11.png")
 	mgUI = tools.GetEbitenImage(s)
 	op11 := newIcon()
-	op11.pos(len, offset)
+	op11.SetPosition(len, offset)
 	op11.op.GeoM.Scale(1, scales)
 	op11.addImage(mgUI)
 	u.AddComponent(op11, tools.ISNORCOM)
@@ -390,7 +418,7 @@ func (u *UI) LoadGameLoginImages() {
 	s, _ = u.image.ReadFile("resource/UI/login4.png")
 	mgUI = tools.GetEbitenImage(s)
 	op4 := newIcon()
-	op4.pos(len, float64(mgUI.Bounds().Max.Y))
+	op4.SetPosition(len, float64(mgUI.Bounds().Max.Y))
 	op4.op.GeoM.Scale(1, scales)
 	op4.addImage(mgUI)
 	u.AddComponent(op4, tools.ISNORCOM)
@@ -400,7 +428,7 @@ func (u *UI) LoadGameLoginImages() {
 	s, _ = u.image.ReadFile("resource/UI/login5.png")
 	mgUI = tools.GetEbitenImage(s)
 	op5 := newIcon()
-	op5.pos(len, float64(mgUI.Bounds().Max.Y))
+	op5.SetPosition(len, float64(mgUI.Bounds().Max.Y))
 	op5.op.GeoM.Scale(1, scales)
 	op5.addImage(mgUI)
 	u.AddComponent(op5, tools.ISNORCOM)
@@ -410,7 +438,7 @@ func (u *UI) LoadGameLoginImages() {
 	s, _ = u.image.ReadFile("resource/UI/login6.png")
 	mgUI = tools.GetEbitenImage(s)
 	op6 := newIcon()
-	op6.pos(len, float64(mgUI.Bounds().Max.Y))
+	op6.SetPosition(len, float64(mgUI.Bounds().Max.Y))
 	op6.op.GeoM.Scale(1, scales)
 	op6.addImage(mgUI)
 	u.AddComponent(op6, tools.ISNORCOM)
@@ -420,7 +448,7 @@ func (u *UI) LoadGameLoginImages() {
 	s, _ = u.image.ReadFile("resource/UI/login7.png")
 	mgUI = tools.GetEbitenImage(s)
 	op7 := newIcon()
-	op7.pos(len, float64(mgUI.Bounds().Max.Y))
+	op7.SetPosition(len, float64(mgUI.Bounds().Max.Y))
 	op7.op.GeoM.Scale(1, scales)
 	op7.addImage(mgUI)
 	u.AddComponent(op7, tools.ISNORCOM)
@@ -439,7 +467,7 @@ func (u *UI) LoadGameCharaSelectImages() {
 	s, _ := u.image.ReadFile("resource/UI/charactSelect.png")
 	mgUI := tools.GetEbitenImage(s)
 	op := newIcon()
-	op.pos(0, 0)
+	op.SetPosition(0, 0)
 	op.op.GeoM.Scale(1, 0.8)
 	op.addImage(mgUI)
 	u.AddComponent(op, tools.ISNORCOM)
@@ -549,7 +577,7 @@ func (u *UI) EventLoop() {
 			if v.hasEvent == 1 && v.isDisplay {
 				x, y := ebiten.CursorPosition()
 				if x >= v.clickMinX && x <= v.clickMaxX && y >= v.clickMinY && y <= v.clickMaxY {
-					//can't touch Ui
+					//设置不可以行走
 					u.status.Flg = false
 					//call back func
 					v.f(v)

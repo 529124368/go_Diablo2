@@ -13,7 +13,6 @@ import (
 	"runtime"
 	"strconv"
 	"sync"
-	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -71,10 +70,10 @@ func NewGame(img *embed.FS) *Game {
 	sta := status.NewStatusManage()
 	//Map
 	m := maps.NewMap(img)
-	//UI
-	u := layout.NewUI(img, sta)
 	//Player
 	r := role.NewPlayer(float64(tools.LAYOUTX/2), float64(tools.LAYOUTY/2), tools.IDLE, 0, 0, 0, img, m, sta)
+	//UI
+	u := layout.NewUI(img, sta, m)
 
 	//BGM
 	bgm := music.NewMusicBGM(images)
@@ -228,12 +227,12 @@ func (g *Game) DrawMouseIcon(screen *ebiten.Image) {
 
 //Draw Game Update
 func (g *Game) changeScenceGameUpdate() {
+	g.count++
 	if g.status.MusicIsPlay == false {
 		//Play  voice
 		g.status.MusicIsPlay = true
-		g.music.PlayMusic("Bar_act2_complete_tombs.wav", "wav")
+		g.music.PlayMusic("Bar_act2_complete_tombs.wav", tools.MUSICWAV)
 	}
-	g.count++
 	if g.player.State != tools.ATTACK {
 		g.player.State = tools.IDLE
 	}
@@ -245,10 +244,18 @@ func (g *Game) changeScenceGameUpdate() {
 		if mouseY < 436 {
 			g.status.Flg = true
 		}
+		//如果打开包裹，包裹已右位置不能点击移动
 		if g.status.OpenBag && mouseX >= tools.LAYOUTX/2 {
 			g.status.Flg = false
 		}
-
+		//如果打开MINi板子，并且没有打开包裹 以下坐标不可以点击移动
+		if g.status.OpenMiniPanel && !g.status.OpenBag && mouseX >= 305 && mouseX <= 475 && mouseY > 407 {
+			g.status.Flg = false
+		}
+		//如果打开MINi板子，并且打开包裹 以下坐标不可以点击移动
+		if g.status.OpenMiniPanel && g.status.OpenBag && mouseX >= 205 && mouseX <= 377 && mouseY > 407 {
+			g.status.Flg = false
+		}
 	}
 
 	//Calculate direction
@@ -284,21 +291,11 @@ func (g *Game) changeScenceGameUpdate() {
 				} else {
 					dir = newPath[turnLoop]
 				}
-				if !g.status.ForCalculateEnd {
-					g.status.ForCalculateEnd = true
-					go func() {
-						for g.status.CalculateEnd {
-							time.Sleep(19000000)
-							turnLoop++
-						}
-					}()
-				}
-
+				turnLoop++
 				g.player.SetPlayerState(tools.IDLE, dir)
 			} else {
 				g.status.CalculateEnd = false
 				turnLoop = 0
-				g.status.ForCalculateEnd = false
 				g.player.UpdateOldPlayerDir(g.player.Direction)
 				g.player.GetMouseController(dir)
 			}
@@ -363,12 +360,14 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 
 	//Idel -> Walk -> Attack Offset
 	if g.player.State == tools.ATTACK {
-		x += -50
-		y += -30
+		// x += -50
+		// y += -30
+		x += -55
+		y += -35
 	}
 	//Draw Shadow
 	opS.GeoM.Reset()
-	opS.GeoM.Translate(float64(tools.LAYOUTX/2+x-350), float64(tools.LAYOUTY/2+y+365))
+	opS.GeoM.Translate(float64(tools.LAYOUTX/2+x+g.status.ShadowOffsetX+g.status.UIOFFSETX), float64(tools.LAYOUTY/2+y+g.status.ShadowOffsetY))
 	opS.Filter = ebiten.FilterLinear
 	opS.GeoM.Rotate(-0.5)
 	opS.GeoM.Scale(1, 0.5)
@@ -377,7 +376,7 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	screen.DrawImage(imagess, opS)
 	//Draw Player
 	op.GeoM.Reset()
-	op.GeoM.Translate(float64(tools.LAYOUTX/2+OFFSETX+x), float64(tools.LAYOUTY/2+OFFSETY+y))
+	op.GeoM.Translate(float64(tools.LAYOUTX/2+OFFSETX+x+g.status.UIOFFSETX), float64(tools.LAYOUTY/2+OFFSETY+y))
 	op.Filter = ebiten.FilterLinear
 	screen.DrawImage(imagess, op)
 
@@ -416,7 +415,7 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 func (g *Game) ChangeScenceLoginUpdate() {
 	if g.status.MusicIsPlay == false {
 		g.status.MusicIsPlay = true
-		g.music.PlayMusic("Act0-Intro.mp3", "mp3")
+		g.music.PlayMusic("Act0-Intro.mp3", tools.MUSICMP3)
 	}
 	frameSpeed_clone := 0
 	if g.currentGameScence == GAMESCENELOGIN {

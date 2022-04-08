@@ -36,3 +36,7 @@ func (m *MapBase) LoadMap() {
 	m.OpBg.Filter = ebiten.FilterLinear
 	m.OpBg.GeoM.Translate(MAPOFFSETX, MAPOFFSETY)
 }
+
+func (m *MapBase) ChangeMapTranslate(x, y float64) {
+	m.OpBg.GeoM.Translate(x, y)
+}

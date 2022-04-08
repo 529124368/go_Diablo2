@@ -3,6 +3,7 @@ package music
 import (
 	"bytes"
 	"embed"
+	"game/tools"
 
 	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/audio/mp3"
@@ -13,41 +14,45 @@ var cont *audio.Context
 
 type MusicBGM struct {
 	image        *embed.FS
-	audioContext *audio.Player
+	AudioContext *audio.Player
 }
 
 func NewMusicBGM(images *embed.FS) *MusicBGM {
 	cont = audio.NewContext(48000)
 	m := &MusicBGM{
 		image:        images,
-		audioContext: nil,
+		AudioContext: nil,
 	}
 	return m
 }
 
-func (m *MusicBGM) PlayMusic(name, ty string) {
+func (m *MusicBGM) PlayMusic(name string, ty int) {
 	switch ty {
-	case "mp3":
+	case tools.MUSICMP3:
 		go func() {
 			bgm, _ := m.image.ReadFile("resource/BGM/" + name)
 			ss, _ := mp3.Decode(cont, bytes.NewReader(bgm))
-			m.audioContext = nil
-			m.audioContext, _ = cont.NewPlayer(ss)
-			m.audioContext.Play()
+			m.AudioContext = nil
+			m.AudioContext, _ = cont.NewPlayer(ss)
+			m.AudioContext.Play()
 		}()
-	case "wav":
+	case tools.MUSICWAV:
 		go func() {
 			bgm, _ := m.image.ReadFile("resource/BGM/" + name)
 			ss, _ := wav.Decode(cont, bytes.NewReader(bgm))
-			m.audioContext = nil
-			m.audioContext, _ = cont.NewPlayer(ss)
-			m.audioContext.Play()
+			m.AudioContext = nil
+			m.AudioContext, _ = cont.NewPlayer(ss)
+			m.AudioContext.Play()
 		}()
 	}
 }
 
 func (m *MusicBGM) CloseMusic() {
 	go func() {
-		m.audioContext.Close()
+		m.AudioContext.Close()
 	}()
+}
+
+func (m *MusicBGM) GeyAudioContext() *audio.Player {
+	return m.AudioContext
 }
