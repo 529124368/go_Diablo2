@@ -4,13 +4,13 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-type icon struct {
+type Sprite struct {
 	op        *ebiten.DrawImageOptions
 	images    *ebiten.Image
 	hasEvent  uint8
 	layer     uint8
 	isDisplay bool
-	f         func(i *icon)
+	f         func(i *Sprite)
 	clickMinX int
 	clickMinY int
 	clickMaxX int
@@ -20,8 +20,8 @@ type icon struct {
 }
 
 //Create Icon Class
-func newIcon() *icon {
-	i := &icon{
+func newIcon() *Sprite {
+	i := &Sprite{
 		op:        new(ebiten.DrawImageOptions),
 		hasEvent:  0,
 		layer:     0,
@@ -34,30 +34,30 @@ func newIcon() *icon {
 }
 
 //获取精灵的图片屏幕坐标
-func (i *icon) GetPosition() (float64, float64) {
+func (i *Sprite) GetPosition() (float64, float64) {
 	return i.imagex, i.imagey
 }
 
 //Set Images Position
-func (i *icon) SetPosition(x, y float64) {
+func (i *Sprite) SetPosition(x, y float64) {
 	i.op.GeoM.Translate(x, y)
 	i.imagex += x
 	i.imagey += y
 }
 
 //Add Imges
-func (i *icon) addImage(m *ebiten.Image) {
+func (i *Sprite) addImage(m *ebiten.Image) {
 	i.images = m
 }
 
 //Register Event To Ui
-func (i *icon) addEvent(fu func(i *icon)) {
+func (i *Sprite) addEvent(fu func(i *Sprite)) {
 	i.hasEvent = 1
 	i.f = fu
 
 }
 
-func (i *icon) addEvnetRange(minX, minY, maxX, maxY int) {
+func (i *Sprite) addEvnetRange(minX, minY, maxX, maxY int) {
 	//Event range
 	i.clickMinX = minX
 	i.clickMinY = minY
@@ -66,7 +66,7 @@ func (i *icon) addEvnetRange(minX, minY, maxX, maxY int) {
 }
 
 //Quick Create icon
-func QuickCreate(x, y float64, img *ebiten.Image, layer uint8, callBack func(i *icon), s ...int) *icon {
+func QuickCreate(x, y float64, img *ebiten.Image, layer uint8, callBack func(i *Sprite), s ...int) *Sprite {
 	op := newIcon()
 	op.SetPosition(x, y)
 	if len(s) == 4 {

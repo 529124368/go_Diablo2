@@ -28,19 +28,19 @@ var (
 //Create UI Class
 type UI struct {
 	image             *embed.FS
-	Compents          []*icon
-	HiddenCompents    []*icon
-	MiniPanelCompents []*icon
-	status            *status.StatusManage
-	maps              *maps.MapBase
+	Compents          []*Sprite            //普通UI存放集合
+	HiddenCompents    []*Sprite            //可以被隐藏的UI组件集合
+	MiniPanelCompents []*Sprite            //MINI板的UI集合
+	status            *status.StatusManage //状态管理器
+	maps              *maps.MapBase        //地图
 }
 
 func NewUI(images *embed.FS, s *status.StatusManage, m *maps.MapBase) *UI {
 	ui := &UI{
 		image:             images,
-		Compents:          make([]*icon, 0, 12),
-		HiddenCompents:    make([]*icon, 0, 6),
-		MiniPanelCompents: make([]*icon, 0, 6),
+		Compents:          make([]*Sprite, 0, 12),
+		HiddenCompents:    make([]*Sprite, 0, 6),
+		MiniPanelCompents: make([]*Sprite, 0, 6),
 		status:            s,
 		maps:              m,
 	}
@@ -117,7 +117,7 @@ func (u *UI) LoadGameImages() {
 
 	s, _ = u.image.ReadFile("resource/UI/skill_btn.png")
 	mgUI = tools.GetEbitenImage(s)
-	u.AddComponent(QuickCreate(204, 441, mgUI, 0, func(i *icon) {
+	u.AddComponent(QuickCreate(204, 441, mgUI, 0, func(i *Sprite) {
 		if isClick == false {
 			isClick = true
 			go func() {
@@ -132,7 +132,7 @@ func (u *UI) LoadGameImages() {
 			}()
 		}
 	}, 201, 446, 228, 468), tools.ISNORCOM)
-	u.AddComponent(QuickCreate(562, 441, mgUI, 0, func(i *icon) {
+	u.AddComponent(QuickCreate(562, 441, mgUI, 0, func(i *Sprite) {
 		if isClick == false {
 			isClick = true
 			go func() {
@@ -172,7 +172,7 @@ func (u *UI) LoadGameImages() {
 	//Close btn
 	s, _ = u.image.ReadFile("resource/UI/close_btn_on.png")
 	mgUI = tools.GetEbitenImage(s)
-	u.AddComponent(QuickCreate(414, 384, mgUI, 0, func(i *icon) {
+	u.AddComponent(QuickCreate(414, 384, mgUI, 0, func(i *Sprite) {
 		if isClick == false {
 			isClick = true
 			go func() {
@@ -222,7 +222,7 @@ func (u *UI) LoadGameImages() {
 	//注册mini板打开按钮
 	s, _ = u.image.ReadFile("resource/UI/open_minipanel_btn.png")
 	mgUI = tools.GetEbitenImage(s)
-	u.AddComponent(QuickCreate(390, 443, mgUI, 0, func(i *icon) {
+	u.AddComponent(QuickCreate(390, 443, mgUI, 0, func(i *Sprite) {
 		if isClick == false {
 			isClick = true
 			go func() {
@@ -264,7 +264,7 @@ func (u *UI) LoadGameImages() {
 	baseX += float64(mgUI.Bounds().Max.X) + 4
 	s, _ = u.image.ReadFile("resource/UI/mini_menu_wea.png")
 	mgUI = tools.GetEbitenImage(s)
-	u.AddComponent(QuickCreate(baseX, 410, mgUI, 0, func(i *icon) {
+	u.AddComponent(QuickCreate(baseX, 410, mgUI, 0, func(i *Sprite) {
 		if isClick == false {
 			isClick = true
 			go func() {
@@ -509,7 +509,7 @@ func (u *UI) GetAnimator(flg, name string) (*ebiten.Image, int, int) {
 }
 
 //Add Component
-func (u *UI) AddComponent(s *icon, ImageType uint8) {
+func (u *UI) AddComponent(s *Sprite, ImageType uint8) {
 	u.Compents = append(u.Compents, s)
 	if ImageType == tools.ISHIDDENCOM {
 		u.HiddenCompents = append(u.HiddenCompents, s)
@@ -551,9 +551,9 @@ func (u *UI) setHidden(ImageType uint8) {
 }
 
 func (u *UI) ClearSlice(cap int) {
-	u.Compents = make([]*icon, 0, cap)
-	u.HiddenCompents = make([]*icon, 0, cap/2)
-	u.MiniPanelCompents = make([]*icon, 0, cap/2)
+	u.Compents = make([]*Sprite, 0, cap)
+	u.HiddenCompents = make([]*Sprite, 0, cap/2)
+	u.MiniPanelCompents = make([]*Sprite, 0, cap/2)
 }
 
 //Render UI

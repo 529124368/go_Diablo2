@@ -156,6 +156,7 @@ func (g *Game) ChangeScene(name string) {
 }
 func (g *Game) Update() error {
 	mouseX, mouseY = ebiten.CursorPosition()
+	//切换场景判定
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && g.status.ChangeScenceFlg == false {
 		if g.currentGameScence == GAMESCENELOGIN {
 			if mouseX > 286 && mouseX < 503 && mouseY > 150 && mouseY < 218 {
@@ -180,13 +181,16 @@ func (g *Game) Update() error {
 		}
 	}
 
-	//check
+	//切换场景逻辑
 	if g.status.ChangeScenceFlg == false {
 		if g.currentGameScence == GAMESCENESTART {
+			//进入游戏场景逻辑
 			g.changeScenceGameUpdate()
 		} else if g.currentGameScence == GAMESCENEOPENDOOR {
+			//游戏加载逻辑
 			g.ChangeScenceOpenDoorUpdate()
 		} else {
+			//进入游戏登录界面逻辑
 			g.ChangeScenceLoginUpdate()
 		}
 	}
@@ -216,7 +220,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 	return tools.LAYOUTX, tools.LAYOUTY
 }
 
-//Draw Mouse Icon
+//重新绘制鼠标ICON
 func (g *Game) DrawMouseIcon(screen *ebiten.Image) {
 	opMouse.GeoM.Reset()
 	opMouse.GeoM.Rotate(-0.5)
@@ -258,10 +262,10 @@ func (g *Game) changeScenceGameUpdate() {
 		}
 	}
 
-	//Calculate direction
+	//计算鼠标位置
 	dir := tools.CaluteDir(PLAYERCENTERX, PLAYERCENTERY, int64(g.player.MouseX), int64(g.player.MouseY))
 
-	//attack
+	//TODO 技能攻击
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
 		g.player.SkillName = "liehuo"
 		if g.player.State != tools.ATTACK {
@@ -273,9 +277,9 @@ func (g *Game) changeScenceGameUpdate() {
 
 		}
 	}
-	//Event Listen
+	//事件循环监听 是否有按钮点击事件
 	g.ui.EventLoop()
-	//mouse controll
+	//鼠标移动控制
 	if g.status.OpenBag == false || g.status.OpenBag == true && mouseX <= tools.LAYOUTX/2 {
 		//
 		if g.player.OldDirection != g.player.Direction && !ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
@@ -308,7 +312,7 @@ func (g *Game) changeScenceGameUpdate() {
 		}
 
 	}
-	//states
+	//根据状态改变帧数
 	if g.player.State == tools.IDLE {
 		frameNums = 16
 		frameSpeed = 5
@@ -324,7 +328,7 @@ func (g *Game) changeScenceGameUpdate() {
 
 }
 
-//Draw Game Scence
+//Draw Game Scence  渲染游戏画面
 func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 
 	defer func() {
@@ -434,7 +438,7 @@ func (g *Game) ChangeScenceLoginUpdate() {
 	}
 }
 
-//Draw Login Scence
+//Draw Login Scence 渲染游戏登录画面
 func (g *Game) ChangeScenceLoginDraw(screen *ebiten.Image) {
 	//Draw UI
 	g.ui.DrawUI(screen)
@@ -471,7 +475,7 @@ func (g *Game) ChangeScenceLoginDraw(screen *ebiten.Image) {
 	}
 }
 
-//Draw Select Scence
+//Draw Select Scence  渲染游戏角色选择画面
 func (g *Game) ChangeScenceSelectDraw(screen *ebiten.Image) {
 	//Draw UI
 	g.ui.DrawUI(screen)
@@ -498,7 +502,7 @@ func (g *Game) ChangeScenceSelectDraw(screen *ebiten.Image) {
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nmouse position %d,%d", int64(ebiten.CurrentFPS()), mouseX, mouseY))
 }
 
-//Draw OpenDoor Scence
+//Draw OpenDoor Scence 渲染游戏加载开门画面
 func (g *Game) ChangeScenceOpenDoorDraw(screen *ebiten.Image) {
 	//Draw Open Door
 	name := "loading_" + strconv.Itoa(counts) + ".png"

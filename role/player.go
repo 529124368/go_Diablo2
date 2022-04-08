@@ -25,15 +25,17 @@ var (
 type Player struct {
 	X            float64
 	Y            float64
-	State        uint8
-	Direction    uint8
-	OldDirection uint8
-	MouseX       int
-	MouseY       int
-	SkillName    string
-	image        *embed.FS
-	map_c        *maps.MapBase
-	status       *status.StatusManage
+	State        uint8                //玩家状态
+	Direction    uint8                //玩家当前方向
+	OldDirection uint8                //玩家旧的方向
+	MouseX       int                  //鼠标X坐标
+	MouseY       int                  //鼠标Y坐标
+	SkillName    string               //技能名称
+	image        *embed.FS            //静态资源获取
+	map_c        *maps.MapBase        //地图
+	status       *status.StatusManage //状态
+	hp           float64              //血
+	mp           float64              //蓝
 }
 
 //Create Player Class
@@ -50,6 +52,8 @@ func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m *
 		image:        images,
 		map_c:        m,
 		status:       s,
+		hp:           100,
+		mp:           100,
 	}
 	return play
 }
@@ -57,7 +61,7 @@ func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m *
 //Load Images
 func (p *Player) LoadImages() {
 
-	//player load
+	//加载玩家素材
 	plist, _ := p.image.ReadFile("resource/man/warrior/ba1.png")
 	plist_json, _ := p.image.ReadFile("resource/man/warrior/ba1.json")
 	plist_sheet, plist_png = tools.GetImageFromPlistPaletted(plist, plist_json)
@@ -73,7 +77,7 @@ func (p *Player) LoadImages() {
 	p.SetPlayerState(0, 0)
 }
 
-//Load Skill Images
+//TODO 加载技能素材
 func (p *Player) loadSkillImages(name string) {
 	go func() {
 		loadedSkill = name
@@ -84,7 +88,7 @@ func (p *Player) loadSkillImages(name string) {
 	}()
 }
 
-//Set Player Status
+//设置玩家状态
 func (p *Player) SetPlayerState(s, d uint8) {
 	p.State = s
 	if p.status.Flg {
@@ -93,12 +97,12 @@ func (p *Player) SetPlayerState(s, d uint8) {
 
 }
 
-//Update Player old direaction
+//更新玩家旧的方向
 func (p *Player) UpdateOldPlayerDir(d uint8) {
 	p.OldDirection = d
 }
 
-//Get Animator
+//获取图片
 func (p *Player) GetAnimator(flg, name string) (*ebiten.Image, int, int) {
 	if flg == "man" {
 		return ebiten.NewImageFromImage(plist_png.SubImage(plist_sheet.Sprites[name].Frame)), plist_sheet.Sprites[name].SpriteSourceSize.Min.X, plist_sheet.Sprites[name].SpriteSourceSize.Min.Y
@@ -113,7 +117,7 @@ func (p *Player) GetAnimator(flg, name string) (*ebiten.Image, int, int) {
 	}
 }
 
-//Mouse Controller For 16 Direction
+//暗黑破坏神 16方位 移动 鼠标控制
 func (p *Player) GetMouseController(dir uint8) {
 	// if true {
 	// 	return
