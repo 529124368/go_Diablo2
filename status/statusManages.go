@@ -12,6 +12,8 @@ type StatusManage struct {
 	UIOFFSETX       int
 	ShadowOffsetX   int
 	ShadowOffsetY   int
+	PLAYERCENTERX   int64
+	PLAYERCENTERY   int64
 }
 
 func NewStatusManage() *StatusManage {
@@ -27,6 +29,8 @@ func NewStatusManage() *StatusManage {
 		UIOFFSETX:       0,
 		ShadowOffsetX:   -350,
 		ShadowOffsetY:   365,
+		PLAYERCENTERX:   388, //LAYOUTX/2
+		PLAYERCENTERY:   242, //LAYOUTY/2
 	}
 	return n
 }

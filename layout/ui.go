@@ -198,6 +198,8 @@ func (u *UI) LoadGameImages() {
 				//恢复影子偏移
 				u.status.ShadowOffsetX = -350
 				u.status.ShadowOffsetY = 365
+				//恢复玩家中心位置
+				u.status.PLAYERCENTERX = 388
 				//恢复地图偏移
 				u.maps.ChangeMapTranslate(200, 0)
 				isClick = false
@@ -272,12 +274,15 @@ func (u *UI) LoadGameImages() {
 				s, _ = u.image.ReadFile("resource/UI/mini_menu_wea_down.png")
 				mgUI = tools.GetEbitenImage(s)
 				if !u.status.OpenBag {
+					//判断MINI板子的最左端坐标是否超过最大极限
 					if x, _ := u.MiniPanelCompents[0].GetPosition(); x > 209 {
 						go func() {
 							//设置因打开包裹导致的人物偏移
 							u.status.UIOFFSETX = -200
 							//修改地图偏移
 							u.maps.ChangeMapTranslate(-200, 0)
+							//修改玩家中心位置
+							u.status.PLAYERCENTERX -= 200
 							//修改人物影子偏移
 							u.status.ShadowOffsetX = u.status.ShadowOffsetX + 14
 							u.status.ShadowOffsetY = u.status.ShadowOffsetY - 79

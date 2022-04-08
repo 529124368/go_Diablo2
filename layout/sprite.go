@@ -4,6 +4,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+//精灵类
 type Sprite struct {
 	op        *ebiten.DrawImageOptions
 	images    *ebiten.Image
@@ -45,18 +46,19 @@ func (i *Sprite) SetPosition(x, y float64) {
 	i.imagey += y
 }
 
-//Add Imges
+//添加图片
 func (i *Sprite) addImage(m *ebiten.Image) {
 	i.images = m
 }
 
-//Register Event To Ui
+//给UI添加事件
 func (i *Sprite) addEvent(fu func(i *Sprite)) {
 	i.hasEvent = 1
 	i.f = fu
 
 }
 
+//添加按钮点击范围
 func (i *Sprite) addEvnetRange(minX, minY, maxX, maxY int) {
 	//Event range
 	i.clickMinX = minX
@@ -65,7 +67,7 @@ func (i *Sprite) addEvnetRange(minX, minY, maxX, maxY int) {
 	i.clickMaxY = maxY
 }
 
-//Quick Create icon
+//快速创建精灵组件
 func QuickCreate(x, y float64, img *ebiten.Image, layer uint8, callBack func(i *Sprite), s ...int) *Sprite {
 	op := newIcon()
 	op.SetPosition(x, y)

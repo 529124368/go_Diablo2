@@ -20,18 +20,17 @@ import (
 
 //config
 const (
-	SCREENWIDTH         int   = 490
-	SCREENHEIGHT        int   = 300
-	OFFSETX             int   = -30
-	OFFSETY             int   = -30
-	PLAYERCENTERX       int64 = 388 //LAYOUTX/2
-	PLAYERCENTERY       int64 = 242 //LAYOUTY/2
-	WEOFFSETX           int   = 127
-	WEOFFSETY           int   = 14
-	GAMESCENELOGIN      int   = 1
-	GAMESCENESELECTROLE int   = 2
-	GAMESCENEOPENDOOR   int   = 3
-	GAMESCENESTART      int   = 4
+	SCREENWIDTH  int = 490
+	SCREENHEIGHT int = 300
+	OFFSETX      int = -30
+	OFFSETY      int = -30
+
+	WEOFFSETX           int = 127
+	WEOFFSETY           int = 14
+	GAMESCENELOGIN      int = 1
+	GAMESCENESELECTROLE int = 2
+	GAMESCENEOPENDOOR   int = 3
+	GAMESCENESTART      int = 4
 )
 
 type Game struct {
@@ -263,7 +262,7 @@ func (g *Game) changeScenceGameUpdate() {
 	}
 
 	//计算鼠标位置
-	dir := tools.CaluteDir(PLAYERCENTERX, PLAYERCENTERY, int64(g.player.MouseX), int64(g.player.MouseY))
+	dir := tools.CaluteDir(g.status.PLAYERCENTERX, g.status.PLAYERCENTERY, int64(g.player.MouseX), int64(g.player.MouseY))
 
 	//TODO 技能攻击
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
@@ -400,10 +399,10 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	// }
 
 	//Draw Debug
-	len := tools.Distance(PLAYERCENTERX, PLAYERCENTERY, int64(mouseX), int64(mouseY))
-	re := tools.Angle(math.Abs(float64(int64(mouseY)-PLAYERCENTERY)), len)
+	len := tools.Distance(g.status.PLAYERCENTERX, g.status.PLAYERCENTERY, int64(mouseX), int64(mouseY))
+	re := tools.Angle(math.Abs(float64(int64(mouseY)-g.status.PLAYERCENTERY)), len)
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nplayer position %d,%d\nmouse position %d,%d\ndir %d\nAngle %f",
-		int64(ebiten.CurrentFPS()), int64(g.player.X), int64(g.player.Y), g.player.MouseX, g.player.MouseY, tools.CaluteDir(PLAYERCENTERX, PLAYERCENTERY, int64(g.player.MouseX), int64(g.player.MouseY)), re))
+		int64(ebiten.CurrentFPS()), int64(g.player.X), int64(g.player.Y), g.player.MouseX, g.player.MouseY, tools.CaluteDir(g.status.PLAYERCENTERX, g.status.PLAYERCENTERY, int64(g.player.MouseX), int64(g.player.MouseY)), re))
 
 	//Change Frame
 	if g.count > frameSpeed {
