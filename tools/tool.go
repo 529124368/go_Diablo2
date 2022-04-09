@@ -16,14 +16,15 @@ const (
 	RUN           uint8         = 1
 	ATTACK        uint8         = 2
 	SPEED         float64       = 2
-	ISHIDDENCOM   uint8         = 1
-	ISMINICOM     uint8         = 2
+	ISHIDDEN      uint8         = 1 //装备栏等隐藏标识
+	ISITEMS       uint8         = 0 //物品和装备标识
+	ISMINICOM     uint8         = 2 //MINI板标识
 	ISNORCOM      uint8         = 3
 	LAYOUTX       int           = 790
 	LAYOUTY       int           = 480
 	CLOSEBTNSLEEP time.Duration = 200000000 //按钮按下弹起动画sleep时间
-	MUSICWAV      int           = 1
-	MUSICMP3      int           = 2
+	MUSICWAV      int           = 1         //音乐WAV格式
+	MUSICMP3      int           = 2         //音乐mp3格式
 )
 
 //Calculate Direction

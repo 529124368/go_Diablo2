@@ -26,9 +26,8 @@ func NewMap(images *embed.FS) *MapBase {
 	return maps
 }
 
-//Load Images
+//加载地图图片
 func (m *MapBase) LoadMap() {
-	//BG
 	s2, _ := m.image.ReadFile("resource/bg/campsite.png")
 	img := tools.GetEbitenImage(s2)
 	m.BgImage = img
@@ -37,6 +36,7 @@ func (m *MapBase) LoadMap() {
 	m.OpBg.GeoM.Translate(MAPOFFSETX, MAPOFFSETY)
 }
 
+//改变地图坐标
 func (m *MapBase) ChangeMapTranslate(x, y float64) {
 	m.OpBg.GeoM.Translate(x, y)
 }

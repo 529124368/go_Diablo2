@@ -375,7 +375,6 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	opS.GeoM.Rotate(-0.5)
 	opS.GeoM.Scale(1, 0.5)
 	opS.ColorM.Scale(0, 0, 0, 1)
-	opS.ColorM.Translate(0, 0, 0, 0)
 	screen.DrawImage(imagess, opS)
 	//Draw Player
 	op.GeoM.Reset()
@@ -439,6 +438,7 @@ func (g *Game) ChangeScenceLoginUpdate() {
 
 //Draw Login Scence 渲染游戏登录画面
 func (g *Game) ChangeScenceLoginDraw(screen *ebiten.Image) {
+
 	//Draw UI
 	g.ui.DrawUI(screen)
 

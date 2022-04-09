@@ -31,6 +31,7 @@ type UI struct {
 	Compents          []*Sprite            //普通UI存放集合
 	HiddenCompents    []*Sprite            //可以被隐藏的UI组件集合
 	MiniPanelCompents []*Sprite            //MINI板的UI集合
+	ItemsCompents     []*SpriteItems       //Items的UI集合
 	status            *status.StatusManage //状态管理器
 	maps              *maps.MapBase        //地图
 }
@@ -41,12 +42,14 @@ func NewUI(images *embed.FS, s *status.StatusManage, m *maps.MapBase) *UI {
 		Compents:          make([]*Sprite, 0, 12),
 		HiddenCompents:    make([]*Sprite, 0, 6),
 		MiniPanelCompents: make([]*Sprite, 0, 6),
+		ItemsCompents:     make([]*SpriteItems, 0, 50),
 		status:            s,
 		maps:              m,
 	}
 	return ui
 }
 
+//加载进入游戏UI
 func (u *UI) LoadGameImages() {
 	u.ClearSlice(10)
 	var len float64 = 0
@@ -117,78 +120,79 @@ func (u *UI) LoadGameImages() {
 
 	s, _ = u.image.ReadFile("resource/UI/skill_btn.png")
 	mgUI = tools.GetEbitenImage(s)
-	u.AddComponent(QuickCreate(204, 441, mgUI, 0, func(i *Sprite) {
+	u.AddComponent(QuickCreate(204, 441, mgUI, 0, func(i spriteInterface) {
 		if isClick == false {
 			isClick = true
 			go func() {
-				on := *i.images
+				on := *i.(*Sprite).images
 				s, _ = u.image.ReadFile("resource/UI/skill_btn_down.png")
 				mgUI = tools.GetEbitenImage(s)
-				i.images = mgUI
+				i.(*Sprite).images = mgUI
 				time.Sleep(tools.CLOSEBTNSLEEP)
-				i.images = &on
+				i.(*Sprite).images = &on
 				runtime.GC()
 				isClick = false
 			}()
 		}
 	}, 201, 446, 228, 468), tools.ISNORCOM)
-	u.AddComponent(QuickCreate(562, 441, mgUI, 0, func(i *Sprite) {
+	u.AddComponent(QuickCreate(562, 441, mgUI, 0, func(i spriteInterface) {
 		if isClick == false {
 			isClick = true
 			go func() {
-				on := *i.images
+				on := *i.(*Sprite).images
 				s, _ = u.image.ReadFile("resource/UI/skill_btn_down.png")
 				mgUI = tools.GetEbitenImage(s)
-				i.images = mgUI
+				i.(*Sprite).images = mgUI
 				time.Sleep(tools.CLOSEBTNSLEEP)
-				i.images = &on
+				i.(*Sprite).images = &on
 				runtime.GC()
 				isClick = false
 			}()
 		}
 	}, 559, 443, 586, 472), tools.ISNORCOM)
 
-	//Draw Eq
+	//描画装备栏和包裹UI
 	s, _ = u.image.ReadFile("resource/UI/eq_0.png")
 	mgUI = tools.GetEbitenImage(s)
-	u.AddComponent(QuickCreate(395, 0, mgUI, 0, nil), tools.ISHIDDENCOM)
+	u.AddComponent(QuickCreate(395, 0, mgUI, 0, nil), tools.ISHIDDEN)
 
 	len += float64(mgUI.Bounds().Max.X)
 
 	s, _ = u.image.ReadFile("resource/UI/eq_1.png")
 	mgUI = tools.GetEbitenImage(s)
-	u.AddComponent(QuickCreate(395+256, 0, mgUI, 0, nil), tools.ISHIDDENCOM)
+	u.AddComponent(QuickCreate(395+256, 0, mgUI, 0, nil), tools.ISHIDDEN)
 
 	len = 395
 	s, _ = u.image.ReadFile("resource/UI/bag_0.png")
 	mgUI = tools.GetEbitenImage(s)
-	u.AddComponent(QuickCreate(395, 176, mgUI, 0, nil), tools.ISHIDDENCOM)
+	u.AddComponent(QuickCreate(395, 176, mgUI, 0, nil), tools.ISHIDDEN)
 
 	len += float64(mgUI.Bounds().Max.X)
 	s, _ = u.image.ReadFile("resource/UI/bag_1.png")
 	mgUI = tools.GetEbitenImage(s)
-	u.AddComponent(QuickCreate(395+256, 176, mgUI, 0, nil), tools.ISHIDDENCOM)
+	u.AddComponent(QuickCreate(395+256, 176, mgUI, 0, nil), tools.ISHIDDEN)
 
 	//Close btn
 	s, _ = u.image.ReadFile("resource/UI/close_btn_on.png")
 	mgUI = tools.GetEbitenImage(s)
-	u.AddComponent(QuickCreate(414, 384, mgUI, 0, func(i *Sprite) {
+	u.AddComponent(QuickCreate(414, 384, mgUI, 0, func(i spriteInterface) {
 		if isClick == false {
 			isClick = true
 			go func() {
-				on := *i.images
+				on := *i.(*Sprite).images
 				s, _ = u.image.ReadFile("resource/UI/close_btn_down.png")
 				mgUI = tools.GetEbitenImage(s)
-				i.images = mgUI
+				i.(*Sprite).images = mgUI
 				time.Sleep(tools.CLOSEBTNSLEEP)
-				i.images = &on
-				u.setHidden(tools.ISHIDDENCOM)
+				i.(*Sprite).images = &on
+				u.setHidden(tools.ISHIDDEN)
 				go func() {
 					for _, v := range u.MiniPanelCompents {
 						v.SetPosition(100, 0)
+
 						if v.clickMaxX != 0 {
-							v.clickMaxX += 100
 							v.clickMinX += 100
+							v.clickMaxX += 100
 						}
 					}
 				}()
@@ -205,7 +209,7 @@ func (u *UI) LoadGameImages() {
 				isClick = false
 			}()
 		}
-	}, 412, 388, 439, 416), tools.ISHIDDENCOM)
+	}, 412, 388, 439, 416), tools.ISHIDDEN)
 
 	//循环获取uixy.go 里登录的物品信息
 	items := getItems()
@@ -218,13 +222,14 @@ func (u *UI) LoadGameImages() {
 			y, _ := strconv.ParseFloat(res[1], 64)
 			lay, _ := strconv.Atoi(res[2])
 			re, _ := strconv.Atoi(res[3])
-			u.AddComponent(QuickCreate(x, y, mgUI, uint8(lay), nil), uint8(re))
+			u.AddComponent(QuickCreateItems(x, y, mgUI, uint8(lay), nil), uint8(re))
 		}
 	}
+
 	//注册mini板打开按钮
 	s, _ = u.image.ReadFile("resource/UI/open_minipanel_btn.png")
 	mgUI = tools.GetEbitenImage(s)
-	u.AddComponent(QuickCreate(390, 443, mgUI, 0, func(i *Sprite) {
+	u.AddComponent(QuickCreate(390, 443, mgUI, 0, func(i spriteInterface) {
 		if isClick == false {
 			isClick = true
 			go func() {
@@ -232,20 +237,20 @@ func (u *UI) LoadGameImages() {
 					u.setHidden(tools.ISMINICOM)
 					s, _ = u.image.ReadFile("resource/UI/open_minipanel_down.png")
 					mgUI = tools.GetEbitenImage(s)
-					i.images = mgUI
+					i.(*Sprite).images = mgUI
 					time.Sleep(tools.CLOSEBTNSLEEP)
 					s, _ = u.image.ReadFile("resource/UI/close_minipanel_btn.png")
 					mgUI = tools.GetEbitenImage(s)
-					i.images = mgUI
+					i.(*Sprite).images = mgUI
 				} else {
 					u.SetDisplay(tools.ISMINICOM)
 					s, _ = u.image.ReadFile("resource/UI/close_minipanel_down.png")
 					mgUI = tools.GetEbitenImage(s)
-					i.images = mgUI
+					i.(*Sprite).images = mgUI
 					time.Sleep(tools.CLOSEBTNSLEEP)
 					s, _ = u.image.ReadFile("resource/UI/open_minipanel_btn.png")
 					mgUI = tools.GetEbitenImage(s)
-					i.images = mgUI
+					i.(*Sprite).images = mgUI
 				}
 				runtime.GC()
 				isClick = false
@@ -266,11 +271,11 @@ func (u *UI) LoadGameImages() {
 	baseX += float64(mgUI.Bounds().Max.X) + 4
 	s, _ = u.image.ReadFile("resource/UI/mini_menu_wea.png")
 	mgUI = tools.GetEbitenImage(s)
-	u.AddComponent(QuickCreate(baseX, 410, mgUI, 0, func(i *Sprite) {
+	u.AddComponent(QuickCreate(baseX, 410, mgUI, 0, func(i spriteInterface) {
 		if isClick == false {
 			isClick = true
 			go func() {
-				on := *i.images
+				on := *i.(*Sprite).images
 				s, _ = u.image.ReadFile("resource/UI/mini_menu_wea_down.png")
 				mgUI = tools.GetEbitenImage(s)
 				if !u.status.OpenBag {
@@ -289,18 +294,17 @@ func (u *UI) LoadGameImages() {
 							for _, v := range u.MiniPanelCompents {
 								v.SetPosition(-100, 0)
 								if v.clickMaxX != 0 {
-									//按钮点击范围偏移
-									v.clickMaxX -= 100
 									v.clickMinX -= 100
+									v.clickMaxX -= 100
 								}
 							}
 						}()
 					}
 				}
-				i.images = mgUI
+				i.(*Sprite).images = mgUI
 				time.Sleep(tools.CLOSEBTNSLEEP)
-				i.images = &on
-				u.SetDisplay(tools.ISHIDDENCOM)
+				i.(*Sprite).images = &on
+				u.SetDisplay(tools.ISHIDDEN)
 				runtime.GC()
 				isClick = false
 			}()
@@ -327,11 +331,12 @@ func (u *UI) LoadGameImages() {
 	mgUI = tools.GetEbitenImage(s)
 	u.AddComponent(QuickCreate(baseX, 410, mgUI, 0, nil), tools.ISMINICOM)
 
-	u.setHidden(tools.ISHIDDENCOM)
+	u.setHidden(tools.ISHIDDEN)
 	u.setHidden(tools.ISMINICOM)
 
 }
 
+//加载登录游戏UI
 func (u *UI) LoadGameLoginImages() {
 	defer func() {
 		if r := recover(); r != nil {
@@ -352,111 +357,111 @@ func (u *UI) LoadGameLoginImages() {
 
 	s, _ = u.image.ReadFile("resource/UI/login1.png")
 	mgUI = tools.GetEbitenImage(s)
-	op1 := newSprite()
-	op1.SetPosition(len, 0)
-	op1.op.GeoM.Scale(1, scales)
-	op1.addImage(mgUI)
-	u.AddComponent(op1, tools.ISNORCOM)
+	op = newSprite()
+	op.SetPosition(len, 0)
+	op.op.GeoM.Scale(1, scales)
+	op.addImage(mgUI)
+	u.AddComponent(op, tools.ISNORCOM)
 
 	len += float64(mgUI.Bounds().Max.X)
 
 	s, _ = u.image.ReadFile("resource/UI/login2.png")
 	mgUI = tools.GetEbitenImage(s)
-	op2 := newSprite()
-	op2.SetPosition(len, 0)
-	op2.op.GeoM.Scale(1, scales)
-	op2.addImage(mgUI)
-	u.AddComponent(op2, tools.ISNORCOM)
+	op = newSprite()
+	op.SetPosition(len, 0)
+	op.op.GeoM.Scale(1, scales)
+	op.addImage(mgUI)
+	u.AddComponent(op, tools.ISNORCOM)
 
 	len += float64(mgUI.Bounds().Max.X)
 
 	s, _ = u.image.ReadFile("resource/UI/login3.png")
 	mgUI = tools.GetEbitenImage(s)
-	op3 := newSprite()
-	op3.SetPosition(len, 0)
-	op3.op.GeoM.Scale(1, scales)
-	op3.addImage(mgUI)
-	u.AddComponent(op3, tools.ISNORCOM)
+	op = newSprite()
+	op.SetPosition(len, 0)
+	op.op.GeoM.Scale(1, scales)
+	op.addImage(mgUI)
+	u.AddComponent(op, tools.ISNORCOM)
 
 	len = 0
 	var offset float64 = 340
 	s, _ = u.image.ReadFile("resource/UI/login8.png")
 	mgUI = tools.GetEbitenImage(s)
-	op8 := newSprite()
-	op8.SetPosition(len, offset)
-	op8.op.GeoM.Scale(1, scales)
-	op8.addImage(mgUI)
-	u.AddComponent(op8, tools.ISNORCOM)
+	op = newSprite()
+	op.SetPosition(len, offset)
+	op.op.GeoM.Scale(1, scales)
+	op.addImage(mgUI)
+	u.AddComponent(op, tools.ISNORCOM)
 
 	len += float64(mgUI.Bounds().Max.X)
 
 	s, _ = u.image.ReadFile("resource/UI/login9.png")
 	mgUI = tools.GetEbitenImage(s)
-	op9 := newSprite()
-	op9.SetPosition(len, offset)
-	op9.op.GeoM.Scale(1, scales)
-	op9.addImage(mgUI)
-	u.AddComponent(op9, tools.ISNORCOM)
+	op = newSprite()
+	op.SetPosition(len, offset)
+	op.op.GeoM.Scale(1, scales)
+	op.addImage(mgUI)
+	u.AddComponent(op, tools.ISNORCOM)
 
 	len += float64(mgUI.Bounds().Max.X)
 
 	s, _ = u.image.ReadFile("resource/UI/login10.png")
 	mgUI = tools.GetEbitenImage(s)
-	op10 := newSprite()
-	op10.SetPosition(len, offset)
-	op10.op.GeoM.Scale(1, scales)
-	op10.addImage(mgUI)
-	u.AddComponent(op10, tools.ISNORCOM)
+	op = newSprite()
+	op.SetPosition(len, offset)
+	op.op.GeoM.Scale(1, scales)
+	op.addImage(mgUI)
+	u.AddComponent(op, tools.ISNORCOM)
 
 	len += float64(mgUI.Bounds().Max.X)
 
 	s, _ = u.image.ReadFile("resource/UI/login11.png")
 	mgUI = tools.GetEbitenImage(s)
-	op11 := newSprite()
-	op11.SetPosition(len, offset)
-	op11.op.GeoM.Scale(1, scales)
-	op11.addImage(mgUI)
-	u.AddComponent(op11, tools.ISNORCOM)
+	op = newSprite()
+	op.SetPosition(len, offset)
+	op.op.GeoM.Scale(1, scales)
+	op.addImage(mgUI)
+	u.AddComponent(op, tools.ISNORCOM)
 
 	len = 0
 
 	s, _ = u.image.ReadFile("resource/UI/login4.png")
 	mgUI = tools.GetEbitenImage(s)
-	op4 := newSprite()
-	op4.SetPosition(len, float64(mgUI.Bounds().Max.Y))
-	op4.op.GeoM.Scale(1, scales)
-	op4.addImage(mgUI)
-	u.AddComponent(op4, tools.ISNORCOM)
+	op = newSprite()
+	op.SetPosition(len, float64(mgUI.Bounds().Max.Y))
+	op.op.GeoM.Scale(1, scales)
+	op.addImage(mgUI)
+	u.AddComponent(op, tools.ISNORCOM)
 
 	len += float64(mgUI.Bounds().Max.X)
 
 	s, _ = u.image.ReadFile("resource/UI/login5.png")
 	mgUI = tools.GetEbitenImage(s)
-	op5 := newSprite()
-	op5.SetPosition(len, float64(mgUI.Bounds().Max.Y))
-	op5.op.GeoM.Scale(1, scales)
-	op5.addImage(mgUI)
-	u.AddComponent(op5, tools.ISNORCOM)
+	op = newSprite()
+	op.SetPosition(len, float64(mgUI.Bounds().Max.Y))
+	op.op.GeoM.Scale(1, scales)
+	op.addImage(mgUI)
+	u.AddComponent(op, tools.ISNORCOM)
 
 	len += float64(mgUI.Bounds().Max.X)
 
 	s, _ = u.image.ReadFile("resource/UI/login6.png")
 	mgUI = tools.GetEbitenImage(s)
-	op6 := newSprite()
-	op6.SetPosition(len, float64(mgUI.Bounds().Max.Y))
-	op6.op.GeoM.Scale(1, scales)
-	op6.addImage(mgUI)
-	u.AddComponent(op6, tools.ISNORCOM)
+	op = newSprite()
+	op.SetPosition(len, float64(mgUI.Bounds().Max.Y))
+	op.op.GeoM.Scale(1, scales)
+	op.addImage(mgUI)
+	u.AddComponent(op, tools.ISNORCOM)
 
 	len += float64(mgUI.Bounds().Max.X)
 
 	s, _ = u.image.ReadFile("resource/UI/login7.png")
 	mgUI = tools.GetEbitenImage(s)
-	op7 := newSprite()
-	op7.SetPosition(len, float64(mgUI.Bounds().Max.Y))
-	op7.op.GeoM.Scale(1, scales)
-	op7.addImage(mgUI)
-	u.AddComponent(op7, tools.ISNORCOM)
+	op = newSprite()
+	op.SetPosition(len, float64(mgUI.Bounds().Max.Y))
+	op.op.GeoM.Scale(1, scales)
+	op.addImage(mgUI)
+	u.AddComponent(op, tools.ISNORCOM)
 
 	go func() {
 		plist, _ := u.image.ReadFile("resource/UI/logo.png")
@@ -467,6 +472,7 @@ func (u *UI) LoadGameLoginImages() {
 
 }
 
+//加载游戏选择角色UI
 func (u *UI) LoadGameCharaSelectImages() {
 	u.ClearSlice(1)
 	s, _ := u.image.ReadFile("resource/UI/charactSelect.png")
@@ -497,6 +503,7 @@ func (u *UI) LoadGameCharaSelectImages() {
 
 }
 
+//图集获取图片
 func (u *UI) GetAnimator(flg, name string) (*ebiten.Image, int, int) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -513,21 +520,35 @@ func (u *UI) GetAnimator(flg, name string) (*ebiten.Image, int, int) {
 	}
 }
 
-//Add Component
-func (u *UI) AddComponent(s *Sprite, ImageType uint8) {
-	u.Compents = append(u.Compents, s)
-	if ImageType == tools.ISHIDDENCOM {
-		u.HiddenCompents = append(u.HiddenCompents, s)
+//组件注册
+func (u *UI) AddComponent(s spriteInterface, ImageType uint8) {
+	if ImageType == tools.ISHIDDEN {
+		//将UI压入通用集合
+		u.Compents = append(u.Compents, s.(*Sprite))
+		//将UI压入可隐藏集合
+		u.HiddenCompents = append(u.HiddenCompents, s.(*Sprite))
 	} else if ImageType == tools.ISMINICOM {
-		u.MiniPanelCompents = append(u.MiniPanelCompents, s)
+		//将UI压入通用集合
+		u.Compents = append(u.Compents, s.(*Sprite))
+		//将UI压入MINI板集合
+		u.MiniPanelCompents = append(u.MiniPanelCompents, s.(*Sprite))
+	} else if ImageType == tools.ISITEMS {
+		//将UI压入Items集合
+		u.ItemsCompents = append(u.ItemsCompents, s.(*SpriteItems))
+	} else {
+		//将UI压入通用集合
+		u.Compents = append(u.Compents, s.(*Sprite))
 	}
 }
 
-//
+//显示UI
 func (u *UI) SetDisplay(ImageType uint8) {
-	if ImageType == tools.ISHIDDENCOM {
+	if ImageType == tools.ISHIDDEN || ImageType == tools.ISITEMS {
 		u.status.OpenBag = true
 		for _, v := range u.HiddenCompents {
+			v.isDisplay = true
+		}
+		for _, v := range u.ItemsCompents {
 			v.isDisplay = true
 		}
 	} else {
@@ -539,11 +560,14 @@ func (u *UI) SetDisplay(ImageType uint8) {
 
 }
 
-//
+//隐藏UI
 func (u *UI) setHidden(ImageType uint8) {
-	if ImageType == tools.ISHIDDENCOM {
+	if ImageType == tools.ISHIDDEN || ImageType == tools.ISITEMS {
 		u.status.OpenBag = false
 		for _, v := range u.HiddenCompents {
+			v.isDisplay = false
+		}
+		for _, v := range u.ItemsCompents {
 			v.isDisplay = false
 		}
 	} else {
@@ -555,27 +579,39 @@ func (u *UI) setHidden(ImageType uint8) {
 
 }
 
+//清除切片
 func (u *UI) ClearSlice(cap int) {
 	u.Compents = make([]*Sprite, 0, cap)
 	u.HiddenCompents = make([]*Sprite, 0, cap/2)
 	u.MiniPanelCompents = make([]*Sprite, 0, cap/2)
+	u.ItemsCompents = make([]*SpriteItems, 0, 50)
 }
 
-//Render UI
+//渲染UI
 func (u *UI) DrawUI(screen *ebiten.Image) {
+	//渲染UI
 	for _, v := range u.Compents {
 		if v.layer == 0 && v.isDisplay {
 			screen.DrawImage(v.images, v.op)
 		}
 	}
+	//渲染层级为1的UI
 	for _, v := range u.Compents {
 		if v.layer == 1 && v.isDisplay {
 			screen.DrawImage(v.images, v.op)
 		}
 	}
+	//当包裹打开的时候，渲染包裹内物品和装备
+	if u.status.OpenBag {
+		for _, v := range u.ItemsCompents {
+			screen.DrawImage(v.imageBg, v.opBg)
+			screen.DrawImage(v.images, v.op)
+		}
+
+	}
 }
 
-//Event Listen
+//事件轮询
 func (u *UI) EventLoop() {
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
 		for _, v := range u.Compents {
@@ -584,7 +620,7 @@ func (u *UI) EventLoop() {
 				if x >= v.clickMinX && x <= v.clickMaxX && y >= v.clickMinY && y <= v.clickMaxY {
 					//设置不可以行走
 					u.status.Flg = false
-					//call back func
+					//实行回调函数
 					v.f(v)
 				}
 			}
@@ -593,7 +629,7 @@ func (u *UI) EventLoop() {
 
 }
 
-//GC for loading
+//GC 加载清楚变量
 func (u *UI) ClearGlobalVariable() {
 	plist_R_sheet = nil
 	plist_R_png = nil
