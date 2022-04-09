@@ -21,6 +21,7 @@ type SpriteItems struct {
 	imageBg     *ebiten.Image
 	bgIsDisplay bool //背景图是否显示
 	bgColor     *RGBColor
+	touchEvnet  func(i spriteInterface, x, y int)
 }
 
 //创建精灵
@@ -43,7 +44,7 @@ func newSpriteItems() *SpriteItems {
 }
 
 //快速创建items精灵组件
-func QuickCreateItems(x, y float64, img *ebiten.Image, layer uint8, callBack func(i spriteInterface), s ...int) *SpriteItems {
+func QuickCreateItems(x, y float64, img *ebiten.Image, layer uint8, callBack func(i spriteInterface), d uint8, s ...int) *SpriteItems {
 	op := newSpriteItems()
 	op.SetPosition(x, y)
 	if len(s) == 4 {
@@ -81,6 +82,21 @@ func QuickCreateItems(x, y float64, img *ebiten.Image, layer uint8, callBack fun
 	}
 	op.opBg.GeoM.Translate(x, y)
 	op.imageBg = emptyImage
+	//背景BG是否显示
+	if d == 1 {
+		op.bgIsDisplay = true
+	} else {
+		op.bgIsDisplay = false
+	}
+	//添加点击事件
+	op.hasEvent = 1
+	op.touchEvnet = func(i spriteInterface, x, y int) {
+		if x >= op.clickMinX && x <= op.clickMaxX && y >= op.clickMinY && y <= op.clickMaxY {
+			i.(*SpriteItems).bgIsDisplay = true
+		} else {
+			i.(*SpriteItems).bgIsDisplay = false
+		}
+	}
 	//保存图片
 	op.addImage(img)
 	return op

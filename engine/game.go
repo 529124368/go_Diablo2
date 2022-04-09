@@ -277,7 +277,7 @@ func (g *Game) changeScenceGameUpdate() {
 		}
 	}
 	//事件循环监听 是否有按钮点击事件
-	g.ui.EventLoop()
+	g.ui.EventLoop(mouseX, mouseY)
 	//鼠标移动控制
 	if g.status.OpenBag == false || g.status.OpenBag == true && mouseX <= tools.LAYOUTX/2 {
 		//

@@ -222,7 +222,12 @@ func (u *UI) LoadGameImages() {
 			y, _ := strconv.ParseFloat(res[1], 64)
 			lay, _ := strconv.Atoi(res[2])
 			re, _ := strconv.Atoi(res[3])
-			u.AddComponent(QuickCreateItems(x, y, mgUI, uint8(lay), nil), uint8(re))
+			d, _ := strconv.Atoi(res[4])
+			a, _ := strconv.Atoi(res[5])
+			b, _ := strconv.Atoi(res[6])
+			c, _ := strconv.Atoi(res[7])
+			e, _ := strconv.Atoi(res[8])
+			u.AddComponent(QuickCreateItems(x, y, mgUI, uint8(lay), nil, uint8(d), a, b, c, e), uint8(re))
 		}
 	}
 
@@ -543,12 +548,9 @@ func (u *UI) AddComponent(s spriteInterface, ImageType uint8) {
 
 //显示UI
 func (u *UI) SetDisplay(ImageType uint8) {
-	if ImageType == tools.ISHIDDEN || ImageType == tools.ISITEMS {
+	if ImageType == tools.ISHIDDEN {
 		u.status.OpenBag = true
 		for _, v := range u.HiddenCompents {
-			v.isDisplay = true
-		}
-		for _, v := range u.ItemsCompents {
 			v.isDisplay = true
 		}
 	} else {
@@ -562,12 +564,9 @@ func (u *UI) SetDisplay(ImageType uint8) {
 
 //隐藏UI
 func (u *UI) setHidden(ImageType uint8) {
-	if ImageType == tools.ISHIDDEN || ImageType == tools.ISITEMS {
+	if ImageType == tools.ISHIDDEN {
 		u.status.OpenBag = false
 		for _, v := range u.HiddenCompents {
-			v.isDisplay = false
-		}
-		for _, v := range u.ItemsCompents {
 			v.isDisplay = false
 		}
 	} else {
@@ -604,7 +603,9 @@ func (u *UI) DrawUI(screen *ebiten.Image) {
 	//当包裹打开的时候，渲染包裹内物品和装备
 	if u.status.OpenBag {
 		for _, v := range u.ItemsCompents {
-			screen.DrawImage(v.imageBg, v.opBg)
+			if v.bgIsDisplay {
+				screen.DrawImage(v.imageBg, v.opBg)
+			}
 			screen.DrawImage(v.images, v.op)
 		}
 
@@ -612,17 +613,23 @@ func (u *UI) DrawUI(screen *ebiten.Image) {
 }
 
 //事件轮询
-func (u *UI) EventLoop() {
+func (u *UI) EventLoop(mouseX, mouseY int) {
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
+		//普通UI事件轮询
 		for _, v := range u.Compents {
 			if v.hasEvent == 1 && v.isDisplay {
-				x, y := ebiten.CursorPosition()
-				if x >= v.clickMinX && x <= v.clickMaxX && y >= v.clickMinY && y <= v.clickMaxY {
-					//设置不可以行走
-					u.status.Flg = false
+				if mouseX >= v.clickMinX && mouseX <= v.clickMaxX && mouseY >= v.clickMinY && mouseY <= v.clickMaxY {
 					//实行回调函数
 					v.f(v)
 				}
+			}
+		}
+	}
+	if u.status.OpenBag {
+		//items UI事件轮询
+		for _, v := range u.ItemsCompents {
+			if v.hasEvent == 1 {
+				v.touchEvnet(v, mouseX, mouseY)
 			}
 		}
 	}
