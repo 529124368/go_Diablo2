@@ -218,11 +218,16 @@ func GetItemsCellSize(name string) (int, int) {
 	case "body-3":
 		return 2, 3
 	case "dun-4":
-		return 2, 2
+		return 2, 3
+	case "dun-5":
+		return 2, 3
 	case "hand":
 		return 2, 2
 	case "shose":
 		return 2, 2
+	case "head-3":
+		return 2, 2
 	}
+
 	return 0, 0
 }

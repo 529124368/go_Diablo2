@@ -38,17 +38,19 @@ type UI struct {
 	ItemsCompents     []*SpriteItems       //Items的UI集合
 	status            *status.StatusManage //状态管理器
 	maps              *maps.MapBase        //地图
-	BagLayout         [4][10]string        //4*10 背包
+	BagLayout         [5][10]string        //4*10 背包 1*10 装备栏
 	tempBag           [1]*SpriteItems      //临时Items存放
 }
 
 func NewUI(images *embed.FS, s *status.StatusManage, m *maps.MapBase) *UI {
 	//初始化背包 数据
-	itemsLayout := [4][10]string{
-		{"HP0", "HP0", "HP0", "HP0", "book_0,4", "", "", "", "dun_0,8", "dun_0,8"},
-		{"", "", "HP0", "", "book_0,4", "", "", "", "dun_0,8", "dun_0,8"},
-		{"dun_2,0", "dun_2,0", "", "book_2,3", "book_2,4", "", "", "", "", ""},
-		{"dun_2,0", "dun_2,0", "HP0", "book_2,3", "book_2,4", "HP0", "", "", "", ""},
+	itemsLayout := [5][10]string{
+		{"HP0", "HP0", "HP0", "HP0", "book_0,4", "dun-5_0,5", "dun-5_0,5", "", "dun_0,8", "dun_0,8"},
+		{"body-3_1,0", "body-3_1,0", "", "", "book_0,4", "dun-5_0,5", "dun-5_0,5", "", "dun_0,8", "dun_0,8"},
+		{"body-3_1,0", "body-3_1,0", "hand_2,2", "hand_2,2", "book_2,4", "dun-5_0,5", "dun-5_0,5", "", "head-3_2,8", "head-3_2,8"},
+		{"body-3_1,0", "body-3_1,0", "hand_2,2", "hand_2,2", "book_2,4", "HP0", "", "", "head-3_2,8", "head-3_2,8"},
+		{"", "", "", "", "", "", "", "", "", ""},
+		//头盔526,8  左手武器412,54 右手武器644,54 项链599,36 铠甲526,80 手套413,182 左戒指485,181 腰带527,181 右戒指599,183 靴子644,183
 	}
 	ui := &UI{
 		image:             images,
@@ -229,31 +231,8 @@ func (u *UI) LoadGameImages() {
 		}
 	}, true), tools.ISHIDDEN)
 
-	//背包物品Loop
-	//事件
-	item_event := func(i spriteInterface, x, y int) {
-		if isClick == false {
-			isClick = true
-			go func() {
-				if !u.status.IsTakeItem {
-					//拿起物品flag设置
-					u.status.IsTakeItem = true
-					s := i.(*SpriteItems)
-					//将拿起的物品放入临时区
-					u.tempBag[0] = s
-					mouseIconCopy = *mouseIcon
-					mouseIcon = s.images
-					go func() {
-						time.Sleep(tools.CLOSEBTNSLEEP)
-						u.status.Mouseoffset = 0
-					}()
-					mouseRoate = 0
-					//拿起物品，从包裹中删除物品
-					u.DelItemFromBag(int((s.imagey-254)/29), int((s.imagex-413)/29))
-				}
-			}()
-		}
-	}
+	//背包物品LOOP Start
+	//临时Map
 	TempArray := make(map[string]int, 10)
 	items := u.BagLayout
 	for i := 0; i < 4; i++ {
@@ -266,22 +245,20 @@ func (u *UI) LoadGameImages() {
 					mgUI = tools.GetEbitenImage(s)
 					x := 413 + j*29
 					y := 254 + i*29
-					u.AddComponent(QuickCreateItems(float64(x), float64(y), t[0], mgUI, 1, item_event, 1, true), 0)
+					u.AddComponent(QuickCreateItems(float64(x), float64(y), t[0], mgUI, 1, u.ItemsEvent(), 1, true), 0)
 				}
 			} else if items[i][j] != "" {
 				s, _ = u.image.ReadFile("resource/UI/" + items[i][j] + ".png")
 				mgUI = tools.GetEbitenImage(s)
 				x := 413 + j*29
 				y := 254 + i*29
-				u.AddComponent(QuickCreateItems(float64(x), float64(y), items[i][j], mgUI, 1, item_event, 1, true), 0)
+				u.AddComponent(QuickCreateItems(float64(x), float64(y), items[i][j], mgUI, 1, u.ItemsEvent(), 1, true), 0)
 			}
 		}
 	}
+	//手动销毁临时Map
 	TempArray = nil
-
-	u.AddItemToBag(0, 5, "sword")
-
-	u.DelItemFromBag(2, 0)
+	//背包物品LOOP END
 
 	//注册mini板打开按钮
 	s, _ = u.image.ReadFile("resource/UI/open_minipanel_btn.png")
@@ -690,14 +667,18 @@ func (u *UI) EventLoop(mouseX, mouseY int) {
 		}
 
 		//点击包裹区域并且在包裹坐标范围内
-		if u.status.OpenBag && mouseX >= 408 && mouseY >= 256 && mouseX <= 698 && mouseY <= 372 && u.tempBag[0] != nil && u.status.IsTakeItem {
+		if u.status.OpenBag && mouseX >= 408 && mouseY >= 6 && mouseX <= 698 && mouseY <= 372 && u.tempBag[0] != nil && u.status.IsTakeItem {
+
 			s := u.tempBag[0]
-			if u.AddItemToBag((int(mouseY+u.status.Mouseoffset-254) / 29), int((mouseX+u.status.Mouseoffset-413)/29), s.itemName) {
+			//给鼠标加一个假偏移，防止双击
+			if u.AddItemToBag(mouseX+u.status.Mouseoffset, mouseY+u.status.Mouseoffset, s.itemName) {
 				//鼠标还原
 				mouseIcon = &mouseIconCopy
+				//清理临时区
 				u.tempBag[0] = nil
 				mouseRoate = -0.5
-				u.status.Mouseoffset = 200
+				//恢复防止双击的鼠标偏移量
+				u.status.Mouseoffset = 500
 				//拿起物品flag设置
 				u.status.IsTakeItem = false
 				go func() {
@@ -727,44 +708,23 @@ func (u *UI) ClearGlobalVariable() {
 	plist_R_png = nil
 }
 
-//添加物品到包裹
-func (u *UI) AddItemToBag(x, y int, itemName string) bool {
+//添加物品到包裹 or 装备栏
+func (u *UI) AddItemToBag(mousex, mousey int, itemName string) bool {
+	//屏幕坐标转换成包裹坐标
+	x := int(mousey-254) / 29
+	y := int(mousex-413) / 29
 	sizeX, sizeY := tools.GetItemsCellSize(itemName)
 	if sizeX != 0 && sizeY != 0 {
-		item_event := func(i spriteInterface, x, y int) {
-			if isClick == false {
-				isClick = true
-				go func() {
-					if !u.status.IsTakeItem {
-						//拿起物品flag设置
-						u.status.IsTakeItem = true
-						s := i.(*SpriteItems)
-						go func() {
-							time.Sleep(tools.CLOSEBTNSLEEP)
-							u.status.Mouseoffset = 0
-						}()
-						//将拿起的物品放入临时区
-						u.tempBag[0] = s
-						mouseIconCopy = *mouseIcon
-						mouseIcon = s.images
-						mouseRoate = 0
-						//拿起物品，从包裹中删除物品
-						u.DelItemFromBag(int((s.imagey-254)/29), int((s.imagex-413)/29))
-					}
-				}()
-			}
-		}
-
 		//x y这个单元格有位置是否
 		if x >= 0 && x <= 3 && y >= 0 && y <= 9 && u.BagLayout[x][y] == "" {
-			//一个大小的时候
+			//是否相同size的时候
 			if sizeX == 1 && sizeY == 1 {
 				u.BagLayout[x][y] = itemName
 				s, _ := u.image.ReadFile("resource/UI/" + itemName + ".png")
 				mgUI := tools.GetEbitenImage(s)
 				layoutX := 413 + y*29
 				layoutY := 254 + x*29
-				u.AddComponent(QuickCreateItems(float64(layoutX), float64(layoutY), itemName, mgUI, 1, item_event, 1, true), 0)
+				u.AddComponent(QuickCreateItems(float64(layoutX), float64(layoutY), itemName, mgUI, 1, u.ItemsEvent(), 1, true), 0)
 				return true
 			} else {
 				//循环判断是否可以放下
@@ -785,21 +745,26 @@ func (u *UI) AddItemToBag(x, y int, itemName string) bool {
 				mgUI := tools.GetEbitenImage(s)
 				layoutX := 413 + y*29
 				layoutY := 254 + x*29
-				u.AddComponent(QuickCreateItems(float64(layoutX), float64(layoutY), itemName, mgUI, 1, item_event, 1, true), 0)
+				u.AddComponent(QuickCreateItems(float64(layoutX), float64(layoutY), itemName, mgUI, 1, u.ItemsEvent(), 1, true), 0)
 				return true
 			}
+		} else if mousex >= 397 && mousey >= 5 && mousex <= 705 && mousey <= 247 {
+			//判断是否放入装备栏
+			return u.JudgeCanToEquip(mousex, mousey, itemName)
 		} else {
 			return false
 		}
 	} else {
 		return false
 	}
-
 }
 
 //从包裹删除物品
-func (u *UI) DelItemFromBag(x, y int) {
-	if u.BagLayout[x][y] != "" {
+func (u *UI) DelItemFromBag(imageX, imageY int) {
+	//屏幕坐标转换成包裹坐标
+	x := int(imageY-254) / 29
+	y := int(imageX-413) / 29
+	if x >= 0 && x <= 3 && y >= 0 && y <= 9 && u.BagLayout[x][y] != "" {
 		if strings.Contains(u.BagLayout[x][y], "_") {
 			itemName := u.BagLayout[x][y]
 			for i := 0; i < 4; i++ {
@@ -815,13 +780,27 @@ func (u *UI) DelItemFromBag(x, y int) {
 		layoutX := 413 + y*29
 		layoutY := 254 + x*29
 		for k, v := range u.ItemsCompents {
+			//根据具体的图片坐标删除 支持唯一性
 			if v.imagex == float64(layoutX) && v.imagey == float64(layoutY) {
 				if k != len(u.ItemsCompents)-1 {
 					u.ItemsCompents = append(u.ItemsCompents[0:k], u.ItemsCompents[k+1:]...)
 				} else {
 					u.ItemsCompents = u.ItemsCompents[0:k]
 				}
-
+			}
+		}
+	} else if xx, _, key := u.JudgeIsEquipArea(imageX, imageY); xx != 0 {
+		//删除装备栏
+		for k, v := range u.ItemsCompents {
+			//根据具体的图片坐标删除 支持唯一性
+			if v.imagex == float64(imageX) && v.imagey == float64(imageY) {
+				if k != len(u.ItemsCompents)-1 {
+					u.ItemsCompents = append(u.ItemsCompents[0:k], u.ItemsCompents[k+1:]...)
+				} else {
+					u.ItemsCompents = u.ItemsCompents[0:k]
+				}
+				u.BagLayout[4][key] = ""
+				return
 			}
 		}
 	}
@@ -834,4 +813,76 @@ func (u *UI) DrawMouseIcon(screen *ebiten.Image, mouseX, mouseY int) {
 	opMouse.Filter = ebiten.FilterLinear
 	opMouse.GeoM.Translate(float64(mouseX), float64(mouseY))
 	screen.DrawImage(mouseIcon, opMouse)
+}
+
+//判断是否可以放入装备栏
+func (u *UI) JudgeCanToEquip(mousex, mousey int, itemName string) bool {
+	x, y, key := u.JudgeIsEquipArea(mousex, mousey)
+	if x != 0 && u.BagLayout[4][key] == "" {
+		s, _ := u.image.ReadFile("resource/UI/" + itemName + ".png")
+		mgUI := tools.GetEbitenImage(s)
+		u.BagLayout[4][key] = itemName
+		u.AddComponent(QuickCreateItems(float64(x), float64(y), itemName, mgUI, 1, u.ItemsEvent(), 0, true), 0)
+		return true
+	} else {
+		return false
+	}
+}
+
+//物品事件
+func (u *UI) ItemsEvent() func(i spriteInterface, x, y int) {
+	//注册监听
+	item_event := func(i spriteInterface, x, y int) {
+		if isClick == false {
+			isClick = true
+			go func() {
+				if !u.status.IsTakeItem {
+					//拿起物品flag设置
+					u.status.IsTakeItem = true
+					s := i.(*SpriteItems)
+					go func() {
+						time.Sleep(tools.CLOSEBTNSLEEP)
+						u.status.Mouseoffset = 0
+					}()
+					//将拿起的物品放入临时区
+					u.tempBag[0] = s
+					mouseIconCopy = *mouseIcon
+					mouseIcon = s.images
+					mouseRoate = 0
+					//拿起物品，从包裹中删除物品
+					u.DelItemFromBag(int(s.imagex), int(s.imagey))
+				}
+			}()
+		}
+	}
+	return item_event
+}
+
+//判断鼠标是否位于装备区
+func (u *UI) JudgeIsEquipArea(mousex, mousey int) (int, int, uint8) {
+	if mousex >= 526 && mousey >= 7 && mousex <= 580 && mousey <= 58 {
+		//判断是否可以放入头盔
+		return 526, 7, 0
+	} else if mousex >= 412 && mousey >= 52 && mousex <= 465 && mousey <= 158 {
+		//判断是否可以放入左武器
+		return 412, 52, 1
+
+	} else if mousex >= 526 && mousey >= 78 && mousex <= 579 && mousey <= 158 {
+		//判断是否可以放入铠甲
+		return 526, 78, 4
+
+	} else if mousex >= 643 && mousey >= 51 && mousex <= 695 && mousey <= 155 {
+		//判断是否可以放入右武器
+		return 643, 51, 2
+
+	} else if mousex >= 410 && mousey >= 181 && mousex <= 464 && mousey <= 234 {
+		//判断是否可以放入手套
+		return 410, 181, 5
+
+	} else if mousex >= 642 && mousey >= 181 && mousex <= 695 && mousey <= 233 {
+		//判断是否可以放入鞋
+		return 642, 181, 9
+	} else {
+		return 0, 0, 0
+	}
 }
