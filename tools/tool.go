@@ -201,3 +201,28 @@ func CalculateDirPath(oldDir, newDir uint8) []uint8 {
 	}
 	return newPath[1 : len(newPath)-1]
 }
+
+//获取物品的尺寸
+func GetItemsCellSize(name string) (int, int) {
+	switch name {
+	case "HP0":
+		return 1, 1
+	case "book":
+		return 1, 2
+	case "dun":
+		return 2, 2
+	case "head-4":
+		return 2, 2
+	case "sword":
+		return 2, 3
+	case "body-3":
+		return 2, 3
+	case "dun-4":
+		return 2, 2
+	case "hand":
+		return 2, 2
+	case "shose":
+		return 2, 2
+	}
+	return 0, 0
+}

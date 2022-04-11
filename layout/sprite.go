@@ -24,8 +24,8 @@ type Sprite struct {
 	clickMinY int
 	clickMaxX int
 	clickMaxY int
-	imagex    float64
-	imagey    float64
+	imagex    float64 //图片的位置x
+	imagey    float64 //图片的位置y
 	size      imageSize
 }
 
@@ -74,21 +74,17 @@ func (s *Sprite) addEvent(fu func(s spriteInterface)) {
 }
 
 //添加按钮点击范围
-func (s *Sprite) addClickRange(minX, minY, maxX, maxY int) {
-	s.clickMinX = minX
-	s.clickMinY = minY
-	s.clickMaxX = maxX
-	s.clickMaxY = maxY
+func (s *Sprite) addClickRange() {
+	s.clickMinX = int(s.imagex)
+	s.clickMinY = int(s.imagey)
+	s.clickMaxX = int(s.imagex) + s.size.width
+	s.clickMaxY = int(s.imagey) + s.size.height
 }
 
 //快速创建精灵组件
-func QuickCreate(x, y float64, img *ebiten.Image, layer uint8, callBack func(i spriteInterface), s ...int) *Sprite {
+func QuickCreate(x, y float64, img *ebiten.Image, layer uint8, callBack func(i spriteInterface), needClickRange ...bool) *Sprite {
 	op := newSprite()
 	op.SetPosition(x, y)
-	if len(s) == 4 {
-		//添加点击范围
-		op.addClickRange(s[0], s[1], s[2], s[3])
-	}
 	//判断是否有注册的UI事件
 	if callBack != nil {
 		op.addEvent(callBack)
@@ -99,6 +95,10 @@ func QuickCreate(x, y float64, img *ebiten.Image, layer uint8, callBack func(i s
 	width, height := img.Size()
 	op.size.width = width
 	op.size.height = height
+	if len(needClickRange) == 1 && needClickRange[0] {
+		//添加点击范围
+		op.addClickRange()
+	}
 	//保存图片
 	op.addImage(img)
 	return op

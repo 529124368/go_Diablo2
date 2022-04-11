@@ -9,7 +9,7 @@ type spriteInterface interface {
 	SetPosition(x, y float64)
 	addImage(m *ebiten.Image)
 	addEvent(fu func(s spriteInterface))
-	addClickRange(minX, minY, maxX, maxY int)
+	addClickRange()
 	DrawItemsBgByCustom(positionX, postionY float64, width, height int, screen *ebiten.Image)
 	QuickDrawItemsBg(screen *ebiten.Image)
 }

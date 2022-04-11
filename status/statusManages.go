@@ -14,6 +14,8 @@ type StatusManage struct {
 	ShadowOffsetY   int
 	PLAYERCENTERX   int64
 	PLAYERCENTERY   int64
+	IsTakeItem      bool //是否拿起物品
+	Mouseoffset     int
 }
 
 func NewStatusManage() *StatusManage {
@@ -31,6 +33,8 @@ func NewStatusManage() *StatusManage {
 		ShadowOffsetY:   365,
 		PLAYERCENTERX:   388, //LAYOUTX/2
 		PLAYERCENTERY:   242, //LAYOUTY/2
+		IsTakeItem:      false,
+		Mouseoffset:     200,
 	}
 	return n
 }

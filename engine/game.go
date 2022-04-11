@@ -41,7 +41,6 @@ type Game struct {
 	currentGameScence int
 	music             music.MusicInterface
 	status            *status.StatusManage
-	//monster *role.Monster
 }
 
 var (
@@ -50,16 +49,15 @@ var (
 	frameSpeed    int = 5
 	op            *ebiten.DrawImageOptions
 	opS           *ebiten.DrawImageOptions
-	opMouse       *ebiten.DrawImageOptions
 	opWea         *ebiten.DrawImageOptions
 	opSkill       *ebiten.DrawImageOptions
 	images        *embed.FS
 	gameSceneType int = 0
-	mouseIcon     *ebiten.Image
-	mouseX        int
-	mouseY        int
-	newPath       []uint8
-	turnLoop      uint8 = 0
+
+	mouseX   int
+	mouseY   int
+	newPath  []uint8
+	turnLoop uint8 = 0
 )
 
 //GameEngine
@@ -90,11 +88,8 @@ func NewGame(img *embed.FS) *Game {
 }
 
 func (g *Game) StartEngine() {
-	//Hidden Mouse Icon
+	//隐藏鼠标系统的ICON
 	ebiten.SetCursorMode(ebiten.CursorModeHidden)
-	opMouse = &ebiten.DrawImageOptions{}
-	s, _ := images.ReadFile("resource/UI/mouse.png")
-	mouseIcon = tools.GetEbitenImage(s)
 	opS = &ebiten.DrawImageOptions{}
 	op = &ebiten.DrawImageOptions{}
 	//
@@ -211,21 +206,12 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			g.ChangeScenceLoginDraw(screen)
 		}
 	}
-	//Draw Mouse Icon
-	g.DrawMouseIcon(screen)
+	//绘制鼠标ICON
+	g.ui.DrawMouseIcon(screen, mouseX, mouseY)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
 	return tools.LAYOUTX, tools.LAYOUTY
-}
-
-//重新绘制鼠标ICON
-func (g *Game) DrawMouseIcon(screen *ebiten.Image) {
-	opMouse.GeoM.Reset()
-	opMouse.GeoM.Rotate(-0.5)
-	opMouse.Filter = ebiten.FilterLinear
-	opMouse.GeoM.Translate(float64(mouseX), float64(mouseY))
-	screen.DrawImage(mouseIcon, opMouse)
 }
 
 //Draw Game Update
@@ -259,13 +245,17 @@ func (g *Game) changeScenceGameUpdate() {
 		if g.status.OpenMiniPanel && g.status.OpenBag && mouseX >= 205 && mouseX <= 377 && mouseY > 407 {
 			g.status.Flg = false
 		}
+		//如果拿起物品也不可以移动
+		if g.status.IsTakeItem {
+			g.status.Flg = false
+		}
 	}
 
 	//计算鼠标位置
 	dir := tools.CaluteDir(g.status.PLAYERCENTERX, g.status.PLAYERCENTERY, int64(g.player.MouseX), int64(g.player.MouseY))
 
 	//TODO 技能攻击
-	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) && !g.status.IsTakeItem {
 		g.player.SkillName = "liehuo"
 		if g.player.State != tools.ATTACK {
 			counts = 0

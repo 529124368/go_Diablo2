@@ -23,9 +23,13 @@ var (
 	plist_sheet   *texturepacker.SpriteSheet
 	plist_R_sheet *texturepacker.SpriteSheet
 	isClick       bool = false
+	mouseIcon     *ebiten.Image
+	mouseIconCopy ebiten.Image
+	opMouse       *ebiten.DrawImageOptions
+	mouseRoate    float64 = -0.5
 )
 
-//Create UI Class
+//UI类
 type UI struct {
 	image             *embed.FS
 	Compents          []*Sprite            //普通UI存放集合
@@ -34,18 +38,32 @@ type UI struct {
 	ItemsCompents     []*SpriteItems       //Items的UI集合
 	status            *status.StatusManage //状态管理器
 	maps              *maps.MapBase        //地图
+	BagLayout         [4][10]string        //4*10 背包
+	tempBag           [1]*SpriteItems      //临时Items存放
 }
 
 func NewUI(images *embed.FS, s *status.StatusManage, m *maps.MapBase) *UI {
+	//初始化背包 数据
+	itemsLayout := [4][10]string{
+		{"HP0", "HP0", "HP0", "HP0", "book_0,4", "", "", "", "dun_0,8", "dun_0,8"},
+		{"", "", "HP0", "", "book_0,4", "", "", "", "dun_0,8", "dun_0,8"},
+		{"dun_2,0", "dun_2,0", "", "book_2,3", "book_2,4", "", "", "", "", ""},
+		{"dun_2,0", "dun_2,0", "HP0", "book_2,3", "book_2,4", "HP0", "", "", "", ""},
+	}
 	ui := &UI{
 		image:             images,
 		Compents:          make([]*Sprite, 0, 12),
 		HiddenCompents:    make([]*Sprite, 0, 6),
 		MiniPanelCompents: make([]*Sprite, 0, 6),
-		ItemsCompents:     make([]*SpriteItems, 0, 50),
+		ItemsCompents:     make([]*SpriteItems, 0, 10),
 		status:            s,
 		maps:              m,
+		BagLayout:         itemsLayout,
 	}
+	//鼠标Icon设置
+	opMouse = &ebiten.DrawImageOptions{}
+	ss, _ := ui.image.ReadFile("resource/UI/mouse.png")
+	mouseIcon = tools.GetEbitenImage(ss)
 	return ui
 }
 
@@ -134,7 +152,7 @@ func (u *UI) LoadGameImages() {
 				isClick = false
 			}()
 		}
-	}, 201, 446, 228, 468), tools.ISNORCOM)
+	}, true), tools.ISNORCOM)
 	u.AddComponent(QuickCreate(562, 441, mgUI, 0, func(i spriteInterface) {
 		if isClick == false {
 			isClick = true
@@ -149,7 +167,7 @@ func (u *UI) LoadGameImages() {
 				isClick = false
 			}()
 		}
-	}, 559, 443, 586, 472), tools.ISNORCOM)
+	}, true), tools.ISNORCOM)
 
 	//描画装备栏和包裹UI
 	s, _ = u.image.ReadFile("resource/UI/eq_0.png")
@@ -172,7 +190,7 @@ func (u *UI) LoadGameImages() {
 	mgUI = tools.GetEbitenImage(s)
 	u.AddComponent(QuickCreate(395+256, 176, mgUI, 0, nil), tools.ISHIDDEN)
 
-	//Close btn
+	//关闭装备栏按钮
 	s, _ = u.image.ReadFile("resource/UI/close_btn_on.png")
 	mgUI = tools.GetEbitenImage(s)
 	u.AddComponent(QuickCreate(414, 384, mgUI, 0, func(i spriteInterface) {
@@ -209,27 +227,61 @@ func (u *UI) LoadGameImages() {
 				isClick = false
 			}()
 		}
-	}, 412, 388, 439, 416), tools.ISHIDDEN)
+	}, true), tools.ISHIDDEN)
 
-	//循环获取uixy.go 里登录的物品信息
-	items := getItems()
-	for k, v := range items {
-		s, _ = u.image.ReadFile("resource/UI/" + k + ".png")
-		mgUI = tools.GetEbitenImage(s)
-		for _, b := range v {
-			res := strings.Split(b, "_")
-			x, _ := strconv.ParseFloat(res[0], 64)
-			y, _ := strconv.ParseFloat(res[1], 64)
-			lay, _ := strconv.Atoi(res[2])
-			re, _ := strconv.Atoi(res[3])
-			d, _ := strconv.Atoi(res[4])
-			a, _ := strconv.Atoi(res[5])
-			b, _ := strconv.Atoi(res[6])
-			c, _ := strconv.Atoi(res[7])
-			e, _ := strconv.Atoi(res[8])
-			u.AddComponent(QuickCreateItems(x, y, mgUI, uint8(lay), nil, uint8(d), a, b, c, e), uint8(re))
+	//背包物品Loop
+	//事件
+	item_event := func(i spriteInterface, x, y int) {
+		if isClick == false {
+			isClick = true
+			go func() {
+				if !u.status.IsTakeItem {
+					//拿起物品flag设置
+					u.status.IsTakeItem = true
+					s := i.(*SpriteItems)
+					//将拿起的物品放入临时区
+					u.tempBag[0] = s
+					mouseIconCopy = *mouseIcon
+					mouseIcon = s.images
+					go func() {
+						time.Sleep(tools.CLOSEBTNSLEEP)
+						u.status.Mouseoffset = 0
+					}()
+					mouseRoate = 0
+					//拿起物品，从包裹中删除物品
+					u.DelItemFromBag(int((s.imagey-254)/29), int((s.imagex-413)/29))
+				}
+			}()
 		}
 	}
+	TempArray := make(map[string]int, 10)
+	items := u.BagLayout
+	for i := 0; i < 4; i++ {
+		for j := 0; j < 10; j++ {
+			if strings.Contains(items[i][j], "_") {
+				if _, ok := TempArray[items[i][j]]; !ok {
+					TempArray[items[i][j]] = 0
+					t := strings.Split(items[i][j], "_")
+					s, _ = u.image.ReadFile("resource/UI/" + t[0] + ".png")
+					mgUI = tools.GetEbitenImage(s)
+					x := 413 + j*29
+					y := 254 + i*29
+					u.AddComponent(QuickCreateItems(float64(x), float64(y), t[0], mgUI, 1, item_event, 1, true), 0)
+				}
+			} else if items[i][j] != "" {
+				s, _ = u.image.ReadFile("resource/UI/" + items[i][j] + ".png")
+				mgUI = tools.GetEbitenImage(s)
+				x := 413 + j*29
+				y := 254 + i*29
+				u.AddComponent(QuickCreateItems(float64(x), float64(y), items[i][j], mgUI, 1, item_event, 1, true), 0)
+			}
+		}
+	}
+	TempArray = nil
+
+	u.AddItemToBag(0, 5, "sword")
+
+	u.DelItemFromBag(2, 0)
 
 	//注册mini板打开按钮
 	s, _ = u.image.ReadFile("resource/UI/open_minipanel_btn.png")
@@ -261,7 +313,7 @@ func (u *UI) LoadGameImages() {
 				isClick = false
 			}()
 		}
-	}, 387, 448, 397, 467), tools.ISNORCOM)
+	}, true), tools.ISNORCOM)
 	//注册mini板
 	s, _ = u.image.ReadFile("resource/UI/miniPanel.png")
 	mgUI = tools.GetEbitenImage(s)
@@ -314,7 +366,7 @@ func (u *UI) LoadGameImages() {
 				isClick = false
 			}()
 		}
-	}, 337, 416, 350, 429), tools.ISMINICOM)
+	}, true), tools.ISMINICOM)
 	baseX += float64(mgUI.Bounds().Max.X) + 4
 	s, _ = u.image.ReadFile("resource/UI/mini_menu_j.png")
 	mgUI = tools.GetEbitenImage(s)
@@ -583,7 +635,7 @@ func (u *UI) ClearSlice(cap int) {
 	u.Compents = make([]*Sprite, 0, cap)
 	u.HiddenCompents = make([]*Sprite, 0, cap/2)
 	u.MiniPanelCompents = make([]*Sprite, 0, cap/2)
-	u.ItemsCompents = make([]*SpriteItems, 0, 50)
+	u.ItemsCompents = make([]*SpriteItems, 0, 10)
 }
 
 //渲染UI
@@ -600,7 +652,7 @@ func (u *UI) DrawUI(screen *ebiten.Image) {
 			screen.DrawImage(v.images, v.op)
 		}
 	}
-	//当包裹打开的时候，渲染包裹内物品和装备
+	//当包裹打开的时候，渲染包裹内物品和装备 TODO
 	if u.status.OpenBag {
 		for _, v := range u.ItemsCompents {
 			if v.bgIsDisplay {
@@ -614,6 +666,7 @@ func (u *UI) DrawUI(screen *ebiten.Image) {
 
 //事件轮询
 func (u *UI) EventLoop(mouseX, mouseY int) {
+
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
 		//普通UI事件轮询
 		for _, v := range u.Compents {
@@ -624,7 +677,39 @@ func (u *UI) EventLoop(mouseX, mouseY int) {
 				}
 			}
 		}
+		//包裹打开的情况下监听
+		if u.status.OpenBag {
+			//items UI事件轮询
+			for _, v := range u.ItemsCompents {
+				if v.hasEvent == 1 {
+					if mouseX > v.clickMinX && mouseX < v.clickMaxX && mouseY > v.clickMinY && mouseY < v.clickMaxY {
+						v.clickEvnet(v, mouseX, mouseY)
+					}
+				}
+			}
+		}
+
+		//点击包裹区域并且在包裹坐标范围内
+		if u.status.OpenBag && mouseX >= 408 && mouseY >= 256 && mouseX <= 698 && mouseY <= 372 && u.tempBag[0] != nil && u.status.IsTakeItem {
+			s := u.tempBag[0]
+			if u.AddItemToBag((int(mouseY+u.status.Mouseoffset-254) / 29), int((mouseX+u.status.Mouseoffset-413)/29), s.itemName) {
+				//鼠标还原
+				mouseIcon = &mouseIconCopy
+				u.tempBag[0] = nil
+				mouseRoate = -0.5
+				u.status.Mouseoffset = 200
+				//拿起物品flag设置
+				u.status.IsTakeItem = false
+				go func() {
+					time.Sleep(tools.CLOSEBTNSLEEP)
+					isClick = false
+				}()
+
+			}
+		}
+
 	}
+	//包裹打开的情况下监听
 	if u.status.OpenBag {
 		//items UI事件轮询
 		for _, v := range u.ItemsCompents {
@@ -636,8 +721,117 @@ func (u *UI) EventLoop(mouseX, mouseY int) {
 
 }
 
-//GC 加载清楚变量
+//GC 清理变量
 func (u *UI) ClearGlobalVariable() {
 	plist_R_sheet = nil
 	plist_R_png = nil
+}
+
+//添加物品到包裹
+func (u *UI) AddItemToBag(x, y int, itemName string) bool {
+	sizeX, sizeY := tools.GetItemsCellSize(itemName)
+	if sizeX != 0 && sizeY != 0 {
+		item_event := func(i spriteInterface, x, y int) {
+			if isClick == false {
+				isClick = true
+				go func() {
+					if !u.status.IsTakeItem {
+						//拿起物品flag设置
+						u.status.IsTakeItem = true
+						s := i.(*SpriteItems)
+						go func() {
+							time.Sleep(tools.CLOSEBTNSLEEP)
+							u.status.Mouseoffset = 0
+						}()
+						//将拿起的物品放入临时区
+						u.tempBag[0] = s
+						mouseIconCopy = *mouseIcon
+						mouseIcon = s.images
+						mouseRoate = 0
+						//拿起物品，从包裹中删除物品
+						u.DelItemFromBag(int((s.imagey-254)/29), int((s.imagex-413)/29))
+					}
+				}()
+			}
+		}
+
+		//x y这个单元格有位置是否
+		if x >= 0 && x <= 3 && y >= 0 && y <= 9 && u.BagLayout[x][y] == "" {
+			//一个大小的时候
+			if sizeX == 1 && sizeY == 1 {
+				u.BagLayout[x][y] = itemName
+				s, _ := u.image.ReadFile("resource/UI/" + itemName + ".png")
+				mgUI := tools.GetEbitenImage(s)
+				layoutX := 413 + y*29
+				layoutY := 254 + x*29
+				u.AddComponent(QuickCreateItems(float64(layoutX), float64(layoutY), itemName, mgUI, 1, item_event, 1, true), 0)
+				return true
+			} else {
+				//循环判断是否可以放下
+				for i := 0; i < sizeX; i++ {
+					for j := 0; j < sizeY; j++ {
+						if x+j > 3 || y+i > 9 || u.BagLayout[x+j][y+i] != "" {
+							return false
+						}
+					}
+				}
+				name := strconv.Itoa(x) + "," + strconv.Itoa(y)
+				for i := 0; i < sizeX; i++ {
+					for j := 0; j < sizeY; j++ {
+						u.BagLayout[x+j][y+i] = itemName + "_" + name
+					}
+				}
+				s, _ := u.image.ReadFile("resource/UI/" + itemName + ".png")
+				mgUI := tools.GetEbitenImage(s)
+				layoutX := 413 + y*29
+				layoutY := 254 + x*29
+				u.AddComponent(QuickCreateItems(float64(layoutX), float64(layoutY), itemName, mgUI, 1, item_event, 1, true), 0)
+				return true
+			}
+		} else {
+			return false
+		}
+	} else {
+		return false
+	}
+
+}
+
+//从包裹删除物品
+func (u *UI) DelItemFromBag(x, y int) {
+	if u.BagLayout[x][y] != "" {
+		if strings.Contains(u.BagLayout[x][y], "_") {
+			itemName := u.BagLayout[x][y]
+			for i := 0; i < 4; i++ {
+				for j := 0; j < 10; j++ {
+					if u.BagLayout[i][j] == itemName {
+						u.BagLayout[i][j] = ""
+					}
+				}
+			}
+		} else {
+			u.BagLayout[x][y] = ""
+		}
+		layoutX := 413 + y*29
+		layoutY := 254 + x*29
+		for k, v := range u.ItemsCompents {
+			if v.imagex == float64(layoutX) && v.imagey == float64(layoutY) {
+				if k != len(u.ItemsCompents)-1 {
+					u.ItemsCompents = append(u.ItemsCompents[0:k], u.ItemsCompents[k+1:]...)
+				} else {
+					u.ItemsCompents = u.ItemsCompents[0:k]
+				}
+
+			}
+		}
+	}
+}
+
+//重新绘制鼠标ICON
+func (u *UI) DrawMouseIcon(screen *ebiten.Image, mouseX, mouseY int) {
+	opMouse.GeoM.Reset()
+	opMouse.GeoM.Rotate(mouseRoate)
+	opMouse.Filter = ebiten.FilterLinear
+	opMouse.GeoM.Translate(float64(mouseX), float64(mouseY))
+	screen.DrawImage(mouseIcon, opMouse)
 }
