@@ -860,28 +860,28 @@ func (u *UI) ItemsEvent() func(i spriteInterface, x, y int) {
 
 //判断鼠标是否位于装备区
 func (u *UI) JudgeIsEquipArea(mousex, mousey int) (int, int, uint8) {
-	if mousex >= 526 && mousey >= 7 && mousex <= 580 && mousey <= 58 {
+	if mousex >= 530 && mousey >= 3 && mousex <= 584 && mousey <= 54 {
 		//判断是否可以放入头盔
-		return 526, 7, 0
-	} else if mousex >= 412 && mousey >= 52 && mousex <= 465 && mousey <= 158 {
+		return 530, 3, 0
+	} else if mousex >= 416 && mousey >= 48 && mousex <= 469 && mousey <= 154 {
 		//判断是否可以放入左武器
-		return 412, 52, 1
+		return 416, 48, 1
 
-	} else if mousex >= 526 && mousey >= 78 && mousex <= 579 && mousey <= 158 {
+	} else if mousex >= 530 && mousey >= 74 && mousex <= 583 && mousey <= 154 {
 		//判断是否可以放入铠甲
-		return 526, 78, 4
+		return 530, 74, 4
 
-	} else if mousex >= 643 && mousey >= 51 && mousex <= 695 && mousey <= 155 {
+	} else if mousex >= 647 && mousey >= 47 && mousex <= 699 && mousey <= 151 {
 		//判断是否可以放入右武器
-		return 643, 51, 2
+		return 647, 47, 2
 
-	} else if mousex >= 410 && mousey >= 181 && mousex <= 464 && mousey <= 234 {
+	} else if mousex >= 414 && mousey >= 177 && mousex <= 468 && mousey <= 230 {
 		//判断是否可以放入手套
-		return 410, 181, 5
+		return 414, 177, 5
 
-	} else if mousex >= 642 && mousey >= 181 && mousex <= 695 && mousey <= 233 {
+	} else if mousex >= 646 && mousey >= 177 && mousex <= 699 && mousey <= 229 {
 		//判断是否可以放入鞋
-		return 642, 181, 9
+		return 646, 177, 9
 	} else {
 		return 0, 0, 0
 	}
