@@ -28,7 +28,7 @@ func NewMap(images *embed.FS) *MapBase {
 
 //加载地图图片
 func (m *MapBase) LoadMap() {
-	s2, _ := m.image.ReadFile("resource/bg/campsite.png")
+	s2, _ := m.image.ReadFile("resource/bg/old.png")
 	img := tools.GetEbitenImage(s2)
 	m.BgImage = img
 	m.OpBg = &ebiten.DrawImageOptions{}
