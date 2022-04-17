@@ -8,6 +8,7 @@ require (
 )
 
 require (
+	github.com/OpenDiablo2/OpenDiablo2 v0.0.0-20211021131836-7f92c571bf04
 	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20220320163800-277f93cfa958 // indirect
 	github.com/hajimehoshi/go-mp3 v0.3.3 // indirect
 	github.com/hajimehoshi/oto/v2 v2.2.0-alpha // indirect

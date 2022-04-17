@@ -81,7 +81,7 @@ func (u *UI) LoadGameImages() {
 	s, _ = u.image.ReadFile("resource/UI/skill_btn.png")
 	mgUI = tools.GetEbitenImage(s)
 	u.AddComponent(QuickCreate(204, 441, mgUI, 0, func(i spriteInterface) {
-		if isClick == false {
+		if !isClick {
 			isClick = true
 			go func() {
 				on := *i.(*Sprite).images
@@ -96,7 +96,7 @@ func (u *UI) LoadGameImages() {
 		}
 	}, true), tools.ISNORCOM)
 	u.AddComponent(QuickCreate(562, 441, mgUI, 0, func(i spriteInterface) {
-		if isClick == false {
+		if !isClick {
 			isClick = true
 			go func() {
 				on := *i.(*Sprite).images
@@ -136,7 +136,7 @@ func (u *UI) LoadGameImages() {
 	s, _ = u.image.ReadFile("resource/UI/close_btn_on.png")
 	mgUI = tools.GetEbitenImage(s)
 	u.AddComponent(QuickCreate(414, 384, mgUI, 0, func(i spriteInterface) {
-		if isClick == false {
+		if !isClick {
 			isClick = true
 			go func() {
 				on := *i.(*Sprite).images
@@ -165,7 +165,9 @@ func (u *UI) LoadGameImages() {
 				//恢复玩家中心位置
 				u.status.PLAYERCENTERX = 388
 				//恢复地图偏移
-				u.maps.ChangeMapTranslate(200, 0)
+				//u.maps.ChangeMapTranslate(200, 0)
+				//修改动态地图偏移
+				u.status.MoveOffsetX += 200
 				isClick = false
 			}()
 		}
@@ -204,7 +206,7 @@ func (u *UI) LoadGameImages() {
 	s, _ = u.image.ReadFile("resource/UI/open_minipanel_btn.png")
 	mgUI = tools.GetEbitenImage(s)
 	u.AddComponent(QuickCreate(390, 443, mgUI, 0, func(i spriteInterface) {
-		if isClick == false {
+		if !isClick {
 			isClick = true
 			go func() {
 				if u.status.OpenMiniPanel {
@@ -246,7 +248,7 @@ func (u *UI) LoadGameImages() {
 	s, _ = u.image.ReadFile("resource/UI/mini_menu_wea.png")
 	mgUI = tools.GetEbitenImage(s)
 	u.AddComponent(QuickCreate(baseX, 410, mgUI, 0, func(i spriteInterface) {
-		if isClick == false {
+		if !isClick {
 			isClick = true
 			go func() {
 				on := *i.(*Sprite).images
@@ -258,8 +260,10 @@ func (u *UI) LoadGameImages() {
 						go func() {
 							//设置因打开包裹导致的人物偏移
 							u.status.UIOFFSETX = -200
-							//修改地图偏移
-							u.maps.ChangeMapTranslate(-200, 0)
+							//修改静态地图偏移
+							//u.maps.ChangeMapTranslate(-200, 0)
+							//修改动态地图偏移
+							u.status.MoveOffsetX -= 200
 							//修改玩家中心位置
 							u.status.PLAYERCENTERX -= 200
 							//修改人物影子偏移

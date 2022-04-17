@@ -4,6 +4,7 @@ import (
 	"embed"
 	"fmt"
 	"game/layout"
+	"game/mapCreator/anm"
 	"game/maps"
 	"game/music"
 	"game/role"
@@ -35,24 +36,26 @@ const (
 
 type Game struct {
 	count             int
-	player            *role.Player
-	maps              *maps.MapBase
-	ui                *layout.UI
+	countForMap       int
+	player            *role.Player  //玩家
+	maps              *maps.MapBase //静态地图
+	objectA           *anm.Anm      //object 动画
+	ui                *layout.UI    //UI
 	currentGameScence int
-	music             music.MusicInterface
-	status            *status.StatusManage
+	music             music.MusicInterface //音乐
+	status            *status.StatusManage //状态管理器
 }
 
 var (
-	counts        int = 0
-	frameNums     int = 4
-	frameSpeed    int = 5
-	op            *ebiten.DrawImageOptions
-	opS           *ebiten.DrawImageOptions
-	opWea         *ebiten.DrawImageOptions
-	opSkill       *ebiten.DrawImageOptions
-	images        *embed.FS
-	gameSceneType int = 0
+	counts       int = 0
+	countsForMap int = 0
+	frameNums    int = 4
+	frameSpeed   int = 5
+	op           *ebiten.DrawImageOptions
+	opS          *ebiten.DrawImageOptions
+	//opWea         *ebiten.DrawImageOptions
+	//opSkill       *ebiten.DrawImageOptions
+	images *embed.FS
 
 	mouseX   int
 	mouseY   int
@@ -61,28 +64,33 @@ var (
 )
 
 //GameEngine
-func NewGame(img *embed.FS) *Game {
-	images = img
+func NewGame(asset *embed.FS) *Game {
+	images = asset
 	//statueManage
 	sta := status.NewStatusManage()
 	//Map
-	m := maps.NewMap(img)
+	m := maps.NewMap(asset)
 	//Player
-	r := role.NewPlayer(float64(tools.LAYOUTX/2), float64(tools.LAYOUTY/2), tools.IDLE, 0, 0, 0, img, m, sta)
+	r := role.NewPlayer(float64(tools.LAYOUTX/2), float64(tools.LAYOUTY/2), tools.IDLE, 0, 0, 0, asset, m, sta)
 	//UI
-	u := layout.NewUI(img, sta, m)
+	u := layout.NewUI(asset, sta, m)
 
 	//BGM
 	bgm := music.NewMusicBGM(images)
 
+	//object Anm
+	object := anm.NewAnm(asset)
+
 	gameEngine := &Game{
 		count:             0,
+		countForMap:       0,
 		player:            r,
 		maps:              m,
 		ui:                u,
 		currentGameScence: GAMESCENELOGIN,
 		music:             bgm,
 		status:            sta,
+		objectA:           object,
 	}
 	return gameEngine
 }
@@ -123,7 +131,7 @@ func (g *Game) ChangeScene(name string) {
 	} else if name == "game" {
 		g.currentGameScence = GAMESCENESTART
 		w := sync.WaitGroup{}
-		w.Add(3)
+		w.Add(4)
 		//Palyer Init
 		go func() {
 			g.player.LoadImages()
@@ -139,6 +147,13 @@ func (g *Game) ChangeScene(name string) {
 		//Map Init
 		go func() {
 			g.maps.LoadMap()
+			runtime.GC()
+			w.Done()
+		}()
+		//object Anmi
+		go func() {
+			g.objectA.LoadAnm()
+			runtime.GC()
 			w.Done()
 		}()
 		w.Wait()
@@ -151,7 +166,7 @@ func (g *Game) ChangeScene(name string) {
 func (g *Game) Update() error {
 	mouseX, mouseY = ebiten.CursorPosition()
 	//切换场景判定
-	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && g.status.ChangeScenceFlg == false {
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && !g.status.ChangeScenceFlg {
 		if g.currentGameScence == GAMESCENELOGIN {
 			if mouseX > 286 && mouseX < 503 && mouseY > 150 && mouseY < 218 {
 				g.currentGameScence = GAMESCENESELECTROLE
@@ -176,7 +191,7 @@ func (g *Game) Update() error {
 	}
 
 	//切换场景逻辑
-	if g.status.ChangeScenceFlg == false {
+	if !g.status.ChangeScenceFlg {
 		if g.currentGameScence == GAMESCENESTART {
 			//进入游戏场景逻辑
 			g.changeScenceGameUpdate()
@@ -195,7 +210,7 @@ func (g *Game) Update() error {
 func (g *Game) Draw(screen *ebiten.Image) {
 
 	//Is Change Scence ?
-	if g.status.ChangeScenceFlg == false {
+	if !g.status.ChangeScenceFlg {
 		if g.currentGameScence == GAMESCENESTART {
 			g.ChangeScenceGameDraw(screen)
 		} else if g.currentGameScence == GAMESCENESELECTROLE {
@@ -217,7 +232,8 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 //Draw Game Update
 func (g *Game) changeScenceGameUpdate() {
 	g.count++
-	if g.status.MusicIsPlay == false {
+	g.countForMap++
+	if !g.status.MusicIsPlay {
 		//Play  voice
 		g.status.MusicIsPlay = true
 		g.music.PlayMusic("Bar_act2_complete_tombs.wav", tools.MUSICWAV)
@@ -269,7 +285,7 @@ func (g *Game) changeScenceGameUpdate() {
 	//事件循环监听 是否有按钮点击事件
 	g.ui.EventLoop(mouseX, mouseY)
 	//鼠标移动控制
-	if g.status.OpenBag == false || g.status.OpenBag == true && mouseX <= tools.LAYOUTX/2 {
+	if !g.status.OpenBag || g.status.OpenBag && mouseX <= tools.LAYOUTX/2 {
 		//
 		if g.player.OldDirection != g.player.Direction && !ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
 			if !g.status.CalculateEnd {
@@ -326,7 +342,7 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 		}
 	}()
 	//Draw Background
-	screen.DrawImage(g.maps.BgImage, g.maps.OpBg)
+	g.maps.Render(screen, g.status.MoveOffsetX, g.status.MoveOffsetY)
 	//
 	var name string
 	//nameSkill := ""
@@ -372,6 +388,8 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	op.Filter = ebiten.FilterLinear
 	screen.DrawImage(imagess, op)
 
+	//Draw object Anmi
+	g.objectA.Render(screen, countsForMap, g.status.MoveOffsetX, g.status.MoveOffsetY)
 	//Draw UI
 	g.ui.DrawUI(screen)
 
@@ -393,7 +411,7 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nplayer position %d,%d\nmouse position %d,%d\ndir %d\nAngle %f",
 		int64(ebiten.CurrentFPS()), int64(g.player.X), int64(g.player.Y), g.player.MouseX, g.player.MouseY, tools.CaluteDir(g.status.PLAYERCENTERX, g.status.PLAYERCENTERY, int64(g.player.MouseX), int64(g.player.MouseY)), re))
 
-	//Change Frame
+	//Change player Frame
 	if g.count > frameSpeed {
 		counts++
 		g.count = 0
@@ -401,11 +419,20 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 			counts = 0
 		}
 	}
+
+	//Change map Frame
+	if g.countForMap > 5 {
+		countsForMap++
+		g.countForMap = 0
+		if countsForMap >= 20 {
+			countsForMap = 0
+		}
+	}
 }
 
 //Draw Login Update
 func (g *Game) ChangeScenceLoginUpdate() {
-	if g.status.MusicIsPlay == false {
+	if !g.status.MusicIsPlay {
 		g.status.MusicIsPlay = true
 		g.music.PlayMusic("Act0-Intro.mp3", tools.MUSICMP3)
 	}
@@ -507,7 +534,7 @@ func (g *Game) ChangeScenceOpenDoorDraw(screen *ebiten.Image) {
 
 //Draw OpenDoor Update
 func (g *Game) ChangeScenceOpenDoorUpdate() {
-	if g.status.DoorCountFlg == false {
+	if !g.status.DoorCountFlg {
 		counts = 0
 		g.status.DoorCountFlg = true
 	}
@@ -519,7 +546,7 @@ func (g *Game) ChangeScenceOpenDoorUpdate() {
 	}
 
 	// Change Scence
-	if counts == 9 && g.status.LoadingFlg == false {
+	if counts == 9 && !g.status.LoadingFlg {
 		g.status.LoadingFlg = true
 		g.currentGameScence = GAMESCENESTART
 		w := sync.WaitGroup{}

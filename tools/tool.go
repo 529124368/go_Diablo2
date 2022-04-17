@@ -2,6 +2,7 @@ package tools
 
 import (
 	"bytes"
+	"errors"
 	"image"
 	"log"
 	"math"
@@ -25,6 +26,7 @@ const (
 	CLOSEBTNSLEEP time.Duration = 200000000 //按钮按下弹起动画sleep时间
 	MUSICWAV      int           = 1         //音乐WAV格式
 	MUSICMP3      int           = 2         //音乐mp3格式
+	ObjectPath    string        = "resource/object"
 )
 
 //Calculate Direction
@@ -230,4 +232,51 @@ func GetItemsCellSize(name string) (int, int) {
 	}
 
 	return 0, 0
+}
+
+// AbsInt32 returns the absolute of the given int32
+func AbsInt32(a int32) int32 {
+	if a < 0 {
+		return -a
+	}
+
+	return a
+}
+
+// MinInt32 returns the higher of two values
+func MinInt32(a, b int32) int32 {
+	if a < b {
+		return a
+	}
+
+	return b
+}
+func MaxInt32(a, b int32) int32 {
+	if a > b {
+		return a
+	}
+
+	return b
+}
+
+//暗黑新手村专用 根据逻辑坐标 求具体坐标
+func GetCellXY(x, y int) (int, int, error) {
+	if x < 0 || x > 57 || y < 0 || y > 41 {
+		str := "error"
+		return 0, 0, errors.New(str)
+	}
+	startY := 0
+	sumX := 0
+	for i := 0; i < 41; i++ {
+		startY += 40
+		sumX = 0
+		for j := 0; j < 57; j++ {
+			sumX += 80
+			if j == x && y == i {
+				return i*(-80) + sumX, startY + j*40, nil
+			}
+		}
+	}
+	str := "no match"
+	return 0, 0, errors.New(str)
 }
