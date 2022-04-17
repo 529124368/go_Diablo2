@@ -268,10 +268,14 @@ func GetCellXY(x, y int) (int, int, error) {
 	startY := 0
 	sumX := 0
 	for i := 0; i < 41; i++ {
-		startY += 40
+		if i > 0 {
+			startY += 40
+		}
 		sumX = 0
-		for j := 0; j < 57; j++ {
-			sumX += 80
+		for j := 11; j < 57; j++ {
+			if j > 11 {
+				sumX += 80
+			}
 			if j == x && y == i {
 				return i*(-80) + sumX, startY + j*40, nil
 			}

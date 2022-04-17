@@ -38,7 +38,7 @@ type Game struct {
 	count             int
 	countForMap       int
 	player            *role.Player  //玩家
-	maps              *maps.MapBase //静态地图
+	maps              *maps.MapBase //地图
 	objectA           *anm.Anm      //object 动画
 	ui                *layout.UI    //UI
 	currentGameScence int
@@ -69,9 +69,9 @@ func NewGame(asset *embed.FS) *Game {
 	//statueManage
 	sta := status.NewStatusManage()
 	//Map
-	m := maps.NewMap(asset)
+	m := maps.NewMap(asset, sta)
 	//Player
-	r := role.NewPlayer(float64(tools.LAYOUTX/2), float64(tools.LAYOUTY/2), tools.IDLE, 0, 0, 0, asset, m, sta)
+	r := role.NewPlayer(0, 0, tools.IDLE, 0, 0, 0, asset, m, sta)
 	//UI
 	u := layout.NewUI(asset, sta, m)
 
@@ -209,7 +209,7 @@ func (g *Game) Update() error {
 
 func (g *Game) Draw(screen *ebiten.Image) {
 
-	//Is Change Scence ?
+	//判断是否切换场景
 	if !g.status.ChangeScenceFlg {
 		if g.currentGameScence == GAMESCENESTART {
 			g.ChangeScenceGameDraw(screen)
@@ -234,7 +234,7 @@ func (g *Game) changeScenceGameUpdate() {
 	g.count++
 	g.countForMap++
 	if !g.status.MusicIsPlay {
-		//Play  voice
+		//音乐
 		g.status.MusicIsPlay = true
 		g.music.PlayMusic("Bar_act2_complete_tombs.wav", tools.MUSICWAV)
 	}
@@ -335,14 +335,13 @@ func (g *Game) changeScenceGameUpdate() {
 
 //Draw Game Scence  渲染游戏画面
 func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
-
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println("has error is :", r)
 		}
 	}()
 	//Draw Background
-	g.maps.Render(screen, g.status.MoveOffsetX, g.status.MoveOffsetY)
+	g.maps.RenderFloor(screen, g.status.MoveOffsetX, g.status.MoveOffsetY)
 	//
 	var name string
 	//nameSkill := ""
@@ -387,7 +386,8 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	op.GeoM.Translate(float64(tools.LAYOUTX/2+OFFSETX+x+g.status.UIOFFSETX), float64(tools.LAYOUTY/2+OFFSETY+y))
 	op.Filter = ebiten.FilterLinear
 	screen.DrawImage(imagess, op)
-
+	//Draw Background
+	g.maps.RenderWall(screen, g.status.MoveOffsetX, g.status.MoveOffsetY)
 	//Draw object Anmi
 	g.objectA.Render(screen, countsForMap, g.status.MoveOffsetX, g.status.MoveOffsetY)
 	//Draw UI

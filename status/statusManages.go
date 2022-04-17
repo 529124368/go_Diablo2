@@ -36,9 +36,10 @@ func NewStatusManage() *StatusManage {
 		PLAYERCENTERX:   388, //LAYOUTX/2
 		PLAYERCENTERY:   242, //LAYOUTY/2
 		IsTakeItem:      false,
-		Mouseoffset:     500,
-		MoveOffsetX:     200,
-		MoveOffsetY:     -1300,
+		Mouseoffset:     -1800,
+		//
+		MoveOffsetX: -1800 + 880,
+		MoveOffsetY: -1600,
 	}
 	return n
 }

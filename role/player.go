@@ -48,7 +48,7 @@ func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m *
 		OldDirection: dir,
 		MouseX:       mx,
 		MouseY:       my,
-		SkillName:    "",
+		SkillName:    "", //技能名字
 		image:        images,
 		map_c:        m,
 		status:       s,
@@ -123,7 +123,6 @@ func (p *Player) GetMouseController(dir uint8) {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
-		//p.map_c.OpBg.GeoM.Translate(-tools.SPEED, tools.SPEED)
 		p.status.MoveOffsetX += -tools.SPEED
 		p.status.MoveOffsetY += tools.SPEED
 		p.Y -= tools.SPEED
@@ -136,7 +135,6 @@ func (p *Player) GetMouseController(dir uint8) {
 			p.SetPlayerState(tools.RUN, dir)
 
 		}
-		//p.map_c.OpBg.GeoM.Translate(-tools.SPEED, -tools.SPEED)
 		p.status.MoveOffsetX += -tools.SPEED
 		p.status.MoveOffsetY += -tools.SPEED
 		p.Y += tools.SPEED
@@ -147,7 +145,6 @@ func (p *Player) GetMouseController(dir uint8) {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
-		//p.map_c.OpBg.GeoM.Translate(tools.SPEED, -tools.SPEED)
 		p.status.MoveOffsetX += tools.SPEED
 		p.status.MoveOffsetY += -tools.SPEED
 		p.Y += tools.SPEED
@@ -158,7 +155,6 @@ func (p *Player) GetMouseController(dir uint8) {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
-		//p.map_c.OpBg.GeoM.Translate(tools.SPEED, tools.SPEED)
 		p.status.MoveOffsetX += tools.SPEED
 		p.status.MoveOffsetY += tools.SPEED
 		p.Y -= tools.SPEED
@@ -169,7 +165,6 @@ func (p *Player) GetMouseController(dir uint8) {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
-		//p.map_c.OpBg.GeoM.Translate(tools.SPEED, 0)
 		p.status.MoveOffsetX += tools.SPEED
 		p.status.MoveOffsetY += 0
 		p.X -= tools.SPEED
@@ -180,7 +175,6 @@ func (p *Player) GetMouseController(dir uint8) {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
-		//p.map_c.OpBg.GeoM.Translate(0, tools.SPEED)
 		p.status.MoveOffsetX += 0
 		p.status.MoveOffsetY += tools.SPEED
 		p.Y -= tools.SPEED
@@ -191,7 +185,6 @@ func (p *Player) GetMouseController(dir uint8) {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
-		//p.map_c.OpBg.GeoM.Translate(-tools.SPEED, 0)
 		p.status.MoveOffsetX += -tools.SPEED
 		p.status.MoveOffsetY += 0
 		p.X += tools.SPEED
@@ -202,7 +195,6 @@ func (p *Player) GetMouseController(dir uint8) {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
-		//p.map_c.OpBg.GeoM.Translate(0, -tools.SPEED)
 		p.status.MoveOffsetX += 0
 		p.status.MoveOffsetY += -tools.SPEED
 		p.Y += tools.SPEED
@@ -212,7 +204,6 @@ func (p *Player) GetMouseController(dir uint8) {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
-		//p.map_c.OpBg.GeoM.Translate(1-tools.SPEED, tools.SPEED)
 		p.status.MoveOffsetX += 1 - tools.SPEED
 		p.status.MoveOffsetY += tools.SPEED
 		p.Y -= tools.SPEED
@@ -223,7 +214,6 @@ func (p *Player) GetMouseController(dir uint8) {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
-		//p.map_c.OpBg.GeoM.Translate(-tools.SPEED, tools.SPEED)
 		p.status.MoveOffsetX += -tools.SPEED
 		p.status.MoveOffsetY += tools.SPEED
 		p.Y -= tools.SPEED
@@ -234,7 +224,6 @@ func (p *Player) GetMouseController(dir uint8) {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
-		//p.map_c.OpBg.GeoM.Translate(-tools.SPEED, tools.SPEED-1)
 		p.status.MoveOffsetX += -tools.SPEED
 		p.status.MoveOffsetY += tools.SPEED - 1
 		p.Y -= tools.SPEED - 1
@@ -245,7 +234,6 @@ func (p *Player) GetMouseController(dir uint8) {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
-		//p.map_c.OpBg.GeoM.Translate(tools.SPEED, tools.SPEED-1)
 		p.status.MoveOffsetX += tools.SPEED
 		p.status.MoveOffsetY += tools.SPEED - 1
 		p.Y -= tools.SPEED - 1
@@ -256,7 +244,6 @@ func (p *Player) GetMouseController(dir uint8) {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
-		//p.map_c.OpBg.GeoM.Translate(tools.SPEED, tools.SPEED)
 		p.status.MoveOffsetX += tools.SPEED
 		p.status.MoveOffsetY += tools.SPEED
 		p.Y -= tools.SPEED
@@ -267,7 +254,6 @@ func (p *Player) GetMouseController(dir uint8) {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
-		//p.map_c.OpBg.GeoM.Translate(tools.SPEED-1, tools.SPEED)
 		p.status.MoveOffsetX += tools.SPEED - 1
 		p.status.MoveOffsetY += tools.SPEED
 		p.Y -= tools.SPEED
@@ -278,7 +264,6 @@ func (p *Player) GetMouseController(dir uint8) {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
-		//p.map_c.OpBg.GeoM.Translate(tools.SPEED, 1-tools.SPEED)
 		p.status.MoveOffsetX += tools.SPEED
 		p.status.MoveOffsetY += 1 - tools.SPEED
 		p.Y += tools.SPEED - 1
@@ -289,7 +274,6 @@ func (p *Player) GetMouseController(dir uint8) {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
-		//p.map_c.OpBg.GeoM.Translate(tools.SPEED, -tools.SPEED)
 		p.status.MoveOffsetX += tools.SPEED
 		p.status.MoveOffsetY += -tools.SPEED
 		p.Y += tools.SPEED
@@ -300,7 +284,6 @@ func (p *Player) GetMouseController(dir uint8) {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
-		//p.map_c.OpBg.GeoM.Translate(tools.SPEED-1, -tools.SPEED)
 		p.status.MoveOffsetX += tools.SPEED - 1
 		p.status.MoveOffsetY += -tools.SPEED
 		p.Y += tools.SPEED
@@ -312,7 +295,6 @@ func (p *Player) GetMouseController(dir uint8) {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
-		//p.map_c.OpBg.GeoM.Translate(1-tools.SPEED, -tools.SPEED)
 		p.status.MoveOffsetX += 1 - tools.SPEED
 		p.status.MoveOffsetY += -tools.SPEED
 		p.Y += tools.SPEED
@@ -323,7 +305,6 @@ func (p *Player) GetMouseController(dir uint8) {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
-		//p.map_c.OpBg.GeoM.Translate(-tools.SPEED, -tools.SPEED)
 		p.status.MoveOffsetX += -tools.SPEED
 		p.status.MoveOffsetY += -tools.SPEED
 		p.Y += tools.SPEED
@@ -334,7 +315,6 @@ func (p *Player) GetMouseController(dir uint8) {
 		if p.Direction != dir || p.State != tools.RUN {
 			p.SetPlayerState(tools.RUN, dir)
 		}
-		//p.map_c.OpBg.GeoM.Translate(-tools.SPEED, 1-tools.SPEED)
 		p.status.MoveOffsetX += -tools.SPEED
 		p.status.MoveOffsetY += 1 - tools.SPEED
 		p.Y += tools.SPEED - 1

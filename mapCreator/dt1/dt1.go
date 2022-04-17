@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"game/mapCreator/d2interface"
 	"game/tools"
+
 	"log"
 )
 

@@ -3,10 +3,10 @@ package maps
 import (
 	"embed"
 	"fmt"
-	"game/mapCreator/d2interface"
 	"game/mapCreator/dat"
 	"game/mapCreator/ds1"
 	"game/mapCreator/dt1"
+	"game/status"
 	"game/tools"
 
 	"github.com/OpenDiablo2/OpenDiablo2/d2common/d2enum"
@@ -15,9 +15,10 @@ import (
 )
 
 var (
-	MAPOFFSETX float64 = -1800
-	MAPOFFSETY float64 = -1300
-	Scale      float64 = 1
+	Scale float64 = 1
+	img   [][]*ebiten.Image
+	img2  [][]imgWall
+	img3  [][]imgWall
 )
 
 type imgWall struct {
@@ -25,68 +26,74 @@ type imgWall struct {
 	h   int
 }
 
-var img [][]*ebiten.Image
-
-var img2 [][]imgWall
-
-var img3 [][]imgWall
-
 type MapBase struct {
 	image   *embed.FS
-	OpBg    *ebiten.DrawImageOptions
 	BgImage *ebiten.Image
+	status  *status.StatusManage //状态
 }
 
 //Create Map Class
-func NewMap(images *embed.FS) *MapBase {
+func NewMap(images *embed.FS, s *status.StatusManage) *MapBase {
 	maps := &MapBase{
-		image: images,
+		image:  images,
+		status: s,
 	}
 	return maps
 }
 
 //加载地图图片
 func (m *MapBase) LoadMap() {
-	//加载静态地图
-	//m.LoadStaticMap()
 	//加载动态地图
 	m.LoadDstMap()
 }
 
 //改变地图坐标
 func (m *MapBase) ChangeMapTranslate(x, y float64) {
-	m.OpBg.GeoM.Translate(x, y)
+	m.status.MoveOffsetX += x
 }
 
-func (m *MapBase) Render(screen *ebiten.Image, offsetX, offsetY float64) {
-	//screen.DrawImage(m.BgImage, m.OpBg)
+//渲染地图的地砖
+func (m *MapBase) RenderFloor(screen *ebiten.Image, offsetX, offsetY float64) {
 	//floor
 	sumX := 0
 	startY := 0
 	for i := 0; i < 41; i++ {
-		startY += 40
+		if i > 0 {
+			startY += 40
+		}
 		sumX = 0
-		for j := 0; j < 57; j++ {
+		for j := 11; j < 57; j++ {
 			s := img[i][j]
-			sumX += 80
+			if j > 11 {
+				sumX += 80
+			}
 			if s != nil {
 				op := &ebiten.DrawImageOptions{}
 				op.GeoM.Translate(float64(i)*(-80)+float64(sumX)+offsetX, float64(startY)+float64(j)*40+offsetY)
 				op.GeoM.Scale(Scale, Scale)
 				screen.DrawImage(s, op)
+				//ebitenutil.DebugPrintAt(screen, "·"+strconv.Itoa(j)+","+strconv.Itoa(i), i*(-80)+sumX+int(offsetX)+74, startY+j*40+int(offsetY)+img3[i][j].h+37)
 			}
 		}
 	}
 
+}
+
+//渲染地图的建筑
+func (m *MapBase) RenderWall(screen *ebiten.Image, offsetX, offsetY float64) {
 	//补图
-	sumX = 0
-	startY = 0
+	sumX := 0
+	startY := 0
 	for i := 0; i < 41; i++ {
-		startY += 40
+		if i > 0 {
+			startY += 40
+		}
 		sumX = 0
-		for j := 0; j < 57; j++ {
+		for j := 11; j < 57; j++ {
 			s := img3[i][j].img
-			sumX += 80
+			if j > 11 {
+				sumX += 80
+			}
 			if s != nil {
 				op := &ebiten.DrawImageOptions{}
 				op.GeoM.Translate(float64(i)*(-80)+float64(sumX)+offsetX, float64(startY)+float64(j)*40+offsetY+float64(img3[i][j].h))
@@ -99,11 +106,15 @@ func (m *MapBase) Render(screen *ebiten.Image, offsetX, offsetY float64) {
 	sumX = 0
 	startY = 0
 	for i := 0; i < 41; i++ {
-		startY += 40
+		if i > 0 {
+			startY += 40
+		}
 		sumX = 0
-		for j := 0; j < 57; j++ {
+		for j := 11; j < 57; j++ {
 			s := img2[i][j].img
-			sumX += 80
+			if j > 11 {
+				sumX += 80
+			}
 			if s != nil {
 				op := &ebiten.DrawImageOptions{}
 				op.GeoM.Translate(float64(i)*(-80)+float64(sumX)+offsetX, float64(startY)+float64(j)*40+offsetY+float64(img2[i][j].h))
@@ -114,17 +125,7 @@ func (m *MapBase) Render(screen *ebiten.Image, offsetX, offsetY float64) {
 	}
 }
 
-//静态地图
-func (m *MapBase) LoadStaticMap() {
-	s2, _ := m.image.ReadFile("resource/bg/old.png")
-	img := tools.GetEbitenImage(s2)
-	m.BgImage = img
-	m.OpBg = &ebiten.DrawImageOptions{}
-	m.OpBg.Filter = ebiten.FilterLinear
-	m.OpBg.GeoM.Translate(MAPOFFSETX, MAPOFFSETY)
-}
-
-//静态动态地图
+//动态地图解析和加载s
 func (m *MapBase) LoadDstMap() {
 	//加载调色板
 	r, _ := m.image.ReadFile(tools.ObjectPath + "/mapSucai/pal.dat")
@@ -278,65 +279,4 @@ func (m *MapBase) LoadDstMap() {
 
 		}
 	}
-}
-
-func getTitleImage(tileData dt1.Tile, w d2interface.Palette) *ebiten.Image {
-	tileYMinimum := int32(0)
-	for _, block := range tileData.Blocks {
-		tileYMinimum = tools.MinInt32(tileYMinimum, int32(block.Y))
-	}
-	tileYOffset := tools.AbsInt32(tileYMinimum)
-	tileHeight := tools.AbsInt32(tileData.Height)
-	indexData := make([]byte, tileData.Width*int32(tileHeight))
-	dt1.DecodeTileGfxData(tileData.Blocks, &indexData, tileYOffset, tileData.Width)
-	//加载调色板
-	pixels := dt1.ImgIndexToRGBA(indexData, w)
-	imgss := ebiten.NewImage(int(tileData.Width), int(tileHeight))
-	imgss.ReplacePixels(pixels)
-	return imgss
-}
-
-func getWallTitleImage(tileData dt1.Tile, tile *ds1.Tile, w d2interface.Palette) (*ebiten.Image, int) {
-
-	tileMinY := int32(0)
-	tileMaxY := int32(0)
-	for _, block := range tileData.Blocks {
-
-		tileMinY = tools.MinInt32(tileMinY, int32(block.Y))
-		tileMaxY = tools.MaxInt32(tileMaxY, int32(block.Y+32))
-	}
-
-	realHeight := tools.MaxInt32(tools.AbsInt32(tileData.Height), tileMaxY-tileMinY)
-	tileYOffset := -tileMinY
-
-	if tile.Type == d2enum.TileRoof {
-		tile.YAdjust = -int(tileData.RoofHeight)
-	} else {
-		tile.YAdjust = int(tileMinY) + 80
-	}
-
-	indexData := make([]byte, 160*realHeight)
-	dt1.DecodeTileGfxData(tileData.Blocks, &indexData, tileYOffset, 160)
-	//加载调色板
-	pixels := dt1.ImgIndexToRGBA(indexData, w)
-	imgss := ebiten.NewImage(160, int(realHeight))
-	imgss.ReplacePixels(pixels)
-	return imgss, tile.YAdjust
-}
-
-//根据ds1 获取对应dt1
-func GetTiles(style, sequence int, tileType d2enum.TileType, m []dt1.Tile) []dt1.Tile {
-	tiles := make([]dt1.Tile, 0)
-
-	for idx := range m {
-		if m[idx].Style != int32(style) || m[idx].Sequence != int32(sequence) ||
-			m[idx].Type != int32(tileType) {
-			continue
-		}
-		tiles = append(tiles, m[idx])
-	}
-	if len(tiles) == 0 {
-		return nil
-	}
-	return tiles
 }
