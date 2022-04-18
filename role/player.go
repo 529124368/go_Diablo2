@@ -30,8 +30,8 @@ var (
 )
 
 type Player struct {
-	X            float64
-	Y            float64
+	X            float64              //玩家世界坐标X
+	Y            float64              //玩家世界坐标Y
 	State        uint8                //玩家状态
 	Direction    uint8                //玩家当前方向
 	OldDirection uint8                //玩家旧的方向
@@ -45,7 +45,7 @@ type Player struct {
 	mp           float64              //蓝
 }
 
-//Create Player Class
+//创建玩家
 func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m *maps.MapBase, s *status.StatusManage) *Player {
 	opS = &ebiten.DrawImageOptions{}
 	op = &ebiten.DrawImageOptions{}

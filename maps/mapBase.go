@@ -63,17 +63,18 @@ func (m *MapBase) RenderFloor(screen *ebiten.Image, offsetX, offsetY float64) {
 		}
 		sumX = 0
 		for j := 0; j < m.status.ReadMapSizeWidth; j++ {
-
 			if j > 0 {
 				sumX += 80
 			}
-			if j > 11 {
+			//视野剔除
+			if j > m.status.MapTitleX-m.status.MapZoom && j < m.status.MapTitleX+m.status.MapZoom && i > m.status.MapTitleY-m.status.MapZoom && i < m.status.MapTitleY+m.status.MapZoom {
 				s := img[i][j]
 				if s != nil {
 					op := &ebiten.DrawImageOptions{}
 					op.GeoM.Translate(float64(i)*(-80)+float64(sumX)+offsetX, float64(startY)+float64(j)*40+offsetY)
 					op.GeoM.Scale(Scale, Scale)
 					screen.DrawImage(s, op)
+					// debug  info
 					//ebitenutil.DebugPrintAt(screen, "·"+strconv.Itoa(j)+","+strconv.Itoa(i), i*(-80)+sumX+int(offsetX)+74, startY+j*40+int(offsetY)+img3[i][j].h+37)
 				}
 			}
@@ -96,8 +97,9 @@ func (m *MapBase) RenderWall(screen *ebiten.Image, offsetX, offsetY float64) {
 			if j > 0 {
 				sumX += 80
 			}
-			if j > 11 {
-				s := img3[i][j].img
+			s := img3[i][j].img
+			//视野剔除
+			if j > m.status.MapTitleX-m.status.MapZoom && j < m.status.MapTitleX+m.status.MapZoom && i > m.status.MapTitleY-m.status.MapZoom && i < m.status.MapTitleY+m.status.MapZoom {
 				if s != nil {
 					op := &ebiten.DrawImageOptions{}
 					op.GeoM.Translate(float64(i)*(-80)+float64(sumX)+offsetX, float64(startY)+float64(j)*40+offsetY+float64(img3[i][j].h))
@@ -110,16 +112,17 @@ func (m *MapBase) RenderWall(screen *ebiten.Image, offsetX, offsetY float64) {
 	//wall
 	sumX = 0
 	startY = 0
-	for i := 0; i < 41; i++ {
+	for i := 0; i < m.status.ReadMapSizeHeight; i++ {
 		if i > 0 {
 			startY += 40
 		}
 		sumX = 0
-		for j := 0; j < 57; j++ {
+		for j := 0; j < m.status.ReadMapSizeWidth; j++ {
 			if j > 0 {
 				sumX += 80
 			}
-			if j > 11 {
+			//视野剔除
+			if j > m.status.MapTitleX-m.status.MapZoom && j < m.status.MapTitleX+m.status.MapZoom && i > m.status.MapTitleY-m.status.MapZoom && i < m.status.MapTitleY+m.status.MapZoom {
 				s := img2[i][j].img
 				if s != nil {
 					op := &ebiten.DrawImageOptions{}
@@ -132,7 +135,7 @@ func (m *MapBase) RenderWall(screen *ebiten.Image, offsetX, offsetY float64) {
 	}
 }
 
-//动态地图解析和加载s
+//动态地图解析和加载
 func (m *MapBase) LoadDstMap() {
 	//加载调色板
 	r, _ := m.image.ReadFile(tools.ObjectPath + "/mapSucai/pal.dat")

@@ -106,24 +106,18 @@ func GetEbitenImage(data []byte) *ebiten.Image {
 
 //Get NRGBA Plist Images
 func GetImageFromPlist(s []byte, json []byte) (*texturepacker.SpriteSheet, *image.NRGBA) {
-	sheet, err := texturepacker.SheetFromData(json, texturepacker.FormatJSONHash{})
+	sheet, _ := texturepacker.SheetFromData(json, texturepacker.FormatJSONHash{})
 
-	img, _, err := image.Decode(bytes.NewReader(s))
-	if err != nil {
-		log.Fatal(err)
-	}
+	img, _, _ := image.Decode(bytes.NewReader(s))
 	sheetImage := img.(*image.NRGBA)
 	return sheet, sheetImage
 }
 
 //Get Paletted Plist Images
 func GetImageFromPlistPaletted(s []byte, json []byte) (*texturepacker.SpriteSheet, *image.Paletted) {
-	sheet, err := texturepacker.SheetFromData(json, texturepacker.FormatJSONHash{})
+	sheet, _ := texturepacker.SheetFromData(json, texturepacker.FormatJSONHash{})
 
-	img, _, err := image.Decode(bytes.NewReader(s))
-	if err != nil {
-		log.Fatal(err)
-	}
+	img, _, _ := image.Decode(bytes.NewReader(s))
 	sheetImage := img.(*image.Paletted)
 	return sheet, sheetImage
 }
@@ -140,6 +134,7 @@ func Angle(y float64, len float64) float64 {
 	return math.Asin(y/len) * 180 / math.Pi
 }
 
+//计算转头角度一栏
 func CalculateDirPath(oldDir, newDir uint8) []uint8 {
 	newPath := make([]uint8, 0, 16)
 	dirList := []uint8{1, 11, 6, 12, 2, 13, 7, 14, 3, 15, 4, 8, 0, 9, 5, 10}
@@ -260,4 +255,14 @@ func MaxInt32(a, b int32) int32 {
 	}
 
 	return b
+}
+
+//计算玩家在所在地砖的逻辑坐标
+func GetFloorPositionAt(x, y float64) (int, int) {
+	//当前菱形地图 0,0 点坐标世界坐标是 （3280,0）
+	M_Minus_N := (x - 3280) / 80
+	M_Plus_N := y / 40
+	xx := math.Floor((M_Minus_N+M_Plus_N)/2 + 0.5)
+	yy := math.Floor(xx - M_Minus_N + 0.5)
+	return int(xx), int(yy)
 }

@@ -128,10 +128,8 @@ func (a *Anm) GetCellXY(x, y int) (int, int, error) {
 			if j > 0 {
 				sumX += 80
 			}
-			if j > 11 {
-				if j == x && y == i {
-					return i*(-80) + sumX, startY + j*40, nil
-				}
+			if j == x && y == i {
+				return i*(-80) + sumX, startY + j*40, nil
 			}
 
 		}

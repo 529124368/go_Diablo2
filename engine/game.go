@@ -17,6 +17,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 //config
@@ -64,8 +65,8 @@ func NewGame(asset *embed.FS) *Game {
 	sta := status.NewStatusManage()
 	//Map
 	m := maps.NewMap(asset, sta)
-	//Player
-	r := role.NewPlayer(0, 0, tools.IDLE, 0, 0, 0, asset, m, sta)
+	//Player  设置初始状态和坐标
+	r := role.NewPlayer(5280, 1840, tools.IDLE, 0, 0, 0, asset, m, sta)
 	//UI
 	u := layout.NewUI(asset, sta, m)
 
@@ -255,6 +256,13 @@ func (g *Game) changeScenceGameUpdate() {
 		}
 	}
 
+	if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) {
+		g.status.MapZoom += 1
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) {
+		g.status.MapZoom -= 1
+	}
+
 	//计算鼠标位置
 	dir := tools.CaluteDir(g.status.PLAYERCENTERX, g.status.PLAYERCENTERY, int64(g.player.MouseX), int64(g.player.MouseY))
 
@@ -330,11 +338,11 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	}()
 	//Draw floor
 	g.maps.RenderFloor(screen, g.status.MoveOffsetX, g.status.MoveOffsetY)
-	//
+	//Draw player
 	g.player.Render(screen, counts)
 	//Draw Wall
 	g.maps.RenderWall(screen, g.status.MoveOffsetX, g.status.MoveOffsetY)
-	//Draw object Anmi
+	//Draw map Anmi
 	g.objectA.Render(screen, countsForMap, g.status.MoveOffsetX, g.status.MoveOffsetY)
 	//Draw UI
 	g.ui.DrawUI(screen)
@@ -342,8 +350,11 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	//Draw Debug
 	len := tools.Distance(g.status.PLAYERCENTERX, g.status.PLAYERCENTERY, int64(mouseX), int64(mouseY))
 	re := tools.Angle(math.Abs(float64(int64(mouseY)-g.status.PLAYERCENTERY)), len)
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nplayer position %d,%d\nmouse position %d,%d\ndir %d\nAngle %f",
-		int64(ebiten.CurrentFPS()), int64(g.player.X), int64(g.player.Y), g.player.MouseX, g.player.MouseY, tools.CaluteDir(g.status.PLAYERCENTERX, g.status.PLAYERCENTERY, int64(g.player.MouseX), int64(g.player.MouseY)), re))
+	mapX, mapY := tools.GetFloorPositionAt(g.player.X, g.player.Y)
+	g.status.MapTitleX = mapX
+	g.status.MapTitleY = mapY
+	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nplayer position %d,%d\nmouse position %d,%d\ndir %d\nAngle %f\nmapXY %d,%d",
+		int64(ebiten.CurrentFPS()), int64(g.player.X), int64(g.player.Y), g.player.MouseX, g.player.MouseY, tools.CaluteDir(g.status.PLAYERCENTERX, g.status.PLAYERCENTERY, int64(g.player.MouseX), int64(g.player.MouseY)), re, mapX, mapY))
 
 	//Change player Frame
 	if g.count > frameSpeed {

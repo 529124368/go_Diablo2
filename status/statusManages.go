@@ -20,6 +20,9 @@ type StatusManage struct {
 	MoveOffsetY       float64
 	ReadMapSizeWidth  int
 	ReadMapSizeHeight int
+	MapTitleX         int
+	MapTitleY         int
+	MapZoom           int
 }
 
 func NewStatusManage() *StatusManage {
@@ -40,11 +43,16 @@ func NewStatusManage() *StatusManage {
 		IsTakeItem:      false,
 		Mouseoffset:     -1800,
 		//玩家初始位置偏移设置
-		MoveOffsetX: -1800,
+		MoveOffsetX: -1650,
 		MoveOffsetY: -1600,
 		//读取地图的尺寸
 		ReadMapSizeWidth:  0,
 		ReadMapSizeHeight: 0,
+		//玩家初始逻辑地图坐标
+		MapTitleX: 36,
+		MapTitleY: 11,
+		//
+		MapZoom: 7,
 	}
 	return n
 }
