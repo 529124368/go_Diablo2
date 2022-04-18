@@ -36,17 +36,17 @@ type UI struct {
 	ItemsCompents     []*SpriteItems       //Items的UI集合
 	status            *status.StatusManage //状态管理器
 	maps              *maps.MapBase        //地图
-	BagLayout         [5][10]string        //4*10 背包 1*10 装备栏
+	BagLayout         [5][10]string        //4*10 背包 + 1*10 装备栏
 	tempBag           [1]*SpriteItems      //临时Items存放
 }
 
 func NewUI(images *embed.FS, s *status.StatusManage, m *maps.MapBase) *UI {
 	//初始化背包 数据
 	itemsLayout := [5][10]string{
-		{"HP0", "HP0", "HP0", "HP0", "book_0,4", "sword_0,5", "sword_0,5", "", "dun_0,8", "dun_0,8"},
-		{"body-3_1,0", "body-3_1,0", "", "", "book_0,4", "sword_0,5", "sword_0,5", "", "dun_0,8", "dun_0,8"},
-		{"body-3_1,0", "body-3_1,0", "hand_2,2", "hand_2,2", "book_2,4", "sword_0,5", "sword_0,5", "", "head-3_2,8", "head-3_2,8"},
-		{"body-3_1,0", "body-3_1,0", "hand_2,2", "hand_2,2", "book_2,4", "HP0", "", "", "head-3_2,8", "head-3_2,8"},
+		{"HP0", "HP0", "book_0,2", "dun-6_0,3", "dun-6_0,3", "sword_0,5", "sword_0,5", "", "dun_0,8", "dun_0,8"},
+		{"body-3_1,0", "body-3_1,0", "book_0,2", "dun-6_0,3", "dun-6_0,3", "sword_0,5", "sword_0,5", "", "dun_0,8", "dun_0,8"},
+		{"body-3_1,0", "body-3_1,0", "", "dun-6_0,3", "dun-6_0,3", "sword_0,5", "sword_0,5", "", "head-5_2,8", "head-5_2,8"},
+		{"body-3_1,0", "body-3_1,0", "", "", "", "", "", "", "head-5_2,8", "head-5_2,8"},
 		{"", "", "", "", "", "", "", "", "", ""},
 		//头盔526,8  左手武器412,54 右手武器644,54 项链599,36 铠甲526,80 手套413,182 左戒指485,181 腰带527,181 右戒指599,183 靴子644,183
 	}

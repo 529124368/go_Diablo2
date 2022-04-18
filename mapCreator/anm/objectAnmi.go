@@ -2,6 +2,8 @@ package anm
 
 import (
 	"embed"
+	"errors"
+	"game/status"
 	"game/tools"
 	"strconv"
 	"strings"
@@ -21,16 +23,18 @@ type Anm struct {
 	huodui   []*ebiten.Image
 	op       []*ebiten.DrawImageOptions
 	xyPos    [17]postion
-	image    *embed.FS //静态资源获取
+	image    *embed.FS            //静态资源获取
+	status   *status.StatusManage //状态
 }
 
-func NewAnm(images *embed.FS) *Anm {
+func NewAnm(images *embed.FS, sta *status.StatusManage) *Anm {
 	a := &Anm{
 		anmiList: make([]*ebiten.Image, 0),
 		wayList:  make([]*ebiten.Image, 0),
 		huodui:   make([]*ebiten.Image, 0),
 		op:       make([]*ebiten.DrawImageOptions, 0),
 		image:    images,
+		status:   sta,
 	}
 	return a
 }
@@ -57,7 +61,7 @@ func (a *Anm) LoadXyList() {
 		re := strings.Split(k, ",")
 		x, _ := strconv.Atoi(re[0])
 		y, _ := strconv.Atoi(re[1])
-		xx, yy, _ := tools.GetCellXY(x, y)
+		xx, yy, _ := a.GetCellXY(x, y)
 		a.xyPos[i].x = xx
 		a.xyPos[i].y = yy
 		opr := &ebiten.DrawImageOptions{}
@@ -105,4 +109,33 @@ func (a *Anm) Render(screen *ebiten.Image, frameIndex int, offsetX, offsetY floa
 	a.op[16].GeoM.Scale(Scale, Scale)
 	screen.DrawImage(a.huodui[frameIndex], a.op[16])
 
+}
+
+//暗黑新手村专用 根据逻辑坐标 求具体坐标
+func (a *Anm) GetCellXY(x, y int) (int, int, error) {
+	if x < 0 || x > 57 || y < 0 || y > 41 {
+		str := "坐标范围不正确"
+		return 0, 0, errors.New(str)
+	}
+	startY := 0
+	sumX := 0
+	for i := 0; i < a.status.ReadMapSizeHeight; i++ {
+		if i > 0 {
+			startY += 40
+		}
+		sumX = 0
+		for j := 0; j < a.status.ReadMapSizeWidth; j++ {
+			if j > 0 {
+				sumX += 80
+			}
+			if j > 11 {
+				if j == x && y == i {
+					return i*(-80) + sumX, startY + j*40, nil
+				}
+			}
+
+		}
+	}
+	str := "没有找到匹配的位置"
+	return 0, 0, errors.New(str)
 }

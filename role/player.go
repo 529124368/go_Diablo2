@@ -14,12 +14,19 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+const (
+	OFFSETX int = -30
+	OFFSETY int = -30
+)
+
 var (
 	plist_sheet       *texturepacker.SpriteSheet
 	plist_skill_sheet *texturepacker.SpriteSheet
 	plist_skill_png   *image.NRGBA
 	plist_png         *image.Paletted
 	loadedSkill       string
+	opS               *ebiten.DrawImageOptions
+	op                *ebiten.DrawImageOptions
 )
 
 type Player struct {
@@ -40,6 +47,8 @@ type Player struct {
 
 //Create Player Class
 func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m *maps.MapBase, s *status.StatusManage) *Player {
+	opS = &ebiten.DrawImageOptions{}
+	op = &ebiten.DrawImageOptions{}
 	play := &Player{
 		X:            x,
 		Y:            y,
@@ -62,8 +71,8 @@ func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m *
 func (p *Player) LoadImages() {
 
 	//加载玩家素材
-	plist, _ := p.image.ReadFile("resource/man/warrior/ba1.png")
-	plist_json, _ := p.image.ReadFile("resource/man/warrior/ba1.json")
+	plist, _ := p.image.ReadFile("resource/man/warrior/ba2.png")
+	plist_json, _ := p.image.ReadFile("resource/man/warrior/ba2.json")
 	plist_sheet, plist_png = tools.GetImageFromPlistPaletted(plist, plist_json)
 	//skill load
 	// go func() {

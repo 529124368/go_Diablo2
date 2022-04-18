@@ -57,22 +57,25 @@ func (m *MapBase) RenderFloor(screen *ebiten.Image, offsetX, offsetY float64) {
 	//floor
 	sumX := 0
 	startY := 0
-	for i := 0; i < 41; i++ {
+	for i := 0; i < m.status.ReadMapSizeHeight; i++ {
 		if i > 0 {
 			startY += 40
 		}
 		sumX = 0
-		for j := 11; j < 57; j++ {
-			s := img[i][j]
-			if j > 11 {
+		for j := 0; j < m.status.ReadMapSizeWidth; j++ {
+
+			if j > 0 {
 				sumX += 80
 			}
-			if s != nil {
-				op := &ebiten.DrawImageOptions{}
-				op.GeoM.Translate(float64(i)*(-80)+float64(sumX)+offsetX, float64(startY)+float64(j)*40+offsetY)
-				op.GeoM.Scale(Scale, Scale)
-				screen.DrawImage(s, op)
-				//ebitenutil.DebugPrintAt(screen, "·"+strconv.Itoa(j)+","+strconv.Itoa(i), i*(-80)+sumX+int(offsetX)+74, startY+j*40+int(offsetY)+img3[i][j].h+37)
+			if j > 11 {
+				s := img[i][j]
+				if s != nil {
+					op := &ebiten.DrawImageOptions{}
+					op.GeoM.Translate(float64(i)*(-80)+float64(sumX)+offsetX, float64(startY)+float64(j)*40+offsetY)
+					op.GeoM.Scale(Scale, Scale)
+					screen.DrawImage(s, op)
+					//ebitenutil.DebugPrintAt(screen, "·"+strconv.Itoa(j)+","+strconv.Itoa(i), i*(-80)+sumX+int(offsetX)+74, startY+j*40+int(offsetY)+img3[i][j].h+37)
+				}
 			}
 		}
 	}
@@ -84,21 +87,23 @@ func (m *MapBase) RenderWall(screen *ebiten.Image, offsetX, offsetY float64) {
 	//补图
 	sumX := 0
 	startY := 0
-	for i := 0; i < 41; i++ {
+	for i := 0; i < m.status.ReadMapSizeHeight; i++ {
 		if i > 0 {
 			startY += 40
 		}
 		sumX = 0
-		for j := 11; j < 57; j++ {
-			s := img3[i][j].img
-			if j > 11 {
+		for j := 0; j < m.status.ReadMapSizeWidth; j++ {
+			if j > 0 {
 				sumX += 80
 			}
-			if s != nil {
-				op := &ebiten.DrawImageOptions{}
-				op.GeoM.Translate(float64(i)*(-80)+float64(sumX)+offsetX, float64(startY)+float64(j)*40+offsetY+float64(img3[i][j].h))
-				op.GeoM.Scale(Scale, Scale)
-				screen.DrawImage(s, op)
+			if j > 11 {
+				s := img3[i][j].img
+				if s != nil {
+					op := &ebiten.DrawImageOptions{}
+					op.GeoM.Translate(float64(i)*(-80)+float64(sumX)+offsetX, float64(startY)+float64(j)*40+offsetY+float64(img3[i][j].h))
+					op.GeoM.Scale(Scale, Scale)
+					screen.DrawImage(s, op)
+				}
 			}
 		}
 	}
@@ -110,16 +115,18 @@ func (m *MapBase) RenderWall(screen *ebiten.Image, offsetX, offsetY float64) {
 			startY += 40
 		}
 		sumX = 0
-		for j := 11; j < 57; j++ {
-			s := img2[i][j].img
-			if j > 11 {
+		for j := 0; j < 57; j++ {
+			if j > 0 {
 				sumX += 80
 			}
-			if s != nil {
-				op := &ebiten.DrawImageOptions{}
-				op.GeoM.Translate(float64(i)*(-80)+float64(sumX)+offsetX, float64(startY)+float64(j)*40+offsetY+float64(img2[i][j].h))
-				op.GeoM.Scale(Scale, Scale)
-				screen.DrawImage(s, op)
+			if j > 11 {
+				s := img2[i][j].img
+				if s != nil {
+					op := &ebiten.DrawImageOptions{}
+					op.GeoM.Translate(float64(i)*(-80)+float64(sumX)+offsetX, float64(startY)+float64(j)*40+offsetY+float64(img2[i][j].h))
+					op.GeoM.Scale(Scale, Scale)
+					screen.DrawImage(s, op)
+				}
 			}
 		}
 	}
@@ -176,8 +183,11 @@ func (m *MapBase) LoadDstMap() {
 	// 	fmt.Println(strings.ReplaceAll(d.Files[i], "tg1", "dt1"))
 	// }
 
-	//floor
 	w, h := d.Floors[0].Size()
+	//保存地图大小
+	m.status.ReadMapSizeWidth = w
+	m.status.ReadMapSizeHeight = h
+	//floor
 	img = make([][]*ebiten.Image, h)
 	for i := 0; i < h; i++ {
 		img[i] = make([]*ebiten.Image, w)

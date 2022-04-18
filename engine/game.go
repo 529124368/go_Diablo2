@@ -23,8 +23,6 @@ import (
 const (
 	SCREENWIDTH  int = 490
 	SCREENHEIGHT int = 300
-	OFFSETX      int = -30
-	OFFSETY      int = -30
 
 	WEOFFSETX           int = 127
 	WEOFFSETY           int = 14
@@ -51,11 +49,7 @@ var (
 	countsForMap int = 0
 	frameNums    int = 4
 	frameSpeed   int = 5
-	op           *ebiten.DrawImageOptions
-	opS          *ebiten.DrawImageOptions
-	//opWea         *ebiten.DrawImageOptions
-	//opSkill       *ebiten.DrawImageOptions
-	images *embed.FS
+	images       *embed.FS
 
 	mouseX   int
 	mouseY   int
@@ -79,7 +73,7 @@ func NewGame(asset *embed.FS) *Game {
 	bgm := music.NewMusicBGM(images)
 
 	//object Anm
-	object := anm.NewAnm(asset)
+	object := anm.NewAnm(asset, sta)
 
 	gameEngine := &Game{
 		count:             0,
@@ -98,8 +92,6 @@ func NewGame(asset *embed.FS) *Game {
 func (g *Game) StartEngine() {
 	//隐藏鼠标系统的ICON
 	ebiten.SetCursorMode(ebiten.CursorModeHidden)
-	opS = &ebiten.DrawImageOptions{}
-	op = &ebiten.DrawImageOptions{}
 	//
 	w := sync.WaitGroup{}
 	w.Add(1)
@@ -131,7 +123,7 @@ func (g *Game) ChangeScene(name string) {
 	} else if name == "game" {
 		g.currentGameScence = GAMESCENESTART
 		w := sync.WaitGroup{}
-		w.Add(4)
+		w.Add(3)
 		//Palyer Init
 		go func() {
 			g.player.LoadImages()
@@ -147,11 +139,7 @@ func (g *Game) ChangeScene(name string) {
 		//Map Init
 		go func() {
 			g.maps.LoadMap()
-			runtime.GC()
-			w.Done()
-		}()
-		//object Anmi
-		go func() {
+			//加载动画
 			g.objectA.LoadAnm()
 			runtime.GC()
 			w.Done()
@@ -340,70 +328,16 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 			fmt.Println("has error is :", r)
 		}
 	}()
-	//Draw Background
+	//Draw floor
 	g.maps.RenderFloor(screen, g.status.MoveOffsetX, g.status.MoveOffsetY)
 	//
-	var name string
-	//nameSkill := ""
-	switch g.player.State {
-	case tools.ATTACK:
-		name = strconv.Itoa(int(g.player.Direction)) + "_attack_" + strconv.Itoa(counts) + ".png"
-		//nameSkill = strconv.Itoa(g.player.Direction) + "_skill_" + strconv.Itoa(counts) + ".png"
-	case tools.IDLE:
-		name = strconv.Itoa(int(g.player.Direction)) + "_stand_" + strconv.Itoa(counts) + ".png"
-	default:
-		if counts >= 8 {
-			counts = 0
-		}
-		name = strconv.Itoa(int(g.player.Direction)) + "_run_" + strconv.Itoa(counts) + ".png"
-	}
-	imagess, x, y := g.player.GetAnimator("man", name)
-	//Idel -> Walk Offset
-	if g.player.State == tools.RUN {
-		// x += -4
-		// y += -3
-		x += 4
-		y += -18
-	}
-
-	//Idel -> Walk -> Attack Offset
-	if g.player.State == tools.ATTACK {
-		// x += -50
-		// y += -30
-		x += -55
-		y += -35
-	}
-	//Draw Shadow
-	opS.GeoM.Reset()
-	opS.GeoM.Translate(float64(tools.LAYOUTX/2+x+g.status.ShadowOffsetX+g.status.UIOFFSETX), float64(tools.LAYOUTY/2+y+g.status.ShadowOffsetY))
-	opS.Filter = ebiten.FilterLinear
-	opS.GeoM.Rotate(-0.5)
-	opS.GeoM.Scale(1, 0.5)
-	opS.ColorM.Scale(0, 0, 0, 1)
-	screen.DrawImage(imagess, opS)
-	//Draw Player
-	op.GeoM.Reset()
-	op.GeoM.Translate(float64(tools.LAYOUTX/2+OFFSETX+x+g.status.UIOFFSETX), float64(tools.LAYOUTY/2+OFFSETY+y))
-	op.Filter = ebiten.FilterLinear
-	screen.DrawImage(imagess, op)
-	//Draw Background
+	g.player.Render(screen, counts)
+	//Draw Wall
 	g.maps.RenderWall(screen, g.status.MoveOffsetX, g.status.MoveOffsetY)
 	//Draw object Anmi
 	g.objectA.Render(screen, countsForMap, g.status.MoveOffsetX, g.status.MoveOffsetY)
 	//Draw UI
 	g.ui.DrawUI(screen)
-
-	//Draw Skill
-	// if g.player.State == ATTACK {
-	// 	imagey, x, y := g.player.GetAnimator("skill", nameSkill)
-	// 	//skill option
-	// 	opSkill = &ebiten.DrawImageOptions{}
-	// 	opSkill.GeoM.Translate(float64(SCREENWIDTH/2+x), float64(SCREENHEIGHT/2+y))
-	// 	opSkill.CompositeMode = ebiten.CompositeModeLighter
-	// 	opSkill.GeoM.Scale(1.5, 1.5)
-	// 	opSkill.Filter = ebiten.FilterLinear
-	// 	screen.DrawImage(imagey, opSkill)
-	// }
 
 	//Draw Debug
 	len := tools.Distance(g.status.PLAYERCENTERX, g.status.PLAYERCENTERY, int64(mouseX), int64(mouseY))

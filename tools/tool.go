@@ -2,7 +2,6 @@ package tools
 
 import (
 	"bytes"
-	"errors"
 	"image"
 	"log"
 	"math"
@@ -215,6 +214,10 @@ func GetItemsCellSize(name string) (int, int) {
 		return 2, 2
 	case "head-4":
 		return 2, 2
+	case "head-5":
+		return 2, 2
+	case "dun-6":
+		return 2, 3
 	case "sword":
 		return 2, 3
 	case "body-3":
@@ -257,30 +260,4 @@ func MaxInt32(a, b int32) int32 {
 	}
 
 	return b
-}
-
-//暗黑新手村专用 根据逻辑坐标 求具体坐标
-func GetCellXY(x, y int) (int, int, error) {
-	if x < 0 || x > 57 || y < 0 || y > 41 {
-		str := "error"
-		return 0, 0, errors.New(str)
-	}
-	startY := 0
-	sumX := 0
-	for i := 0; i < 41; i++ {
-		if i > 0 {
-			startY += 40
-		}
-		sumX = 0
-		for j := 11; j < 57; j++ {
-			if j > 11 {
-				sumX += 80
-			}
-			if j == x && y == i {
-				return i*(-80) + sumX, startY + j*40, nil
-			}
-		}
-	}
-	str := "no match"
-	return 0, 0, errors.New(str)
 }
