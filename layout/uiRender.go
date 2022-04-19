@@ -326,120 +326,96 @@ func (u *UI) LoadGameLoginImages() {
 	var scales float64 = 0.8
 	s, _ := u.image.ReadFile("resource/UI/login0.png")
 	mgUI := tools.GetEbitenImage(s)
-	op := newSprite()
-	op.SetPosition(len, 0)
+	op := QuickCreate(len, 0, mgUI, 0, nil)
 	op.op.GeoM.Scale(1, scales)
-	op.addImage(mgUI)
 	u.AddComponent(op, tools.ISNORCOM)
 
 	len += float64(mgUI.Bounds().Max.X)
 
 	s, _ = u.image.ReadFile("resource/UI/login1.png")
 	mgUI = tools.GetEbitenImage(s)
-	op = newSprite()
-	op.SetPosition(len, 0)
+	op = QuickCreate(len, 0, mgUI, 0, nil)
 	op.op.GeoM.Scale(1, scales)
-	op.addImage(mgUI)
 	u.AddComponent(op, tools.ISNORCOM)
 
 	len += float64(mgUI.Bounds().Max.X)
 
 	s, _ = u.image.ReadFile("resource/UI/login2.png")
 	mgUI = tools.GetEbitenImage(s)
-	op = newSprite()
-	op.SetPosition(len, 0)
+	op = QuickCreate(len, 0, mgUI, 0, nil)
 	op.op.GeoM.Scale(1, scales)
-	op.addImage(mgUI)
 	u.AddComponent(op, tools.ISNORCOM)
 
 	len += float64(mgUI.Bounds().Max.X)
 
 	s, _ = u.image.ReadFile("resource/UI/login3.png")
 	mgUI = tools.GetEbitenImage(s)
-	op = newSprite()
-	op.SetPosition(len, 0)
+	op = QuickCreate(len, 0, mgUI, 0, nil)
 	op.op.GeoM.Scale(1, scales)
-	op.addImage(mgUI)
 	u.AddComponent(op, tools.ISNORCOM)
 
 	len = 0
 	var offset float64 = 340
 	s, _ = u.image.ReadFile("resource/UI/login8.png")
 	mgUI = tools.GetEbitenImage(s)
-	op = newSprite()
-	op.SetPosition(len, offset)
+	op = QuickCreate(len, offset, mgUI, 0, nil)
 	op.op.GeoM.Scale(1, scales)
-	op.addImage(mgUI)
 	u.AddComponent(op, tools.ISNORCOM)
 
 	len += float64(mgUI.Bounds().Max.X)
 
 	s, _ = u.image.ReadFile("resource/UI/login9.png")
 	mgUI = tools.GetEbitenImage(s)
-	op = newSprite()
-	op.SetPosition(len, offset)
+	op = QuickCreate(len, offset, mgUI, 0, nil)
 	op.op.GeoM.Scale(1, scales)
-	op.addImage(mgUI)
 	u.AddComponent(op, tools.ISNORCOM)
 
 	len += float64(mgUI.Bounds().Max.X)
 
 	s, _ = u.image.ReadFile("resource/UI/login10.png")
 	mgUI = tools.GetEbitenImage(s)
-	op = newSprite()
-	op.SetPosition(len, offset)
+	op = QuickCreate(len, offset, mgUI, 0, nil)
 	op.op.GeoM.Scale(1, scales)
-	op.addImage(mgUI)
 	u.AddComponent(op, tools.ISNORCOM)
 
 	len += float64(mgUI.Bounds().Max.X)
 
 	s, _ = u.image.ReadFile("resource/UI/login11.png")
 	mgUI = tools.GetEbitenImage(s)
-	op = newSprite()
-	op.SetPosition(len, offset)
+	op = QuickCreate(len, offset, mgUI, 0, nil)
 	op.op.GeoM.Scale(1, scales)
-	op.addImage(mgUI)
 	u.AddComponent(op, tools.ISNORCOM)
 
 	len = 0
 
 	s, _ = u.image.ReadFile("resource/UI/login4.png")
 	mgUI = tools.GetEbitenImage(s)
-	op = newSprite()
-	op.SetPosition(len, float64(mgUI.Bounds().Max.Y))
+	op = QuickCreate(len, float64(mgUI.Bounds().Max.Y), mgUI, 0, nil)
 	op.op.GeoM.Scale(1, scales)
-	op.addImage(mgUI)
 	u.AddComponent(op, tools.ISNORCOM)
 
 	len += float64(mgUI.Bounds().Max.X)
 
 	s, _ = u.image.ReadFile("resource/UI/login5.png")
 	mgUI = tools.GetEbitenImage(s)
-	op = newSprite()
-	op.SetPosition(len, float64(mgUI.Bounds().Max.Y))
+	op = QuickCreate(len, float64(mgUI.Bounds().Max.Y), mgUI, 0, nil)
 	op.op.GeoM.Scale(1, scales)
-	op.addImage(mgUI)
 	u.AddComponent(op, tools.ISNORCOM)
 
 	len += float64(mgUI.Bounds().Max.X)
 
 	s, _ = u.image.ReadFile("resource/UI/login6.png")
 	mgUI = tools.GetEbitenImage(s)
-	op = newSprite()
-	op.SetPosition(len, float64(mgUI.Bounds().Max.Y))
+	op = QuickCreate(len, float64(mgUI.Bounds().Max.Y), mgUI, 0, nil)
 	op.op.GeoM.Scale(1, scales)
-	op.addImage(mgUI)
 	u.AddComponent(op, tools.ISNORCOM)
 
 	len += float64(mgUI.Bounds().Max.X)
 
 	s, _ = u.image.ReadFile("resource/UI/login7.png")
 	mgUI = tools.GetEbitenImage(s)
-	op = newSprite()
-	op.SetPosition(len, float64(mgUI.Bounds().Max.Y))
+	op = QuickCreate(len, float64(mgUI.Bounds().Max.Y), mgUI, 0, nil)
 	op.op.GeoM.Scale(1, scales)
-	op.addImage(mgUI)
 	u.AddComponent(op, tools.ISNORCOM)
 
 	go func() {
@@ -476,10 +452,12 @@ func (u *UI) LoadGameCharaSelectImages() {
 				i.(*Sprite).images = &on
 				u.SetDisplay(tools.ISHIDDEN)
 				//切换游戏场景到开门loading
-				u.status.CurrentGameScence = tools.GAMESCENEOPENDOOR
+				u.status.ChangeScenceFlg = true
 				u.ClearSlice(0)
 				u.ClearGlobalVariable()
 				runtime.GC()
+				u.status.CurrentGameScence = tools.GAMESCENEOPENDOOR
+				u.status.ChangeScenceFlg = false
 				isClick = false
 			}()
 		}

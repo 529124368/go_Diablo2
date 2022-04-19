@@ -2,6 +2,7 @@ package engine
 
 import (
 	"embed"
+	"game/fonts"
 	"game/layout"
 	"game/mapCreator/anm"
 	"game/maps"
@@ -32,6 +33,7 @@ type Game struct {
 	ui          *layout.UI           //UI
 	music       music.MusicInterface //音乐
 	status      *status.StatusManage //状态管理器
+	font_style  *fonts.FontBase      //字体
 }
 
 var (
@@ -39,7 +41,6 @@ var (
 	countsForMap int = 0
 	frameNums    int = 4
 	frameSpeed   int = 5
-	images       *embed.FS
 	mouseX       int
 	mouseY       int
 	newPath      []uint8
@@ -48,7 +49,6 @@ var (
 
 //GameEngine
 func NewGame(asset *embed.FS) *Game {
-	images = asset
 	//statueManage
 	sta := status.NewStatusManage()
 	//Map
@@ -58,10 +58,11 @@ func NewGame(asset *embed.FS) *Game {
 	//UI
 	u := layout.NewUI(asset, sta, m)
 	//BGM
-	bgm := music.NewMusicBGM(images)
+	bgm := music.NewMusicBGM(asset)
 	//场景动画
 	object := anm.NewAnm(asset, sta)
-
+	//字体
+	f := fonts.NewFont(asset)
 	gameEngine := &Game{
 		count:       0,
 		countForMap: 0,
@@ -71,6 +72,7 @@ func NewGame(asset *embed.FS) *Game {
 		music:       bgm,
 		status:      sta,
 		objectA:     object,
+		font_style:  f,
 	}
 	return gameEngine
 }
@@ -83,6 +85,7 @@ func (g *Game) StartEngine() {
 	w.Add(1)
 	//UI Init
 	go func() {
+		g.font_style.LoadFont("resource/font/DiabloLight.ttf")
 		g.ui.LoadGameLoginImages()
 		runtime.GC()
 		w.Done()

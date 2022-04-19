@@ -268,7 +268,6 @@ func (g *Game) ChangeScenceSelectUpdate() {
 
 //Draw Login Scence
 func (g *Game) ChangeScenceLoginDraw(screen *ebiten.Image) {
-
 	//Draw UI
 	g.ui.DrawUI(screen)
 
@@ -293,7 +292,6 @@ func (g *Game) ChangeScenceLoginDraw(screen *ebiten.Image) {
 	//Draw Debug
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nmouse position %d,%d",
 		int64(ebiten.CurrentFPS()), mouseX, mouseY))
-
 	//Change Frame
 	if g.count > frameSpeed {
 		counts++
@@ -304,7 +302,7 @@ func (g *Game) ChangeScenceLoginDraw(screen *ebiten.Image) {
 	}
 }
 
-//Draw Select Scence  渲
+//Draw Select Scence
 func (g *Game) ChangeScenceSelectDraw(screen *ebiten.Image) {
 	//Draw UI
 	g.ui.DrawUI(screen)
@@ -328,6 +326,8 @@ func (g *Game) ChangeScenceSelectDraw(screen *ebiten.Image) {
 
 	//Draw Debug
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nmouse position %d,%d", int64(ebiten.CurrentFPS()), mouseX, mouseY))
+	//Draw Font
+	g.font_style.Render(screen, 651, 446, "Ok")
 }
 
 //Draw OpenDoor Scence
