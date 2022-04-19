@@ -23,6 +23,7 @@ type StatusManage struct {
 	MapTitleX         int
 	MapTitleY         int
 	MapZoom           int
+	CurrentGameScence int
 }
 
 func NewStatusManage() *StatusManage {
@@ -52,7 +53,8 @@ func NewStatusManage() *StatusManage {
 		MapTitleX: 36,
 		MapTitleY: 11,
 		//
-		MapZoom: 7,
+		MapZoom:           7,
+		CurrentGameScence: 1,
 	}
 	return n
 }

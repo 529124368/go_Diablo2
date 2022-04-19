@@ -12,20 +12,24 @@ import (
 )
 
 const (
-	IDLE          uint8         = 0
-	RUN           uint8         = 1
-	ATTACK        uint8         = 2
-	SPEED         float64       = 2
-	ISHIDDEN      uint8         = 1 //装备栏等隐藏标识
-	ISITEMS       uint8         = 0 //物品和装备标识
-	ISMINICOM     uint8         = 2 //MINI板标识
-	ISNORCOM      uint8         = 3
-	LAYOUTX       int           = 790
-	LAYOUTY       int           = 480
-	CLOSEBTNSLEEP time.Duration = 200000000 //按钮按下弹起动画sleep时间
-	MUSICWAV      int           = 1         //音乐WAV格式
-	MUSICMP3      int           = 2         //音乐mp3格式
-	ObjectPath    string        = "resource/object"
+	IDLE                uint8         = 0
+	RUN                 uint8         = 1
+	ATTACK              uint8         = 2
+	SPEED               float64       = 2 //玩家移动素材
+	ISHIDDEN            uint8         = 1 //装备栏等隐藏标识
+	ISITEMS             uint8         = 0 //物品和装备标识
+	ISMINICOM           uint8         = 2 //MINI板标识
+	ISNORCOM            uint8         = 3 //无标识 占位用
+	LAYOUTX             int           = 790
+	LAYOUTY             int           = 480
+	CLOSEBTNSLEEP       time.Duration = 200000000 //按钮按下弹起动画sleep时间
+	MUSICWAV            int           = 1         //音乐WAV格式
+	MUSICMP3            int           = 2         //音乐mp3格式
+	ObjectPath          string        = "resource/object"
+	GAMESCENELOGIN      int           = 1 //登录场景
+	GAMESCENESELECTROLE int           = 2 //选择场景
+	GAMESCENEOPENDOOR   int           = 3 //开门场景
+	GAMESCENESTART      int           = 4 //游戏场景
 )
 
 //Calculate Direction

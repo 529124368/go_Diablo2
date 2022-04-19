@@ -12,13 +12,18 @@ import (
 //加载进入游戏UI
 func (u *UI) LoadGameImages() {
 	u.ClearSlice(10)
+	//初始化背包 数据
+	itemsLayout := [5][10]string{
+		{"HP0", "HP0", "book_0,2", "dun-6_0,3", "dun-6_0,3", "sword_0,5", "sword_0,5", "", "dun_0,8", "dun_0,8"},
+		{"body-3_1,0", "body-3_1,0", "book_0,2", "dun-6_0,3", "dun-6_0,3", "sword_0,5", "sword_0,5", "", "dun_0,8", "dun_0,8"},
+		{"body-3_1,0", "body-3_1,0", "", "dun-6_0,3", "dun-6_0,3", "sword_0,5", "sword_0,5", "", "head-5_2,8", "head-5_2,8"},
+		{"body-3_1,0", "body-3_1,0", "", "", "", "", "", "", "head-5_2,8", "head-5_2,8"},
+		{"", "", "", "", "", "", "", "", "", ""},
+		//头盔526,8  左手武器412,54 右手武器644,54 项链599,36 铠甲526,80 手套413,182 左戒指485,181 腰带527,181 右戒指599,183 靴子644,183
+	}
+	u.BagLayout = itemsLayout
+	//
 	var len float64 = 0
-	// go func() {
-	// 	plist, _ := u.image.ReadFile("resource/UI/0000.png")
-	// 	plist_json, _ := u.image.ReadFile("resource/man/warrior/ba.json")
-	// 	plist_sheet, plist_png = tools.GetImageFromPlistPaletted(plist, plist_json)
-	// 	runtime.GC()
-	// }()
 	s, _ := u.image.ReadFile("resource/UI/0000.png")
 	mgUI := tools.GetEbitenImage(s)
 	u.AddComponent(QuickCreate(len, 480-float64(mgUI.Bounds().Max.Y), mgUI, 0, nil), tools.ISNORCOM)
@@ -243,14 +248,14 @@ func (u *UI) LoadGameImages() {
 	u.AddComponent(QuickCreate(baseX, 410, mgUI, 0, nil), tools.ISMINICOM)
 	//
 	baseX += float64(mgUI.Bounds().Max.X) + 4
-	s, _ = u.image.ReadFile("resource/UI/mini_menu_wea.png")
+	s, _ = u.image.ReadFile("resource/UI/mini_menu_eq.png")
 	mgUI = tools.GetEbitenImage(s)
 	u.AddComponent(QuickCreate(baseX, 410, mgUI, 0, func(i spriteInterface) {
 		if !isClick {
 			isClick = true
 			go func() {
 				on := *i.(*Sprite).images
-				s, _ = u.image.ReadFile("resource/UI/mini_menu_wea_down.png")
+				s, _ = u.image.ReadFile("resource/UI/mini_menu_eq_down.png")
 				mgUI = tools.GetEbitenImage(s)
 				if !u.status.OpenBag {
 					//判断MINI板子的最左端坐标是否超过最大极限
@@ -448,22 +453,50 @@ func (u *UI) LoadGameLoginImages() {
 
 //加载游戏选择角色UI
 func (u *UI) LoadGameCharaSelectImages() {
+	//清空
 	u.ClearSlice(1)
+	//角色选择背景图加载
 	s, _ := u.image.ReadFile("resource/UI/charactSelect.png")
 	mgUI := tools.GetEbitenImage(s)
-	op := newSprite()
-	op.SetPosition(0, 0)
+	op := QuickCreate(0, 0, mgUI, 0, nil)
 	op.op.GeoM.Scale(1, 0.8)
-	op.addImage(mgUI)
 	u.AddComponent(op, tools.ISNORCOM)
+	//游戏开始按钮
+	s, _ = u.image.ReadFile("resource/UI/startGameButton.png")
+	mgUI = tools.GetEbitenImage(s)
+	op = QuickCreate(1250, 850, mgUI, 0, func(i spriteInterface) {
+		if !isClick {
+			isClick = true
+			go func() {
+				on := *i.(*Sprite).images
+				s, _ = u.image.ReadFile("resource/UI/startGameButton_down.png")
+				mgUI = tools.GetEbitenImage(s)
+				i.(*Sprite).images = mgUI
+				time.Sleep(tools.CLOSEBTNSLEEP)
+				i.(*Sprite).images = &on
+				u.SetDisplay(tools.ISHIDDEN)
+				//切换游戏场景到开门loading
+				u.status.CurrentGameScence = tools.GAMESCENEOPENDOOR
+				u.ClearSlice(0)
+				u.ClearGlobalVariable()
+				runtime.GC()
+				isClick = false
+			}()
+		}
+	}, false)
+	op.op.GeoM.Scale(0.5, 0.5)
+	u.AddComponent(op, tools.ISNORCOM)
+	//动画
 	w := &sync.WaitGroup{}
 	w.Add(2)
+	//加载火焰
 	go func() {
 		plist, _ := u.image.ReadFile("resource/UI/logo.png")
 		plist_json, _ := u.image.ReadFile("resource/UI/logo.json")
 		plist_sheet, plist_png = tools.GetImageFromPlist(plist, plist_json)
 		w.Done()
 	}()
+	//加载野蛮人
 	go func() {
 		plist, _ := u.image.ReadFile("resource/UI/selectRoles.png")
 		plist_json, _ := u.image.ReadFile("resource/UI/selectRoles.json")
@@ -471,6 +504,7 @@ func (u *UI) LoadGameCharaSelectImages() {
 		w.Done()
 	}()
 	w.Wait()
+	//手动GC
 	go func() {
 		runtime.GC()
 	}()

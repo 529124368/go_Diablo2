@@ -82,6 +82,13 @@ func (s *Sprite) addClickRange() {
 }
 
 //快速创建精灵组件
+/**
+** x y UI坐标
+** img UI icon
+** layer 渲染先后顺序
+** callBack 回调函数
+** needClickRange 是否需要点击范围
+**/
 func QuickCreate(x, y float64, img *ebiten.Image, layer uint8, callBack func(i spriteInterface), needClickRange ...bool) *Sprite {
 	op := newSprite()
 	op.SetPosition(x, y)
@@ -131,4 +138,9 @@ func (s *Sprite) QuickDrawItemsBg(screen *ebiten.Image) {
 
 	op.GeoM.Translate(s.imagex, s.imagey)
 	screen.DrawImage(emptyImage, op)
+}
+
+//调用回调函数
+func (s *Sprite) CallFunc() func(i spriteInterface) {
+	return s.f
 }

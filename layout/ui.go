@@ -41,15 +41,7 @@ type UI struct {
 }
 
 func NewUI(images *embed.FS, s *status.StatusManage, m *maps.MapBase) *UI {
-	//初始化背包 数据
-	itemsLayout := [5][10]string{
-		{"HP0", "HP0", "book_0,2", "dun-6_0,3", "dun-6_0,3", "sword_0,5", "sword_0,5", "", "dun_0,8", "dun_0,8"},
-		{"body-3_1,0", "body-3_1,0", "book_0,2", "dun-6_0,3", "dun-6_0,3", "sword_0,5", "sword_0,5", "", "dun_0,8", "dun_0,8"},
-		{"body-3_1,0", "body-3_1,0", "", "dun-6_0,3", "dun-6_0,3", "sword_0,5", "sword_0,5", "", "head-5_2,8", "head-5_2,8"},
-		{"body-3_1,0", "body-3_1,0", "", "", "", "", "", "", "head-5_2,8", "head-5_2,8"},
-		{"", "", "", "", "", "", "", "", "", ""},
-		//头盔526,8  左手武器412,54 右手武器644,54 项链599,36 铠甲526,80 手套413,182 左戒指485,181 腰带527,181 右戒指599,183 靴子644,183
-	}
+
 	ui := &UI{
 		image:             images,
 		Compents:          make([]*Sprite, 0, 12),
@@ -58,7 +50,6 @@ func NewUI(images *embed.FS, s *status.StatusManage, m *maps.MapBase) *UI {
 		ItemsCompents:     make([]*SpriteItems, 0, 10),
 		status:            s,
 		maps:              m,
-		BagLayout:         itemsLayout,
 	}
 	//鼠标Icon设置
 	opMouse = &ebiten.DrawImageOptions{}
@@ -198,7 +189,6 @@ func (u *UI) EventLoop(mouseX, mouseY int) {
 
 		//点击包裹区域并且在包裹坐标范围内
 		if u.status.OpenBag && mouseX >= 408 && mouseY >= 6 && mouseX <= 698 && mouseY <= 372 && u.tempBag[0] != nil && u.status.IsTakeItem {
-
 			s := u.tempBag[0]
 			//给鼠标加一个假偏移，防止双击
 			if u.AddItemToBag(mouseX+u.status.Mouseoffset, mouseY+u.status.Mouseoffset, s.itemName) {
