@@ -16,16 +16,17 @@ type RGBColor struct {
 
 //精灵子类 items专用精灵
 type SpriteItems struct {
-	Sprite                                //继承父结构体
-	opBg         *ebiten.DrawImageOptions //背景图片坐标
-	imageBg      *ebiten.Image            //背景图片
-	opContent    *ebiten.DrawImageOptions //物品介绍文
-	imageContent *ebiten.Image            //物品介绍文坐标
-	bgIsDisplay  bool                     //背景图是否显示
-	bgColor      *RGBColor
-	touchEvent   func(i spriteInterface, x, y int)
-	clickEvent   func(i spriteInterface, x, y int)
-	itemName     string
+	Sprite                                    //继承父结构体
+	opBg             *ebiten.DrawImageOptions //背景图片坐标
+	imageBg          *ebiten.Image            //背景图片
+	opContent        *ebiten.DrawImageOptions //物品介绍文
+	imageContent     *ebiten.Image            //物品介绍文坐标
+	bgIsDisplay      bool                     //背景图是否显示
+	contentIsDisplay bool                     //装备描述是否显示
+	bgColor          *RGBColor
+	touchEvent       func(i spriteInterface, x, y int)
+	clickEvent       func(i spriteInterface, x, y int)
+	itemName         string
 }
 
 //创建精灵
@@ -42,7 +43,9 @@ func newSpriteItems() *SpriteItems {
 	s.op.Filter = ebiten.FilterLinear
 	//本类属性
 	s.opBg = new(ebiten.DrawImageOptions)
+	s.opContent = new(ebiten.DrawImageOptions)
 	s.bgIsDisplay = true
+	s.contentIsDisplay = false
 	s.bgColor = &RGBColor{0, 0, 0, 0}
 	return s
 }
@@ -103,6 +106,13 @@ func QuickCreateItems(x, y float64, name string, img *ebiten.Image, layer uint8,
 	} else {
 		op.bgIsDisplay = false
 	}
+	//物品详细
+	ContImage := ebiten.NewImage(op.size.width*2, op.size.height*2)
+	ContImage.Fill(color.White)
+	op.opContent.ColorM.Scale(0, 0, 0, 0.5)
+	op.opContent.GeoM.Translate(x-float64(op.size.width/2), y+25)
+	op.imageContent = ContImage
+	//
 	op.hasEvent = 1
 	//添加鼠标悬停事件
 	op.touchEvent = func(i spriteInterface, x, y int) {
@@ -114,6 +124,13 @@ func QuickCreateItems(x, y float64, name string, img *ebiten.Image, layer uint8,
 				i.(*SpriteItems).bgIsDisplay = false
 			}
 		}
+		//显示装备信息
+		if x >= op.clickMinX && x <= op.clickMaxX && y >= op.clickMinY && y <= op.clickMaxY {
+			i.(*SpriteItems).contentIsDisplay = true
+		} else {
+			i.(*SpriteItems).contentIsDisplay = false
+		}
+
 	}
 	//保存图片
 	op.addImage(img)

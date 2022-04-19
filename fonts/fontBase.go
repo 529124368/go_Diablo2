@@ -57,7 +57,16 @@ func (f *FontBase) RenderByCustomer(screen *ebiten.Image, size, dpi float64, x, 
 	text.Draw(screen, cont, f_face, x, y, color.RGBA{R: 255, G: 0, B: 0, A: 255})
 }
 
-func (f *FontBase) Render(screen *ebiten.Image, x, y int, cont string) {
+func (f *FontBase) Render(screen *ebiten.Image, x, y int, cont string, size, dpi float64, f_color color.Color) {
+	if f.Size != size || f.DPI != dpi {
+		f.f_face.Close()
+		face := truetype.NewFace(f.tt, &truetype.Options{
+			Size:    size,
+			DPI:     dpi,
+			Hinting: font.HintingFull,
+		})
+		f.f_face = face
+	}
 	//color.RGBA{R: 255, G: 0, B: 0, A: 255}
-	text.Draw(screen, cont, f.f_face, x, y, color.White)
+	text.Draw(screen, cont, f.f_face, x, y, f_color)
 }

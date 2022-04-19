@@ -3,10 +3,12 @@ package layout
 import (
 	"embed"
 	"fmt"
+	"game/fonts"
 	"game/maps"
 	"game/status"
 	"game/tools"
 	"image"
+	"image/color"
 	"strconv"
 	"strings"
 	"time"
@@ -38,9 +40,10 @@ type UI struct {
 	maps              *maps.MapBase        //地图
 	BagLayout         [5][10]string        //4*10 背包 + 1*10 装备栏
 	tempBag           [1]*SpriteItems      //临时Items存放
+	fCont             *fonts.FontBase
 }
 
-func NewUI(images *embed.FS, s *status.StatusManage, m *maps.MapBase) *UI {
+func NewUI(images *embed.FS, s *status.StatusManage, m *maps.MapBase, f *fonts.FontBase) *UI {
 
 	ui := &UI{
 		image:             images,
@@ -50,6 +53,7 @@ func NewUI(images *embed.FS, s *status.StatusManage, m *maps.MapBase) *UI {
 		ItemsCompents:     make([]*SpriteItems, 0, 10),
 		status:            s,
 		maps:              m,
+		fCont:             f,
 	}
 	//鼠标Icon设置
 	opMouse = &ebiten.DrawImageOptions{}
@@ -153,10 +157,20 @@ func (u *UI) DrawUI(screen *ebiten.Image) {
 	//当包裹打开的时候，渲染包裹内物品和装备 TODO
 	if u.status.OpenBag {
 		for _, v := range u.ItemsCompents {
+			//先渲染背景色
 			if v.bgIsDisplay {
 				screen.DrawImage(v.imageBg, v.opBg)
 			}
+			//再渲染物品
 			screen.DrawImage(v.images, v.op)
+		}
+		//渲染物品信息
+		for _, v := range u.ItemsCompents {
+			//TODO 是否显示物品详细
+			if v.contentIsDisplay {
+				screen.DrawImage(v.imageContent, v.opContent)
+				u.fCont.Render(screen, int(v.imagex)-20, int(v.imagey)+50, "PHP golang\nPHP golang\n\n\n\n\n\n\n\nQQ:1326741056", 10, 100, color.RGBA{R: 255, G: 0, B: 0, A: 255})
+			}
 		}
 
 	}

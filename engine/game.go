@@ -55,14 +55,15 @@ func NewGame(asset *embed.FS) *Game {
 	m := maps.NewMap(asset, sta)
 	//Player  设置初始状态和坐标
 	r := role.NewPlayer(5280, 1840, tools.IDLE, 0, 0, 0, asset, m, sta)
+	//字体
+	f := fonts.NewFont(asset)
 	//UI
-	u := layout.NewUI(asset, sta, m)
+	u := layout.NewUI(asset, sta, m, f)
 	//BGM
 	bgm := music.NewMusicBGM(asset)
 	//场景动画
 	object := anm.NewAnm(asset, sta)
-	//字体
-	f := fonts.NewFont(asset)
+
 	gameEngine := &Game{
 		count:       0,
 		countForMap: 0,
@@ -85,7 +86,7 @@ func (g *Game) StartEngine() {
 	w.Add(1)
 	//UI Init
 	go func() {
-		g.font_style.LoadFont("resource/font/DiabloLight.ttf")
+		g.font_style.LoadFont("resource/font/DiabloHeavy.ttf")
 		g.ui.LoadGameLoginImages()
 		runtime.GC()
 		w.Done()
