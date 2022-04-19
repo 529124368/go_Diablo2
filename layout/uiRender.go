@@ -453,9 +453,6 @@ func (u *UI) LoadGameCharaSelectImages() {
 				u.SetDisplay(tools.ISHIDDEN)
 				//切换游戏场景到开门loading
 				u.status.ChangeScenceFlg = true
-				u.ClearSlice(0)
-				u.ClearGlobalVariable()
-				runtime.GC()
 				u.status.CurrentGameScence = tools.GAMESCENEOPENDOOR
 				u.status.ChangeScenceFlg = false
 				isClick = false

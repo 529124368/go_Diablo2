@@ -181,7 +181,7 @@ func (u *UI) EventLoop(mouseX, mouseY int) {
 			for _, v := range u.ItemsCompents {
 				if v.hasEvent == 1 {
 					if mouseX > v.clickMinX && mouseX < v.clickMaxX && mouseY > v.clickMinY && mouseY < v.clickMaxY {
-						v.clickEvnet(v, mouseX, mouseY)
+						v.clickEvent(v, mouseX, mouseY)
 					}
 				}
 			}
@@ -215,7 +215,7 @@ func (u *UI) EventLoop(mouseX, mouseY int) {
 		//items UI事件轮询
 		for _, v := range u.ItemsCompents {
 			if v.hasEvent == 1 {
-				v.touchEvnet(v, mouseX, mouseY)
+				v.touchEvent(v, mouseX, mouseY)
 			}
 		}
 	}
@@ -341,6 +341,11 @@ func (u *UI) JudgeCanToEquip(mousex, mousey int, itemName string) bool {
 	if x != 0 && u.BagLayout[4][key] == "" {
 		s, _ := u.image.ReadFile("resource/UI/" + itemName + ".png")
 		mgUI := tools.GetEbitenImage(s)
+		_, yy := mgUI.Size()
+		//左右手武器并且图片高度为2格的情况下
+		if (key == 1 || key == 2) && yy/28 == 2 {
+			y += 20
+		}
 		u.BagLayout[4][key] = itemName
 		u.AddComponent(QuickCreateItems(float64(x), float64(y), itemName, mgUI, 1, u.ItemsEvent(), 0, true), 0)
 		return true
@@ -353,7 +358,7 @@ func (u *UI) JudgeCanToEquip(mousex, mousey int, itemName string) bool {
 func (u *UI) ItemsEvent() func(i spriteInterface, x, y int) {
 	//注册监听
 	item_event := func(i spriteInterface, x, y int) {
-		if isClick == false {
+		if !isClick {
 			isClick = true
 			go func() {
 				if !u.status.IsTakeItem {
@@ -385,7 +390,7 @@ func (u *UI) JudgeIsEquipArea(mousex, mousey int) (int, int, uint8) {
 		return 530, 3, 0
 	} else if mousex >= 416 && mousey >= 48 && mousex <= 469 && mousey <= 154 {
 		//判断是否可以放入左武器
-		return 416, 48, 1
+		return 416, 60, 1
 
 	} else if mousex >= 530 && mousey >= 74 && mousex <= 583 && mousey <= 154 {
 		//判断是否可以放入铠甲
@@ -393,7 +398,7 @@ func (u *UI) JudgeIsEquipArea(mousex, mousey int) (int, int, uint8) {
 
 	} else if mousex >= 647 && mousey >= 47 && mousex <= 699 && mousey <= 151 {
 		//判断是否可以放入右武器
-		return 647, 47, 2
+		return 647, 60, 2
 
 	} else if mousex >= 414 && mousey >= 177 && mousex <= 468 && mousey <= 230 {
 		//判断是否可以放入手套

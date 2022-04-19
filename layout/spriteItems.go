@@ -16,14 +16,16 @@ type RGBColor struct {
 
 //精灵子类 items专用精灵
 type SpriteItems struct {
-	Sprite      //继承
-	opBg        *ebiten.DrawImageOptions
-	imageBg     *ebiten.Image
-	bgIsDisplay bool //背景图是否显示
-	bgColor     *RGBColor
-	touchEvnet  func(i spriteInterface, x, y int)
-	clickEvnet  func(i spriteInterface, x, y int)
-	itemName    string
+	Sprite                                //继承父结构体
+	opBg         *ebiten.DrawImageOptions //背景图片坐标
+	imageBg      *ebiten.Image            //背景图片
+	opContent    *ebiten.DrawImageOptions //物品介绍文
+	imageContent *ebiten.Image            //物品介绍文坐标
+	bgIsDisplay  bool                     //背景图是否显示
+	bgColor      *RGBColor
+	touchEvent   func(i spriteInterface, x, y int)
+	clickEvent   func(i spriteInterface, x, y int)
+	itemName     string
 }
 
 //创建精灵
@@ -51,26 +53,30 @@ func QuickCreateItems(x, y float64, name string, img *ebiten.Image, layer uint8,
 	op.SetPosition(x, y)
 	//判断是否有注册的UI事件
 	if clickEvnet != nil {
-		op.clickEvnet = clickEvnet
+		op.clickEvent = clickEvnet
 	}
 	//item名字设定
 	op.itemName = name
 	//添加UI显示层级
 	op.layer = layer
 	//添加图片长度
-	width, height := img.Size()
-	op.size.width = width
-	op.size.height = height
+	op.size.width, op.size.height = img.Size()
 	if len(needClickRange) == 1 && needClickRange[0] {
 		//添加点击范围
 		op.addClickRange()
 	}
 	//添加items背景图
-	emptyImage := ebiten.NewImage(width, height)
-	emptyImage.Fill(color.White)
+	//如果图片位置位于左右手武器栏
+	var GBImage *ebiten.Image
+	if x == 416 && y == 60 || x == 647 && y == 60 {
+		GBImage = ebiten.NewImage(op.size.width, 116)
+	} else {
+		GBImage = ebiten.NewImage(op.size.width, op.size.height)
+	}
+	GBImage.Fill(color.White)
 	//透明蓝色
-	re := width / 28
-	ss := height / 28
+	re := op.size.width / 28
+	ss := op.size.height / 28
 	//图片位置在装备区的单一颜色
 	if y < 238 {
 		//透明绿色
@@ -84,9 +90,13 @@ func QuickCreateItems(x, y float64, name string, img *ebiten.Image, layer uint8,
 			op.opBg.ColorM.Scale(0, 0, 255, 0.13)
 		}
 	}
+	if x == 416 && y == 60 || x == 647 && y == 60 {
+		op.opBg.GeoM.Translate(x, y-15)
+	} else {
+		op.opBg.GeoM.Translate(x, y)
+	}
 
-	op.opBg.GeoM.Translate(x, y)
-	op.imageBg = emptyImage
+	op.imageBg = GBImage
 	//背景BG是否显示
 	if d == 1 {
 		op.bgIsDisplay = true
@@ -95,7 +105,7 @@ func QuickCreateItems(x, y float64, name string, img *ebiten.Image, layer uint8,
 	}
 	op.hasEvent = 1
 	//添加鼠标悬停事件
-	op.touchEvnet = func(i spriteInterface, x, y int) {
+	op.touchEvent = func(i spriteInterface, x, y int) {
 		//装备栏位置
 		if i.(*SpriteItems).imagey < 238 {
 			if x >= op.clickMinX && x <= op.clickMaxX && y >= op.clickMinY && y <= op.clickMaxY {

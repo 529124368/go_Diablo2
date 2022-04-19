@@ -345,6 +345,11 @@ func (g *Game) ChangeScenceOpenDoorDraw(screen *ebiten.Image) {
 
 //Draw OpenDoor Update
 func (g *Game) ChangeScenceOpenDoorUpdate() {
+	go func() {
+		g.ui.ClearSlice(0)
+		g.ui.ClearGlobalVariable()
+		runtime.GC()
+	}()
 	if !g.status.DoorCountFlg {
 		counts = 0
 		g.status.DoorCountFlg = true
