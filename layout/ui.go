@@ -368,6 +368,25 @@ func (u *UI) JudgeCanToEquip(mousex, mousey int, itemName string) bool {
 	}
 }
 
+//判断是否可以放入装备栏
+func (u *UI) InsertToEquip(mousex, mousey int, itemName string) bool {
+	x, y, key := u.JudgeIsEquipArea(mousex, mousey)
+	if x != 0 {
+		s, _ := u.image.ReadFile("resource/UI/" + itemName + ".png")
+		mgUI := tools.GetEbitenImage(s)
+		_, yy := mgUI.Size()
+		//左右手武器并且图片高度为2格的情况下
+		if (key == 1 || key == 2) && yy/28 == 2 {
+			y += 20
+		}
+		u.BagLayout[4][key] = itemName
+		u.AddComponent(QuickCreateItems(float64(x), float64(y), itemName, mgUI, 1, u.ItemsEvent(), 0, true), 0)
+		return true
+	} else {
+		return false
+	}
+}
+
 //物品事件
 func (u *UI) ItemsEvent() func(i spriteInterface, x, y int) {
 	//注册监听

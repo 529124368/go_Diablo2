@@ -69,6 +69,5 @@ func (f *FontBase) Render(screen *ebiten.Image, x, y int, cont string, size, dpi
 		f.DPI = dpi
 		f.f_face = face
 	}
-	//color.RGBA{R: 255, G: 0, B: 0, A: 255}
 	text.Draw(screen, cont, f.f_face, x, y, f_color)
 }

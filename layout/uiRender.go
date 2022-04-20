@@ -14,11 +14,13 @@ func (u *UI) LoadGameImages() {
 	u.ClearSlice(10)
 	//初始化背包 数据
 	itemsLayout := [5][10]string{
-		{"HP0", "HP0", "book_0,2", "dun-6_0,3", "dun-6_0,3", "sword_0,5", "sword_0,5", "", "dun_0,8", "dun_0,8"},
-		{"body-3_1,0", "body-3_1,0", "book_0,2", "dun-6_0,3", "dun-6_0,3", "sword_0,5", "sword_0,5", "", "dun_0,8", "dun_0,8"},
-		{"body-3_1,0", "body-3_1,0", "", "dun-6_0,3", "dun-6_0,3", "sword_0,5", "sword_0,5", "", "head-5_2,8", "head-5_2,8"},
-		{"body-3_1,0", "body-3_1,0", "", "", "", "", "", "", "head-5_2,8", "head-5_2,8"},
-		{"", "", "", "", "", "", "", "", "", ""},
+		//包裹区
+		{"HP0", "HP0", "book_0,2", "body-2_0,3", "body-2_0,3", "", "", "", "dun_0,8", "dun_0,8"},
+		{"dun-5_1,0", "dun-5_1,0", "book_0,2", "body-2_0,3", "body-2_0,3", "", "dun-4_1,6", "dun-4_1,6", "dun_0,8", "dun_0,8"},
+		{"dun-5_1,0", "dun-5_1,0", "", "body-2_0,3", "body-2_0,3", "", "dun-4_1,6", "dun-4_1,6", "book_2,8", "book_2,9"},
+		{"dun-5_1,0", "dun-5_1,0", "", "", "", "", "dun-4_1,6", "dun-4_1,6", "book_2,8", "book_2,9"},
+		//装备区域
+		{"head-5", "sword", "dun-6", "", "body-3", "hand", "", "", "", "shose"},
 		//头盔526,8  左手武器412,54 右手武器644,54 项链599,36 铠甲526,80 手套413,182 左戒指485,181 腰带527,181 右戒指599,183 靴子644,183
 	}
 	u.BagLayout = itemsLayout
@@ -204,6 +206,35 @@ func (u *UI) LoadGameImages() {
 	//手动销毁临时Map
 	TempArray = nil
 	//背包物品LOOP END
+	xx, yy := 0, 0
+	for i := 0; i < 10; i++ {
+		//装备栏初始化
+		if u.BagLayout[4][i] != "" {
+			if i == 0 {
+				xx, yy = 530, 3
+			}
+			if i == 1 {
+				xx, yy = 416, 48
+			}
+			if i == 2 {
+				xx, yy = 647, 47
+			}
+			if i == 2 {
+				xx, yy = 647, 47
+			}
+			if i == 5 {
+				xx, yy = 414, 177
+			}
+			if i == 9 {
+				xx, yy = 646, 177
+			}
+			if i == 4 {
+				xx, yy = 530, 74
+			}
+			//插入装备
+			u.InsertToEquip(xx, yy, u.BagLayout[4][i])
+		}
+	}
 
 	//注册mini板打开按钮
 	s, _ = u.image.ReadFile("resource/UI/open_minipanel_btn.png")
