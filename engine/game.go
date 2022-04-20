@@ -86,7 +86,7 @@ func (g *Game) StartEngine() {
 	w.Add(1)
 	//UI Init
 	go func() {
-		g.font_style.LoadFont("resource/font/DiabloHeavy.ttf")
+		g.font_style.LoadFont("resource/font/pf_normal.ttf")
 		g.ui.LoadGameLoginImages()
 		runtime.GC()
 		w.Done()

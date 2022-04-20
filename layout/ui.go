@@ -169,10 +169,10 @@ func (u *UI) DrawUI(screen *ebiten.Image) {
 			//TODO 是否显示物品详细
 			if v.contentIsDisplay {
 				screen.DrawImage(v.imageContent, v.opContent)
-				u.fCont.Render(screen, int(v.imagex)-20, int(v.imagey)+50, "PHP golang\nPHP golang", 10, 100, color.RGBA{R: 255, G: 0, B: 0, A: 255})
+				//Draw Text
+				u.fCont.Render(screen, int(v.imagex)-20, int(v.imagey)+50, "购买源码\n请联系\nQQ:\n1326741056", 7.2, 150, color.RGBA{R: 255, G: 255, B: 255, A: 255})
 			}
 		}
-
 	}
 }
 

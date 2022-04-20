@@ -327,8 +327,8 @@ func (g *Game) ChangeScenceSelectDraw(screen *ebiten.Image) {
 
 	//Draw Debug
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nmouse position %d,%d", int64(ebiten.CurrentFPS()), mouseX, mouseY))
-	//Draw Font
-	g.font_style.Render(screen, 651, 446, "Ok", 10, 150, color.White)
+	//Draw Text
+	g.font_style.Render(screen, 635, 446, "开始游戏", 8, 130, color.White)
 }
 
 //Draw OpenDoor Scence

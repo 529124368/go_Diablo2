@@ -109,7 +109,7 @@ func QuickCreateItems(x, y float64, name string, img *ebiten.Image, layer uint8,
 	//物品详细
 	ContImage := ebiten.NewImage(op.size.width*2, op.size.height*2)
 	ContImage.Fill(color.White)
-	op.opContent.ColorM.Scale(0, 0, 0, 0.5)
+	op.opContent.ColorM.Scale(0, 0, 0, 0.7)
 	op.opContent.GeoM.Translate(x-float64(op.size.width/2), y+25)
 	op.imageContent = ContImage
 	//
