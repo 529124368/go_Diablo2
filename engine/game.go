@@ -47,23 +47,25 @@ var (
 	turnLoop     uint8 = 0
 )
 
+//go:embed resource
+var asset embed.FS
+
 //GameEngine
-func NewGame(asset *embed.FS) *Game {
+func NewGame() *Game {
 	//statueManage
 	sta := status.NewStatusManage()
 	//Map
-	m := maps.NewMap(asset, sta)
+	m := maps.NewMap(&asset, sta)
 	//Player  设置初始状态和坐标
-	r := role.NewPlayer(5280, 1840, tools.IDLE, 0, 0, 0, asset, m, sta)
+	r := role.NewPlayer(5280, 1840, tools.IDLE, 0, 0, 0, &asset, m, sta)
 	//字体
-	f := fonts.NewFont(asset)
+	f := fonts.NewFont(&asset)
 	//UI
-	u := layout.NewUI(asset, sta, m, f)
+	u := layout.NewUI(&asset, sta, m, f)
 	//BGM
-	bgm := music.NewMusicBGM(asset)
+	bgm := music.NewMusicBGM(&asset)
 	//场景动画
-	object := anm.NewAnm(asset, sta)
-
+	object := anm.NewAnm(&asset, sta)
 	gameEngine := &Game{
 		count:       0,
 		countForMap: 0,
@@ -75,6 +77,8 @@ func NewGame(asset *embed.FS) *Game {
 		objectA:     object,
 		font_style:  f,
 	}
+	//启动游戏
+	gameEngine.StartEngine()
 	return gameEngine
 }
 

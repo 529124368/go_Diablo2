@@ -3,6 +3,7 @@ package tools
 import (
 	"bytes"
 	"image"
+	_ "image/png"
 	"log"
 	"math"
 	"time"
