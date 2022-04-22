@@ -206,10 +206,11 @@ func CalculateDirPath(oldDir, newDir uint8) []uint8 {
 
 //获取物品的尺寸
 func GetItemsCellSize(name string) (int, int) {
-	type1 := "HP0"
+	type1 := "HP0,MP0,neck,ring"
 	type2 := "book"
-	type3 := "dun,head-4,head-5,hand,shose,head-3"
-	type4 := "dun-6,sword,body-3,body-2,dun-4,dun-5,futou,futou-1,body-4"
+	type3 := "dun,head-4,head-5,hand,shose,head-3,box"
+	type4 := "dun-6,sword,body-3,body-2,dun-4,dun-5,futou,futou-1,body-4,dun-3,futou-3"
+	type5 := "blet"
 	if strings.Contains(type1, name) {
 		return 1, 1
 	} else if strings.Contains(type2, name) {
@@ -218,6 +219,8 @@ func GetItemsCellSize(name string) (int, int) {
 		return 2, 2
 	} else if strings.Contains(type4, name) {
 		return 2, 3
+	} else if strings.Contains(type5, name) {
+		return 2, 1
 	} else {
 		return 2, 4
 	}

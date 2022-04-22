@@ -15,12 +15,12 @@ func (u *UI) LoadGameImages() {
 	//初始化背包 数据
 	itemsLayout := [5][10]string{
 		//包裹区
-		{"dun-2_0,0", "dun-2_0,0", "book_0,2", "", "", "", "", "", "dun_0,8", "dun_0,8"},
-		{"dun-2_0,0", "dun-2_0,0", "book_0,2", "", "", "", "dun-4_1,6", "dun-4_1,6", "dun_0,8", "dun_0,8"},
-		{"dun-2_0,0", "dun-2_0,0", "", "", "", "", "dun-4_1,6", "dun-4_1,6", "book_2,8", "book_2,9"},
-		{"dun-2_0,0", "dun-2_0,0", "HP0", "HP0", "HP0", "HP0", "dun-4_1,6", "dun-4_1,6", "book_2,8", "book_2,9"},
+		{"dun-2_0,0", "dun-2_0,0", "book_0,2", "MP0", "MP0", "", "", "", "", ""},
+		{"dun-2_0,0", "dun-2_0,0", "book_0,2", "box_1,3", "box_1,3", "", "dun-4_1,6", "dun-4_1,6", "", ""},
+		{"dun-2_0,0", "dun-2_0,0", "box_1,3", "box_1,3", "", "", "dun-4_1,6", "dun-4_1,6", "", ""},
+		{"dun-2_0,0", "dun-2_0,0", "HP0", "HP0", "HP0", "HP0", "dun-4_1,6", "dun-4_1,6", "", ""},
 		//装备区域
-		{"head-5", "futou-1", "dun-6", "", "body-4", "hand", "", "", "", "shose"},
+		{"head-5", "futou-2", "dun-6", "neck", "body-4", "hand", "ring", "blet", "ring", "shose"},
 		//头盔526,8  左手武器412,54 右手武器644,54 项链599,36 铠甲526,80 手套413,182 左戒指485,181 腰带527,181 右戒指599,183 靴子644,183
 	}
 	u.BagLayout = itemsLayout
@@ -214,23 +214,33 @@ func (u *UI) LoadGameImages() {
 				xx, yy = 530, 3
 			}
 			if i == 1 {
-				xx, yy = 416, 48
+				xx, yy = 416, 60
 			}
 			if i == 2 {
-				xx, yy = 647, 47
+				xx, yy = 647, 60
 			}
-			if i == 2 {
-				xx, yy = 647, 47
-			}
-			if i == 5 {
-				xx, yy = 414, 177
-			}
-			if i == 9 {
-				xx, yy = 646, 177
+			if i == 3 {
+				xx, yy = 600, 32
 			}
 			if i == 4 {
 				xx, yy = 530, 74
 			}
+			if i == 5 {
+				xx, yy = 414, 177
+			}
+			if i == 6 {
+				xx, yy = 487, 177
+			}
+			if i == 7 {
+				xx, yy = 529, 178
+			}
+			if i == 8 {
+				xx, yy = 600, 177
+			}
+			if i == 9 {
+				xx, yy = 646, 177
+			}
+
 			//插入装备
 			u.InsertToEquip(xx, yy, u.BagLayout[4][i])
 		}

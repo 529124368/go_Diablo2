@@ -164,13 +164,15 @@ func (u *UI) DrawUI(screen *ebiten.Image) {
 			//再渲染物品
 			screen.DrawImage(v.images, v.op)
 		}
-		//渲染物品信息
-		for _, v := range u.ItemsCompents {
-			//TODO 是否显示物品详细
-			if v.contentIsDisplay {
-				screen.DrawImage(v.imageContent, v.opContent)
-				//Draw Text
-				u.fCont.Render(screen, int(v.imagex)-20, int(v.imagey)+50, "有任何疑问\n请联系作者\nQQ:\n1326741056", 7.2, 150, color.RGBA{R: 255, G: 255, B: 255, A: 255})
+		if !u.status.IsTakeItem {
+			//渲染物品信息
+			for _, v := range u.ItemsCompents {
+				//TODO 是否显示物品详细
+				if v.contentIsDisplay {
+					screen.DrawImage(v.imageContent, v.opContent)
+					//Draw Text
+					u.fCont.Render(screen, int(v.imagex)-20, int(v.imagey)+50, "属性:xx\n攻击:+2\n敏捷:+4", 7.2, 150, color.RGBA{R: 255, G: 255, B: 255, A: 255})
+				}
 			}
 		}
 	}
@@ -446,6 +448,18 @@ func (u *UI) JudgeIsEquipArea(mousex, mousey int) (int, int, uint8) {
 	} else if mousex >= 646 && mousey >= 177 && mousex <= 699 && mousey <= 229 {
 		//判断是否可以放入鞋
 		return 646, 177, 9
+	} else if mousex >= 600 && mousey >= 32 && mousex <= 622 && mousey <= 58 {
+		//判断是否可以放入项链
+		return 600, 32, 3
+	} else if mousex >= 487 && mousey >= 177 && mousex <= 508 && mousey <= 204 {
+		//判断是否可以放入左戒指
+		return 487, 177, 6
+	} else if mousex >= 600 && mousey >= 177 && mousex <= 622 && mousey <= 205 {
+		//判断是否可以放入右戒指
+		return 600, 177, 8
+	} else if mousex >= 529 && mousey >= 178 && mousex <= 581 && mousey <= 203 {
+		//判断是否可以放入腰带
+		return 529, 178, 7
 	} else {
 		return 0, 0, 0
 	}
