@@ -254,7 +254,7 @@ func (u *UI) AddItemToBag(mousex, mousey int, itemName string) bool {
 			//是否相同size的时候
 			if sizeX == 1 && sizeY == 1 {
 				u.BagLayout[x][y] = itemName
-				s, _ := u.image.ReadFile("resource/UI/" + itemName + ".png")
+				s, _ := u.image.ReadFile("resource/items/" + itemName + ".png")
 				mgUI := tools.GetEbitenImage(s)
 				layoutX := 413 + y*29
 				layoutY := 254 + x*29
@@ -275,7 +275,7 @@ func (u *UI) AddItemToBag(mousex, mousey int, itemName string) bool {
 						u.BagLayout[x+j][y+i] = itemName + "_" + name
 					}
 				}
-				s, _ := u.image.ReadFile("resource/UI/" + itemName + ".png")
+				s, _ := u.image.ReadFile("resource/items/" + itemName + ".png")
 				mgUI := tools.GetEbitenImage(s)
 				layoutX := 413 + y*29
 				layoutY := 254 + x*29
@@ -353,12 +353,15 @@ func (u *UI) DrawMouseIcon(screen *ebiten.Image, mouseX, mouseY int) {
 func (u *UI) JudgeCanToEquip(mousex, mousey int, itemName string) bool {
 	x, y, key := u.JudgeIsEquipArea(mousex, mousey)
 	if x != 0 && u.BagLayout[4][key] == "" {
-		s, _ := u.image.ReadFile("resource/UI/" + itemName + ".png")
+		s, _ := u.image.ReadFile("resource/items/" + itemName + ".png")
 		mgUI := tools.GetEbitenImage(s)
 		_, yy := mgUI.Size()
 		//左右手武器并且图片高度为2格的情况下
 		if (key == 1 || key == 2) && yy/28 == 2 {
 			y += 20
+		} else if (key == 1 || key == 2) && yy/28 == 4 {
+			//左右手武器并且图片高度为4格的情况下
+			y -= 15
 		}
 		u.BagLayout[4][key] = itemName
 		u.AddComponent(QuickCreateItems(float64(x), float64(y), itemName, mgUI, 1, u.ItemsEvent(), 0, true), 0)
@@ -372,12 +375,15 @@ func (u *UI) JudgeCanToEquip(mousex, mousey int, itemName string) bool {
 func (u *UI) InsertToEquip(mousex, mousey int, itemName string) bool {
 	x, y, key := u.JudgeIsEquipArea(mousex, mousey)
 	if x != 0 {
-		s, _ := u.image.ReadFile("resource/UI/" + itemName + ".png")
+		s, _ := u.image.ReadFile("resource/items/" + itemName + ".png")
 		mgUI := tools.GetEbitenImage(s)
 		_, yy := mgUI.Size()
 		//左右手武器并且图片高度为2格的情况下
 		if (key == 1 || key == 2) && yy/28 == 2 {
 			y += 20
+		} else if (key == 1 || key == 2) && yy/28 == 4 {
+			//左右手武器并且图片高度为4格的情况下
+			y -= 15
 		}
 		u.BagLayout[4][key] = itemName
 		u.AddComponent(QuickCreateItems(float64(x), float64(y), itemName, mgUI, 1, u.ItemsEvent(), 0, true), 0)
@@ -421,7 +427,7 @@ func (u *UI) JudgeIsEquipArea(mousex, mousey int) (int, int, uint8) {
 	if mousex >= 530 && mousey >= 3 && mousex <= 584 && mousey <= 54 {
 		//判断是否可以放入头盔
 		return 530, 3, 0
-	} else if mousex >= 416 && mousey >= 48 && mousex <= 469 && mousey <= 154 {
+	} else if mousex >= 416 && mousey >= 45 && mousex <= 469 && mousey <= 154 {
 		//判断是否可以放入左武器
 		return 416, 60, 1
 
@@ -429,7 +435,7 @@ func (u *UI) JudgeIsEquipArea(mousex, mousey int) (int, int, uint8) {
 		//判断是否可以放入铠甲
 		return 530, 74, 4
 
-	} else if mousex >= 647 && mousey >= 47 && mousex <= 699 && mousey <= 151 {
+	} else if mousex >= 647 && mousey >= 45 && mousex <= 699 && mousey <= 154 {
 		//判断是否可以放入右武器
 		return 647, 60, 2
 

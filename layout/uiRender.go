@@ -15,12 +15,12 @@ func (u *UI) LoadGameImages() {
 	//初始化背包 数据
 	itemsLayout := [5][10]string{
 		//包裹区
-		{"HP0", "HP0", "book_0,2", "body-2_0,3", "body-2_0,3", "", "", "", "dun_0,8", "dun_0,8"},
-		{"dun-5_1,0", "dun-5_1,0", "book_0,2", "body-2_0,3", "body-2_0,3", "", "dun-4_1,6", "dun-4_1,6", "dun_0,8", "dun_0,8"},
-		{"dun-5_1,0", "dun-5_1,0", "", "body-2_0,3", "body-2_0,3", "", "dun-4_1,6", "dun-4_1,6", "book_2,8", "book_2,9"},
-		{"dun-5_1,0", "dun-5_1,0", "", "", "", "", "dun-4_1,6", "dun-4_1,6", "book_2,8", "book_2,9"},
+		{"dun-2_0,0", "dun-2_0,0", "book_0,2", "", "", "", "", "", "dun_0,8", "dun_0,8"},
+		{"dun-2_0,0", "dun-2_0,0", "book_0,2", "", "", "", "dun-4_1,6", "dun-4_1,6", "dun_0,8", "dun_0,8"},
+		{"dun-2_0,0", "dun-2_0,0", "", "", "", "", "dun-4_1,6", "dun-4_1,6", "book_2,8", "book_2,9"},
+		{"dun-2_0,0", "dun-2_0,0", "HP0", "HP0", "HP0", "HP0", "dun-4_1,6", "dun-4_1,6", "book_2,8", "book_2,9"},
 		//装备区域
-		{"head-5", "sword", "dun-6", "", "body-3", "hand", "", "", "", "shose"},
+		{"head-5", "futou-1", "dun-6", "", "body-4", "hand", "", "", "", "shose"},
 		//头盔526,8  左手武器412,54 右手武器644,54 项链599,36 铠甲526,80 手套413,182 左戒指485,181 腰带527,181 右戒指599,183 靴子644,183
 	}
 	u.BagLayout = itemsLayout
@@ -188,14 +188,14 @@ func (u *UI) LoadGameImages() {
 				if _, ok := TempArray[items[i][j]]; !ok {
 					TempArray[items[i][j]] = 0
 					t := strings.Split(items[i][j], "_")
-					s, _ = u.image.ReadFile("resource/UI/" + t[0] + ".png")
+					s, _ = u.image.ReadFile("resource/items/" + t[0] + ".png")
 					mgUI = tools.GetEbitenImage(s)
 					x := 413 + j*29
 					y := 254 + i*29
 					u.AddComponent(QuickCreateItems(float64(x), float64(y), t[0], mgUI, 1, u.ItemsEvent(), 1, true), 0)
 				}
 			} else if items[i][j] != "" {
-				s, _ = u.image.ReadFile("resource/UI/" + items[i][j] + ".png")
+				s, _ = u.image.ReadFile("resource/items/" + items[i][j] + ".png")
 				mgUI = tools.GetEbitenImage(s)
 				x := 413 + j*29
 				y := 254 + i*29

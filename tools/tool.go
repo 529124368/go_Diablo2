@@ -6,6 +6,7 @@ import (
 	_ "image/png"
 	"log"
 	"math"
+	"strings"
 	"time"
 
 	"github.com/fzipp/texturepacker"
@@ -205,38 +206,21 @@ func CalculateDirPath(oldDir, newDir uint8) []uint8 {
 
 //获取物品的尺寸
 func GetItemsCellSize(name string) (int, int) {
-	switch name {
-	case "HP0":
+	type1 := "HP0"
+	type2 := "book"
+	type3 := "dun,head-4,head-5,hand,shose,head-3"
+	type4 := "dun-6,sword,body-3,body-2,dun-4,dun-5,futou,futou-1,body-4"
+	if strings.Contains(type1, name) {
 		return 1, 1
-	case "book":
+	} else if strings.Contains(type2, name) {
 		return 1, 2
-	case "dun":
+	} else if strings.Contains(type3, name) {
 		return 2, 2
-	case "head-4":
-		return 2, 2
-	case "head-5":
-		return 2, 2
-	case "dun-6":
+	} else if strings.Contains(type4, name) {
 		return 2, 3
-	case "sword":
-		return 2, 3
-	case "body-3":
-		return 2, 3
-	case "body-2":
-		return 2, 3
-	case "dun-4":
-		return 2, 3
-	case "dun-5":
-		return 2, 3
-	case "hand":
-		return 2, 2
-	case "shose":
-		return 2, 2
-	case "head-3":
-		return 2, 2
+	} else {
+		return 2, 4
 	}
-
-	return 0, 0
 }
 
 // AbsInt32 returns the absolute of the given int32

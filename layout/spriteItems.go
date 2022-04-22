@@ -71,7 +71,8 @@ func QuickCreateItems(x, y float64, name string, img *ebiten.Image, layer uint8,
 	//添加items背景图
 	//如果图片位置位于左右手武器栏
 	var GBImage *ebiten.Image
-	if x == 416 && y == 60 || x == 647 && y == 60 {
+
+	if (x == 416 || x == 647) && y >= 45 && y <= 154 {
 		GBImage = ebiten.NewImage(op.size.width, 116)
 	} else {
 		GBImage = ebiten.NewImage(op.size.width, op.size.height)
@@ -95,6 +96,9 @@ func QuickCreateItems(x, y float64, name string, img *ebiten.Image, layer uint8,
 	}
 	if x == 416 && y == 60 || x == 647 && y == 60 {
 		op.opBg.GeoM.Translate(x, y-15)
+	} else if (x == 416 || x == 647) && y == 80 {
+		//如果为2*2大小的装备的情况下需要y轴偏移下面距离
+		op.opBg.GeoM.Translate(x, y-30)
 	} else {
 		op.opBg.GeoM.Translate(x, y)
 	}
