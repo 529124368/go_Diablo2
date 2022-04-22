@@ -170,7 +170,7 @@ func (u *UI) DrawUI(screen *ebiten.Image) {
 			if v.contentIsDisplay {
 				screen.DrawImage(v.imageContent, v.opContent)
 				//Draw Text
-				u.fCont.Render(screen, int(v.imagex)-20, int(v.imagey)+50, "购买源码\n请联系\nQQ:\n1326741056", 7.2, 150, color.RGBA{R: 255, G: 255, B: 255, A: 255})
+				u.fCont.Render(screen, int(v.imagex)-20, int(v.imagey)+50, "有任何疑问\n请联系作者\nQQ:\n1326741056", 7.2, 150, color.RGBA{R: 255, G: 255, B: 255, A: 255})
 			}
 		}
 	}

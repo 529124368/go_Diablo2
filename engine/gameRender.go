@@ -92,12 +92,9 @@ func (g *Game) changeScenceGameUpdate() {
 		}
 	}
 
-	//测试TODO
-	if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) {
-		g.status.MapZoom += 1
-	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) {
-		g.status.MapZoom -= 1
+	//测试TODO 鼠标滚轮控制
+	if _, x := ebiten.Wheel(); x != 0 {
+		g.status.MapZoom += int(x)
 	}
 
 	//计算鼠标位置
