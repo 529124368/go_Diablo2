@@ -14,19 +14,14 @@ type imageSize struct {
 
 //精灵类
 type Sprite struct {
-	op        *ebiten.DrawImageOptions
-	images    *ebiten.Image
-	hasEvent  uint8
-	layer     uint8
-	isDisplay bool
-	f         func(i spriteInterface)
-	clickMinX int
-	clickMinY int
-	clickMaxX int
-	clickMaxY int
-	imagex    float64 //图片的位置x
-	imagey    float64 //图片的位置y
-	size      imageSize
+	op                                         *ebiten.DrawImageOptions
+	images                                     *ebiten.Image
+	hasEvent, layer                            uint8
+	isDisplay                                  bool
+	f                                          func(i spriteInterface)
+	clickMinX, clickMinY, clickMaxX, clickMaxY int
+	imagex, imagey                             float64 //图片的位置x 图片的位置y
+	size                                       imageSize
 }
 
 //创建精灵

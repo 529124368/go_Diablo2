@@ -14,6 +14,7 @@ import (
 	"sync"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 //config
@@ -25,15 +26,14 @@ const (
 )
 
 type Game struct {
-	count       int
-	countForMap int
-	player      *role.Player         //玩家
-	maps        *maps.MapBase        //地图
-	objectA     *anm.Anm             //object 动画
-	ui          *layout.UI           //UI
-	music       music.MusicInterface //音乐
-	status      *status.StatusManage //状态管理器
-	font_style  *fonts.FontBase      //字体
+	count, countForMap int
+	player             *role.Player         //玩家
+	maps               *maps.MapBase        //地图
+	objectA            *anm.Anm             //object 动画
+	ui                 *layout.UI           //UI
+	music              music.MusicInterface //音乐
+	status             *status.StatusManage //状态管理器
+	font_style         *fonts.FontBase      //字体
 }
 
 var (
@@ -118,6 +118,11 @@ func (g *Game) Update() error {
 			//进入游戏登录界面逻辑
 			g.ChangeScenceLoginUpdate()
 		}
+	}
+	//全屏显示控制
+	if inpututil.IsKeyJustPressed(ebiten.KeyF) {
+		i := ebiten.IsFullscreen()
+		ebiten.SetFullscreen(!i)
 	}
 
 	return nil
