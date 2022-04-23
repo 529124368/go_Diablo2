@@ -208,20 +208,8 @@ func (u *UI) EventLoop(mouseX, mouseY int) {
 			s := u.tempBag[0]
 			//给鼠标加一个假偏移，防止双击
 			if u.AddItemToBag(mouseX+u.status.Mouseoffset, mouseY+u.status.Mouseoffset, s.itemName) {
-				//鼠标还原
-				mouseIcon = &mouseIconCopy
-				//清理临时区
-				u.tempBag[0] = nil
-				mouseRoate = -0.5
-				//恢复防止双击的鼠标偏移量
-				u.status.Mouseoffset = 500
-				//拿起物品flag设置
-				u.status.IsTakeItem = false
-				go func() {
-					time.Sleep(tools.CLOSEBTNSLEEP)
-					isClick = false
-				}()
-
+				//清空缓冲区
+				u.ClearTempBag()
 			}
 		}
 
@@ -463,4 +451,24 @@ func (u *UI) JudgeIsEquipArea(mousex, mousey int) (int, int, uint8) {
 	} else {
 		return 0, 0, 0
 	}
+}
+
+//清空缓冲区物品信息 实现真正删除物品
+func (u *UI) ClearTempBag() string {
+	name := ""
+	//鼠标还原
+	mouseIcon = &mouseIconCopy
+	//清理临时区
+	name = u.tempBag[0].itemName
+	u.tempBag[0] = nil
+	mouseRoate = -0.5
+	//恢复防止双击的鼠标偏移量
+	u.status.Mouseoffset = 500
+	go func() {
+		time.Sleep(tools.CLOSEBTNSLEEP)
+		isClick = false
+		u.status.IsTakeItem = false
+		u.status.IsDropDeal = false
+	}()
+	return name
 }

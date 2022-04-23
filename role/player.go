@@ -52,8 +52,8 @@ func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m *
 	opS = &ebiten.DrawImageOptions{}
 	op = &ebiten.DrawImageOptions{}
 	play := &Player{
-		X:            x,
-		Y:            y,
+		X:            x, //地图坐标X
+		Y:            y, //地图坐标Y
 		State:        state,
 		Direction:    dir,
 		OldDirection: dir,

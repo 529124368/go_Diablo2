@@ -4,7 +4,7 @@ import (
 	"embed"
 	"game/fonts"
 	"game/layout"
-	"game/mapCreator/anm"
+	"game/mapCreator/mapItems"
 	"game/maps"
 	"game/music"
 	"game/role"
@@ -17,7 +17,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
-//config
+//配置信息
 const (
 	SCREENWIDTH  int = 490
 	SCREENHEIGHT int = 300
@@ -29,7 +29,7 @@ type Game struct {
 	count, countForMap int
 	player             *role.Player         //玩家
 	maps               *maps.MapBase        //地图
-	objectA            *anm.Anm             //object 动画
+	mapManage          *mapItems.MapItems   //地图动画等管理
 	ui                 *layout.UI           //UI
 	music              music.MusicInterface //音乐
 	status             *status.StatusManage //状态管理器
@@ -37,14 +37,15 @@ type Game struct {
 }
 
 var (
-	counts       int = 0
-	countsForMap int = 0
-	frameNums    int = 4
-	frameSpeed   int = 5
-	mouseX       int
-	mouseY       int
-	newPath      []uint8
-	turnLoop     uint8 = 0
+	counts      int = 0
+	countsFor20 int = 0
+	countsFor12 int = 0
+	frameNums   int = 4
+	frameSpeed  int = 5
+	mouseX      int
+	mouseY      int
+	newPath     []uint8
+	turnLoop    uint8 = 0
 )
 
 //go:embed resource
@@ -65,7 +66,7 @@ func NewGame() *Game {
 	//BGM
 	bgm := music.NewMusicBGM(&asset)
 	//场景动画
-	object := anm.NewAnm(&asset, sta)
+	object := mapItems.New(&asset, sta)
 	gameEngine := &Game{
 		count:       0,
 		countForMap: 0,
@@ -74,7 +75,7 @@ func NewGame() *Game {
 		ui:          u,
 		music:       bgm,
 		status:      sta,
-		objectA:     object,
+		mapManage:   object,
 		font_style:  f,
 	}
 	//启动游戏
@@ -90,6 +91,7 @@ func (g *Game) StartEngine() {
 	w.Add(1)
 	//UI Init
 	go func() {
+		//加载字体
 		g.font_style.LoadFont("resource/font/pf_normal.ttf")
 		g.ui.LoadGameLoginImages()
 		runtime.GC()
@@ -105,16 +107,17 @@ func (g *Game) Update() error {
 	mouseX, mouseY = ebiten.CursorPosition()
 	//切换场景逻辑
 	if !g.status.ChangeScenceFlg {
-		if g.status.CurrentGameScence == tools.GAMESCENESTART {
+		switch g.status.CurrentGameScence {
+		case tools.GAMESCENESTART:
 			//进入游戏场景逻辑
 			g.changeScenceGameUpdate()
-		} else if g.status.CurrentGameScence == tools.GAMESCENEOPENDOOR {
+		case tools.GAMESCENEOPENDOOR:
 			//游戏加载逻辑
 			g.ChangeScenceOpenDoorUpdate()
-		} else if g.status.CurrentGameScence == tools.GAMESCENESELECTROLE {
+		case tools.GAMESCENESELECTROLE:
 			//进入游戏选择界面逻辑
 			g.ChangeScenceSelectUpdate()
-		} else {
+		default:
 			//进入游戏登录界面逻辑
 			g.ChangeScenceLoginUpdate()
 		}
@@ -136,13 +139,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	//判断是否切换场景
 	if !g.status.ChangeScenceFlg {
-		if g.status.CurrentGameScence == tools.GAMESCENESTART {
+		switch g.status.CurrentGameScence {
+		case tools.GAMESCENESTART:
 			g.ChangeScenceGameDraw(screen)
-		} else if g.status.CurrentGameScence == tools.GAMESCENESELECTROLE {
+		case tools.GAMESCENESELECTROLE:
 			g.ChangeScenceSelectDraw(screen)
-		} else if g.status.CurrentGameScence == tools.GAMESCENEOPENDOOR {
+		case tools.GAMESCENEOPENDOOR:
 			g.ChangeScenceOpenDoorDraw(screen)
-		} else {
+		default:
 			g.ChangeScenceLoginDraw(screen)
 		}
 	}

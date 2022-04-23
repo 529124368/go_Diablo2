@@ -25,7 +25,9 @@ type StatusManage struct {
 	MapTitleY         int
 	MapZoom           int
 	CurrentGameScence int
-	DisPlayDebugInfo  bool
+	DisPlayDebugInfo  bool //是否显示Debug信息
+	IsPlayDropAnmi    bool //是否播放掉落物品动画
+	IsDropDeal        bool //是否掉落物品处理中
 }
 
 func NewStatusManage() *StatusManage {
@@ -59,6 +61,8 @@ func NewStatusManage() *StatusManage {
 		MapZoom:           7,
 		CurrentGameScence: 1,
 		DisPlayDebugInfo:  false,
+		IsPlayDropAnmi:    false,
+		IsDropDeal:        false,
 	}
 	return n
 }

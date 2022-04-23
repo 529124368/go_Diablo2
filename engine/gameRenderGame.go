@@ -40,7 +40,7 @@ func (g *Game) ChangeScene(name string) {
 		go func() {
 			g.maps.LoadMap()
 			//加载动画
-			g.objectA.LoadAnm()
+			g.mapManage.LoadAnm()
 			runtime.GC()
 			w.Done()
 		}()
@@ -64,6 +64,7 @@ func (g *Game) changeScenceGameUpdate() {
 		g.player.State = tools.IDLE
 	}
 
+	//鼠标事件
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
 		g.player.MouseX = mouseX
 		g.player.MouseY = mouseY
@@ -86,10 +87,20 @@ func (g *Game) changeScenceGameUpdate() {
 		//如果拿起物品也不可以移动
 		if g.status.IsTakeItem {
 			g.status.Flg = false
+			//这个范围内就是丢弃物品
+			if mouseY < 436 && mouseX < 390 {
+				if !g.status.IsDropDeal {
+					g.status.IsDropDeal = true
+					//播放掉落物品动画
+					g.status.IsPlayDropAnmi = true
+					//丢弃物品
+					g.ui.ClearTempBag()
+				}
+			}
 		}
 	}
 
-	//测试TODO 鼠标滚轮控制
+	//鼠标滚轮控制
 	if _, x := ebiten.Wheel(); x != 0 {
 		g.status.MapZoom += int(x)
 	}
@@ -174,13 +185,19 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	//Draw Wall
 	g.maps.RenderWall(screen, g.status.MoveOffsetX, g.status.MoveOffsetY)
 	//Draw map Anmi
-	g.objectA.Render(screen, countsForMap, g.status.MoveOffsetX, g.status.MoveOffsetY)
+	g.mapManage.Render(screen, countsFor20, countsFor12, g.status.MoveOffsetX, g.status.MoveOffsetY)
 	//Draw UI
 	g.ui.DrawUI(screen)
 	//获取玩家当前的地图块坐标
 	mapX, mapY := tools.GetFloorPositionAt(g.player.X, g.player.Y)
 	g.status.MapTitleX = mapX
 	g.status.MapTitleY = mapY
+	//Draw Drop items Anm
+	if g.status.IsPlayDropAnmi {
+		g.status.IsPlayDropAnmi = false
+		g.mapManage.PlayDropItemAnm(screen, mapX, mapY)
+	}
+
 	//Draw Debug
 	if g.status.DisPlayDebugInfo {
 		len := tools.Distance(g.status.PLAYERCENTERX, g.status.PLAYERCENTERY, int64(mouseX), int64(mouseY))
@@ -199,10 +216,14 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 
 	//Change map Frame
 	if g.countForMap > 5 {
-		countsForMap++
+		countsFor20++
+		countsFor12++
 		g.countForMap = 0
-		if countsForMap >= 20 {
-			countsForMap = 0
+		if countsFor20 >= 20 {
+			countsFor20 = 0
+		}
+		if countsFor12 >= 12 {
+			countsFor12 = 0
 		}
 	}
 }
