@@ -1,13 +1,14 @@
 package status
 
 type StatusManage struct {
-	Flg               bool
+	Flg               bool //是否可以移动标志
 	ChangeScenceFlg   bool
 	DoorCountFlg      bool
 	LoadingFlg        bool
 	MusicIsPlay       bool
 	OpenBag           bool
 	OpenMiniPanel     bool
+	IsWalk            bool
 	CalculateEnd      bool
 	UIOFFSETX         int
 	ShadowOffsetX     int
@@ -35,6 +36,7 @@ func NewStatusManage() *StatusManage {
 		MusicIsPlay:     false,
 		OpenBag:         false,
 		OpenMiniPanel:   false,
+		IsWalk:          true,
 		CalculateEnd:    false,
 		UIOFFSETX:       0,
 		ShadowOffsetX:   -348,

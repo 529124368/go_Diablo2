@@ -15,9 +15,11 @@ import (
 
 const (
 	IDLE                uint8         = 0
-	RUN                 uint8         = 1
+	Walk                uint8         = 1
+	RUN                 uint8         = 3
 	ATTACK              uint8         = 2
-	SPEED               float64       = 2 //玩家移动素材
+	SPEED               float64       = 2 //玩家走路移动速度
+	SPEED_RUN           float64       = 3 //玩家跑步移动速度
 	ISHIDDEN            uint8         = 1 //装备栏等隐藏标识
 	ISITEMS             uint8         = 0 //物品和装备标识
 	ISMINICOM           uint8         = 2 //MINI板标识

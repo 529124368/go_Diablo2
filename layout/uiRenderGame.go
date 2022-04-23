@@ -1,11 +1,9 @@
 package layout
 
 import (
-	"fmt"
 	"game/tools"
 	"runtime"
 	"strings"
-	"sync"
 	"time"
 )
 
@@ -112,6 +110,38 @@ func (u *UI) LoadGameImages() {
 				i.(*Sprite).images = mgUI
 				time.Sleep(tools.CLOSEBTNSLEEP)
 				i.(*Sprite).images = &on
+				runtime.GC()
+				isClick = false
+			}()
+		}
+	}, true), tools.ISNORCOM)
+
+	//注册跑步走路动作切换
+	s, _ = u.image.ReadFile("resource/UI/walk_button.png")
+	mgUI = tools.GetEbitenImage(s)
+	u.AddComponent(QuickCreate(254, 451, mgUI, 0, func(i spriteInterface) {
+		if !isClick {
+			isClick = true
+			go func() {
+				if u.status.IsWalk {
+					s, _ = u.image.ReadFile("resource/UI/walk_button_down.png")
+					mgUI = tools.GetEbitenImage(s)
+					i.(*Sprite).images = mgUI
+					time.Sleep(tools.CLOSEBTNSLEEP)
+					s, _ = u.image.ReadFile("resource/UI/run_button.png")
+					mgUI = tools.GetEbitenImage(s)
+					i.(*Sprite).images = mgUI
+					u.status.IsWalk = false
+				} else {
+					s, _ = u.image.ReadFile("resource/UI/run_button_down.png")
+					mgUI = tools.GetEbitenImage(s)
+					i.(*Sprite).images = mgUI
+					time.Sleep(tools.CLOSEBTNSLEEP)
+					s, _ = u.image.ReadFile("resource/UI/walk_button.png")
+					mgUI = tools.GetEbitenImage(s)
+					i.(*Sprite).images = mgUI
+					u.status.IsWalk = true
+				}
 				runtime.GC()
 				isClick = false
 			}()
@@ -353,176 +383,5 @@ func (u *UI) LoadGameImages() {
 
 	u.setHidden(tools.ISHIDDEN)
 	u.setHidden(tools.ISMINICOM)
-
-}
-
-//加载登录游戏UI
-func (u *UI) LoadGameLoginImages() {
-	defer func() {
-		if r := recover(); r != nil {
-			fmt.Println("has error is :", r)
-		}
-	}()
-	var len float64 = 0
-	var scales float64 = 0.8
-	s, _ := u.image.ReadFile("resource/UI/login0.png")
-	mgUI := tools.GetEbitenImage(s)
-	op := QuickCreate(len, 0, mgUI, 0, nil)
-	op.op.GeoM.Scale(1, scales)
-	u.AddComponent(op, tools.ISNORCOM)
-
-	len += float64(mgUI.Bounds().Max.X)
-
-	s, _ = u.image.ReadFile("resource/UI/login1.png")
-	mgUI = tools.GetEbitenImage(s)
-	op = QuickCreate(len, 0, mgUI, 0, nil)
-	op.op.GeoM.Scale(1, scales)
-	u.AddComponent(op, tools.ISNORCOM)
-
-	len += float64(mgUI.Bounds().Max.X)
-
-	s, _ = u.image.ReadFile("resource/UI/login2.png")
-	mgUI = tools.GetEbitenImage(s)
-	op = QuickCreate(len, 0, mgUI, 0, nil)
-	op.op.GeoM.Scale(1, scales)
-	u.AddComponent(op, tools.ISNORCOM)
-
-	len += float64(mgUI.Bounds().Max.X)
-
-	s, _ = u.image.ReadFile("resource/UI/login3.png")
-	mgUI = tools.GetEbitenImage(s)
-	op = QuickCreate(len, 0, mgUI, 0, nil)
-	op.op.GeoM.Scale(1, scales)
-	u.AddComponent(op, tools.ISNORCOM)
-
-	len = 0
-	var offset float64 = 340
-	s, _ = u.image.ReadFile("resource/UI/login8.png")
-	mgUI = tools.GetEbitenImage(s)
-	op = QuickCreate(len, offset, mgUI, 0, nil)
-	op.op.GeoM.Scale(1, scales)
-	u.AddComponent(op, tools.ISNORCOM)
-
-	len += float64(mgUI.Bounds().Max.X)
-
-	s, _ = u.image.ReadFile("resource/UI/login9.png")
-	mgUI = tools.GetEbitenImage(s)
-	op = QuickCreate(len, offset, mgUI, 0, nil)
-	op.op.GeoM.Scale(1, scales)
-	u.AddComponent(op, tools.ISNORCOM)
-
-	len += float64(mgUI.Bounds().Max.X)
-
-	s, _ = u.image.ReadFile("resource/UI/login10.png")
-	mgUI = tools.GetEbitenImage(s)
-	op = QuickCreate(len, offset, mgUI, 0, nil)
-	op.op.GeoM.Scale(1, scales)
-	u.AddComponent(op, tools.ISNORCOM)
-
-	len += float64(mgUI.Bounds().Max.X)
-
-	s, _ = u.image.ReadFile("resource/UI/login11.png")
-	mgUI = tools.GetEbitenImage(s)
-	op = QuickCreate(len, offset, mgUI, 0, nil)
-	op.op.GeoM.Scale(1, scales)
-	u.AddComponent(op, tools.ISNORCOM)
-
-	len = 0
-
-	s, _ = u.image.ReadFile("resource/UI/login4.png")
-	mgUI = tools.GetEbitenImage(s)
-	op = QuickCreate(len, float64(mgUI.Bounds().Max.Y), mgUI, 0, nil)
-	op.op.GeoM.Scale(1, scales)
-	u.AddComponent(op, tools.ISNORCOM)
-
-	len += float64(mgUI.Bounds().Max.X)
-
-	s, _ = u.image.ReadFile("resource/UI/login5.png")
-	mgUI = tools.GetEbitenImage(s)
-	op = QuickCreate(len, float64(mgUI.Bounds().Max.Y), mgUI, 0, nil)
-	op.op.GeoM.Scale(1, scales)
-	u.AddComponent(op, tools.ISNORCOM)
-
-	len += float64(mgUI.Bounds().Max.X)
-
-	s, _ = u.image.ReadFile("resource/UI/login6.png")
-	mgUI = tools.GetEbitenImage(s)
-	op = QuickCreate(len, float64(mgUI.Bounds().Max.Y), mgUI, 0, nil)
-	op.op.GeoM.Scale(1, scales)
-	u.AddComponent(op, tools.ISNORCOM)
-
-	len += float64(mgUI.Bounds().Max.X)
-
-	s, _ = u.image.ReadFile("resource/UI/login7.png")
-	mgUI = tools.GetEbitenImage(s)
-	op = QuickCreate(len, float64(mgUI.Bounds().Max.Y), mgUI, 0, nil)
-	op.op.GeoM.Scale(1, scales)
-	u.AddComponent(op, tools.ISNORCOM)
-
-	go func() {
-		plist, _ := u.image.ReadFile("resource/UI/logo.png")
-		plist_json, _ := u.image.ReadFile("resource/UI/logo.json")
-		plist_sheet, plist_png = tools.GetImageFromPlist(plist, plist_json)
-		runtime.GC()
-	}()
-
-}
-
-//加载游戏选择角色UI
-func (u *UI) LoadGameCharaSelectImages() {
-	//清空
-	u.ClearSlice(1)
-	//角色选择背景图加载
-	s, _ := u.image.ReadFile("resource/UI/charactSelect.png")
-	mgUI := tools.GetEbitenImage(s)
-	op := QuickCreate(0, 0, mgUI, 0, nil)
-	op.op.GeoM.Scale(1, 0.8)
-	u.AddComponent(op, tools.ISNORCOM)
-	//游戏开始按钮
-	s, _ = u.image.ReadFile("resource/UI/startGameButton.png")
-	mgUI = tools.GetEbitenImage(s)
-	op = QuickCreate(1250, 850, mgUI, 0, func(i spriteInterface) {
-		if !isClick {
-			isClick = true
-			go func() {
-				on := *i.(*Sprite).images
-				s, _ = u.image.ReadFile("resource/UI/startGameButton_down.png")
-				mgUI = tools.GetEbitenImage(s)
-				i.(*Sprite).images = mgUI
-				time.Sleep(tools.CLOSEBTNSLEEP)
-				i.(*Sprite).images = &on
-				u.SetDisplay(tools.ISHIDDEN)
-				//切换游戏场景到开门loading
-				u.status.ChangeScenceFlg = true
-				u.status.CurrentGameScence = tools.GAMESCENEOPENDOOR
-				u.status.ChangeScenceFlg = false
-				isClick = false
-			}()
-		}
-	}, false)
-	op.op.GeoM.Scale(0.5, 0.5)
-	u.AddComponent(op, tools.ISNORCOM)
-	//动画
-	w := &sync.WaitGroup{}
-	w.Add(2)
-	//加载火焰
-	go func() {
-		plist, _ := u.image.ReadFile("resource/UI/logo.png")
-		plist_json, _ := u.image.ReadFile("resource/UI/logo.json")
-		plist_sheet, plist_png = tools.GetImageFromPlist(plist, plist_json)
-		w.Done()
-	}()
-	//加载野蛮人
-	go func() {
-		plist, _ := u.image.ReadFile("resource/UI/selectRoles.png")
-		plist_json, _ := u.image.ReadFile("resource/UI/selectRoles.json")
-		plist_R_sheet, plist_R_png = tools.GetImageFromPlist(plist, plist_json)
-		w.Done()
-	}()
-	w.Wait()
-	//手动GC
-	go func() {
-		runtime.GC()
-	}()
 
 }

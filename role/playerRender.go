@@ -10,6 +10,7 @@ import (
 //渲染角色
 func (p *Player) Render(screen *ebiten.Image, counts int) {
 	var name string
+	block := 1
 	//nameSkill := ""
 	switch p.State {
 	case tools.ATTACK:
@@ -17,15 +18,22 @@ func (p *Player) Render(screen *ebiten.Image, counts int) {
 		//nameSkill = strconv.Itoa(p.Direction) + "_skill_" + strconv.Itoa(counts) + ".png"
 	case tools.IDLE:
 		name = strconv.Itoa(int(p.Direction)) + "_stand_" + strconv.Itoa(counts) + ".png"
-	default:
+	case tools.Walk:
 		if counts >= 8 {
 			counts = 0
 		}
 		name = strconv.Itoa(int(p.Direction)) + "_run_" + strconv.Itoa(counts) + ".png"
+	case tools.RUN:
+		block = 2
+		if counts >= 8 {
+			counts = 0
+		}
+		name = strconv.Itoa(int(p.Direction)) + "_run2_" + strconv.Itoa(counts) + ".png"
 	}
-	imagess, x, y := p.GetAnimator("man", name)
+
+	imagess, x, y := p.GetAnimator("man", name, uint8(block))
 	//Idel -> Walk Offset
-	if p.State == tools.RUN {
+	if p.State == tools.Walk {
 		//ba1
 		// x += -4
 		// y += -3
@@ -35,6 +43,18 @@ func (p *Player) Render(screen *ebiten.Image, counts int) {
 		//ba3
 		x += 3
 		y += -7
+	}
+	//Idel -> RUN Offset
+	if p.State == tools.RUN {
+		//ba1
+		// x += -4
+		// y += -3
+		//ba2
+		// x += 4
+		// y += -18
+		//ba3
+		x += 8
+		y += -10
 	}
 
 	//Idel -> Walk -> Attack Offset
