@@ -180,16 +180,17 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	g.objectA.Render(screen, countsForMap, g.status.MoveOffsetX, g.status.MoveOffsetY)
 	//Draw UI
 	g.ui.DrawUI(screen)
-
-	//Draw Debug
-	len := tools.Distance(g.status.PLAYERCENTERX, g.status.PLAYERCENTERY, int64(mouseX), int64(mouseY))
-	re := tools.Angle(math.Abs(float64(int64(mouseY)-g.status.PLAYERCENTERY)), len)
+	//获取玩家当前的地图块坐标
 	mapX, mapY := tools.GetFloorPositionAt(g.player.X, g.player.Y)
 	g.status.MapTitleX = mapX
 	g.status.MapTitleY = mapY
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nplayer position %d,%d\nmouse position %d,%d\ndir %d\nAngle %f\nmapXY %d,%d",
-		int64(ebiten.CurrentFPS()), int64(g.player.X), int64(g.player.Y), g.player.MouseX, g.player.MouseY, tools.CaluteDir(g.status.PLAYERCENTERX, g.status.PLAYERCENTERY, int64(g.player.MouseX), int64(g.player.MouseY)), re, mapX, mapY))
-
+	//Draw Debug
+	if g.status.DisPlayDebugInfo {
+		len := tools.Distance(g.status.PLAYERCENTERX, g.status.PLAYERCENTERY, int64(mouseX), int64(mouseY))
+		re := tools.Angle(math.Abs(float64(int64(mouseY)-g.status.PLAYERCENTERY)), len)
+		ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nplayer position %d,%d\nmouse position %d,%d\ndir %d\nAngle %f\nmapXY %d,%d",
+			int64(ebiten.CurrentFPS()), int64(g.player.X), int64(g.player.Y), g.player.MouseX, g.player.MouseY, tools.CaluteDir(g.status.PLAYERCENTERX, g.status.PLAYERCENTERY, int64(g.player.MouseX), int64(g.player.MouseY)), re, mapX, mapY))
+	}
 	//Change player Frame
 	if g.count > frameSpeed {
 		counts++
@@ -287,9 +288,11 @@ func (g *Game) ChangeScenceLoginDraw(screen *ebiten.Image) {
 	opRo.CompositeMode = ebiten.CompositeModeLighter
 	opRo.GeoM.Scale(1, 0.7)
 	screen.DrawImage(right, opRo)
-	//Draw Debug
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nmouse position %d,%d",
-		int64(ebiten.CurrentFPS()), mouseX, mouseY))
+	if g.status.DisPlayDebugInfo {
+		//Draw Debug
+		ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nmouse position %d,%d",
+			int64(ebiten.CurrentFPS()), mouseX, mouseY))
+	}
 	//Change Frame
 	if g.count > frameSpeed {
 		counts++
@@ -323,7 +326,9 @@ func (g *Game) ChangeScenceSelectDraw(screen *ebiten.Image) {
 	screen.DrawImage(ba, opBa)
 
 	//Draw Debug
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nmouse position %d,%d", int64(ebiten.CurrentFPS()), mouseX, mouseY))
+	if g.status.DisPlayDebugInfo {
+		ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nmouse position %d,%d", int64(ebiten.CurrentFPS()), mouseX, mouseY))
+	}
 	//Draw Text
 	g.font_style.Render(screen, 635, 446, "开始游戏", 8, 130, color.White)
 }
@@ -338,7 +343,10 @@ func (g *Game) ChangeScenceOpenDoorDraw(screen *ebiten.Image) {
 	op.GeoM.Translate(268, 120)
 	screen.DrawImage(door, op)
 	//Draw Debug
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nmouse position %d,%d", int64(ebiten.CurrentFPS()), mouseX, mouseY))
+	if g.status.DisPlayDebugInfo {
+		ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nmouse position %d,%d", int64(ebiten.CurrentFPS()), mouseX, mouseY))
+	}
+
 }
 
 //Draw OpenDoor Update

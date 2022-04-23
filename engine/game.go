@@ -124,6 +124,10 @@ func (g *Game) Update() error {
 		i := ebiten.IsFullscreen()
 		ebiten.SetFullscreen(!i)
 	}
+	//Debug 信息显示控制
+	if inpututil.IsKeyJustPressed(ebiten.KeyD) {
+		g.status.DisPlayDebugInfo = !g.status.DisPlayDebugInfo
+	}
 
 	return nil
 }

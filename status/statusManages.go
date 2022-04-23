@@ -25,6 +25,7 @@ type StatusManage struct {
 	MapTitleY         int
 	MapZoom           int
 	CurrentGameScence int
+	DisPlayDebugInfo  bool
 }
 
 func NewStatusManage() *StatusManage {
@@ -57,6 +58,7 @@ func NewStatusManage() *StatusManage {
 		//
 		MapZoom:           7,
 		CurrentGameScence: 1,
+		DisPlayDebugInfo:  false,
 	}
 	return n
 }
