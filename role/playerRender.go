@@ -15,7 +15,12 @@ func (p *Player) Render(screen *ebiten.Image, counts int) {
 	switch p.State {
 	case tools.ATTACK:
 		name = strconv.Itoa(int(p.Direction)) + "_attack_" + strconv.Itoa(counts) + ".png"
-		//nameSkill = strconv.Itoa(p.Direction) + "_skill_" + strconv.Itoa(counts) + ".png"
+	case tools.SkILL:
+		block = 2
+		if counts >= 14 {
+			counts = 0
+		}
+		name = strconv.Itoa(int(p.Direction)) + "_skill_" + strconv.Itoa(counts) + ".png"
 	case tools.IDLE:
 		name = strconv.Itoa(int(p.Direction)) + "_stand_" + strconv.Itoa(counts) + ".png"
 	case tools.Walk:
@@ -68,6 +73,19 @@ func (p *Player) Render(screen *ebiten.Image, counts int) {
 		//ba3
 		x += -55
 		y += -20
+	}
+
+	//Idel -> SKILL-> Offset
+	if p.State == tools.SkILL {
+		//ba1
+		// x += -50
+		// y += -30
+		//ba2
+		// x += -55
+		// y += -35
+		//ba3
+		x += -10
+		y += -15
 	}
 	//Draw Shadow
 	opS.GeoM.Reset()

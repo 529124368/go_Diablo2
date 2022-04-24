@@ -58,7 +58,7 @@ func NewGame() *Game {
 	//Map
 	m := maps.NewMap(&asset, sta)
 	//Player  设置初始状态和坐标
-	r := role.NewPlayer(5280, 1840, tools.IDLE, 0, 0, 0, &asset, m, sta)
+	r := role.NewPlayer(5280, 1880, tools.IDLE, 0, 0, 0, &asset, m, sta)
 	//字体
 	f := fonts.NewFont(&asset)
 	//UI

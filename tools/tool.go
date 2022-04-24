@@ -18,6 +18,7 @@ const (
 	Walk                uint8         = 1
 	RUN                 uint8         = 3
 	ATTACK              uint8         = 2
+	SkILL               uint8         = 4
 	SPEED               float64       = 2 //玩家走路移动速度
 	SPEED_RUN           float64       = 3 //玩家跑步移动速度
 	ISHIDDEN            uint8         = 1 //装备栏等隐藏标识
@@ -258,7 +259,7 @@ func GetFloorPositionAt(x, y float64) (int, int) {
 	//当前菱形地图 0,0 点坐标世界坐标是 （3280,0）
 	M_Minus_N := (x - 3280) / 80
 	M_Plus_N := y / 40
-	xx := math.Floor((M_Minus_N+M_Plus_N)/2 + 0.5)
-	yy := math.Floor(xx - M_Minus_N + 0.5)
+	xx := math.Floor((M_Minus_N + M_Plus_N) / 2)
+	yy := math.Floor((M_Minus_N+M_Plus_N)/2 - M_Minus_N + 0.5)
 	return int(xx), int(yy)
 }

@@ -22,7 +22,7 @@ var (
 )
 
 type imgWall struct {
-	img *ebiten.Image
+	Img *ebiten.Image
 	h   int
 }
 
@@ -71,7 +71,7 @@ func (m *MapBase) RenderFloor(screen *ebiten.Image, offsetX, offsetY float64) {
 				s := img[i][j]
 				if s != nil {
 					op := &ebiten.DrawImageOptions{}
-					op.GeoM.Translate(float64(i)*(-80)+float64(sumX)+offsetX, float64(startY)+float64(j)*40+offsetY)
+					op.GeoM.Translate(3280+float64(i)*(-80)+float64(sumX)+offsetX, float64(startY)+float64(j)*40+offsetY)
 					op.GeoM.Scale(Scale, Scale)
 					screen.DrawImage(s, op)
 					// debug  info
@@ -97,12 +97,12 @@ func (m *MapBase) RenderWall(screen *ebiten.Image, offsetX, offsetY float64) {
 			if j > 0 {
 				sumX += 80
 			}
-			s := img3[i][j].img
+			s := img3[i][j].Img
 			//视野剔除
 			if j > m.status.MapTitleX-m.status.MapZoom && j < m.status.MapTitleX+m.status.MapZoom && i > m.status.MapTitleY-m.status.MapZoom && i < m.status.MapTitleY+m.status.MapZoom {
 				if s != nil {
 					op := &ebiten.DrawImageOptions{}
-					op.GeoM.Translate(float64(i)*(-80)+float64(sumX)+offsetX, float64(startY)+float64(j)*40+offsetY+float64(img3[i][j].h))
+					op.GeoM.Translate(3280+float64(i)*(-80)+float64(sumX)+offsetX, float64(startY)+float64(j)*40+offsetY+float64(img3[i][j].h))
 					op.GeoM.Scale(Scale, Scale)
 					screen.DrawImage(s, op)
 				}
@@ -123,10 +123,10 @@ func (m *MapBase) RenderWall(screen *ebiten.Image, offsetX, offsetY float64) {
 			}
 			//视野剔除
 			if j > m.status.MapTitleX-m.status.MapZoom && j < m.status.MapTitleX+m.status.MapZoom && i > m.status.MapTitleY-m.status.MapZoom && i < m.status.MapTitleY+m.status.MapZoom {
-				s := img2[i][j].img
+				s := img2[i][j].Img
 				if s != nil {
 					op := &ebiten.DrawImageOptions{}
-					op.GeoM.Translate(float64(i)*(-80)+float64(sumX)+offsetX, float64(startY)+float64(j)*40+offsetY+float64(img2[i][j].h))
+					op.GeoM.Translate(3280+float64(i)*(-80)+float64(sumX)+offsetX, float64(startY)+float64(j)*40+offsetY+float64(img2[i][j].h))
 					op.GeoM.Scale(Scale, Scale)
 					screen.DrawImage(s, op)
 				}
@@ -218,16 +218,16 @@ func (m *MapBase) LoadDstMap() {
 						dss := GetTiles(int(ds1Tile.Style), int(ds1Tile.Sequence), d2enum.TileLeftPartOfNorthCornerWall, ss2.Tiles)
 						if dss != nil && dss[ds1Tile.RandomIndex].Height < ds[ds1Tile.RandomIndex].Height {
 							m, h := getWallTitleImage(dss[ds1Tile.RandomIndex], ds1Tile, ww)
-							img2[i][j].img = m
+							img2[i][j].Img = m
 							img2[i][j].h = h
 						} else {
 							m, h := getWallTitleImage(ds[ds1Tile.RandomIndex], ds1Tile, ww)
-							img2[i][j].img = m
+							img2[i][j].Img = m
 							img2[i][j].h = h
 						}
 					} else {
 						m, h := getWallTitleImage(ds[ds1Tile.RandomIndex], ds1Tile, ww)
-						img2[i][j].img = m
+						img2[i][j].Img = m
 						img2[i][j].h = h
 					}
 				}
@@ -241,55 +241,65 @@ func (m *MapBase) LoadDstMap() {
 		img3[i] = make([]imgWall, w)
 		for j := 0; j < w; j++ {
 			if j == 18 && i == 6 {
-				img3[i][j].img = getTitleImage(ss4.Tiles[7], ww)
+				img3[i][j].Img = getTitleImage(ss4.Tiles[7], ww)
 				img3[i][j].h = -170
 			}
 			if j == 30 && i == 11 {
-				img3[i][j].img = getTitleImage(ss1.Tiles[22], ww)
+				img3[i][j].Img = getTitleImage(ss1.Tiles[22], ww)
 				img3[i][j].h = -80
 			}
 			if j == 31 && i == 11 {
-				img3[i][j].img = getTitleImage(ss1.Tiles[23], ww)
+				img3[i][j].Img = getTitleImage(ss1.Tiles[23], ww)
 				img3[i][j].h = -110
 			}
 
 			if j == 32 && i == 11 {
-				img3[i][j].img = getTitleImage(ss1.Tiles[24], ww)
+				img3[i][j].Img = getTitleImage(ss1.Tiles[24], ww)
 				img3[i][j].h = -110
 			}
 			if j == 22 && i == 22 {
-				img3[i][j].img = getTitleImage(ss1.Tiles[24], ww)
+				img3[i][j].Img = getTitleImage(ss1.Tiles[24], ww)
 				img3[i][j].h = -110
 			}
 			if j == 33 && i == 11 {
-				img3[i][j].img = getTitleImage(ss1.Tiles[21], ww)
+				img3[i][j].Img = getTitleImage(ss1.Tiles[21], ww)
 				img3[i][j].h = -20
 			}
 			if j == 33 && i == 10 {
-				img3[i][j].img = getTitleImage(ss1.Tiles[25], ww)
+				img3[i][j].Img = getTitleImage(ss1.Tiles[25], ww)
 				img3[i][j].h = -80
 			}
 			if j == 33 && i == 9 {
-				img3[i][j].img = getTitleImage(ss1.Tiles[26], ww)
+				img3[i][j].Img = getTitleImage(ss1.Tiles[26], ww)
 				img3[i][j].h = -80
 			}
 			if j == 33 && i == 8 {
-				img3[i][j].img = getTitleImage(ss1.Tiles[27], ww)
+				img3[i][j].Img = getTitleImage(ss1.Tiles[27], ww)
 				img3[i][j].h = -40
 			}
 			if j == 33 && i == 7 {
-				img3[i][j].img = getTitleImage(ss1.Tiles[28], ww)
+				img3[i][j].Img = getTitleImage(ss1.Tiles[28], ww)
 				img3[i][j].h = -40
 			}
 			if j == 22 && i == 22 {
-				img3[i][j].img = getTitleImage(ss1.Tiles[19], ww)
+				img3[i][j].Img = getTitleImage(ss1.Tiles[19], ww)
 				img3[i][j].h = -80
 			}
 			if j == 21 && i == 24 {
-				img3[i][j].img = getTitleImage(ss1.Tiles[16], ww)
+				img3[i][j].Img = getTitleImage(ss1.Tiles[16], ww)
 				img3[i][j].h = -80
 			}
 
 		}
 	}
+}
+
+//获取墙体区域
+func (m *MapBase) GetBlock1Aera() [][]imgWall {
+	return img2
+}
+
+//获取墙体区域
+func (m *MapBase) GetBlock2Aera() [][]imgWall {
+	return img3
 }

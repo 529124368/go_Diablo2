@@ -6,9 +6,6 @@ import (
 	"game/status"
 	"game/tools"
 	"image"
-	"runtime"
-	"strconv"
-	"strings"
 
 	"github.com/fzipp/texturepacker"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -20,15 +17,12 @@ const (
 )
 
 var (
-	plist_sheet       *texturepacker.SpriteSheet
-	plist_sheet_2     *texturepacker.SpriteSheet
-	plist_skill_sheet *texturepacker.SpriteSheet
-	plist_skill_png   *image.NRGBA
-	plist_png         *image.Paletted
-	plist_png_2       *image.Paletted
-	loadedSkill       string
-	opS               *ebiten.DrawImageOptions
-	op                *ebiten.DrawImageOptions
+	plist_sheet   *texturepacker.SpriteSheet
+	plist_sheet_2 *texturepacker.SpriteSheet
+	plist_png     *image.Paletted
+	plist_png_2   *image.Paletted
+	opS           *ebiten.DrawImageOptions
+	op            *ebiten.DrawImageOptions
 )
 
 type Player struct {
@@ -76,31 +70,11 @@ func (p *Player) LoadImages() {
 	plist, _ := p.image.ReadFile("resource/man/warrior/ba2.png")
 	plist_json, _ := p.image.ReadFile("resource/man/warrior/ba2.json")
 	plist_sheet, plist_png = tools.GetImageFromPlistPaletted(plist, plist_json)
-	plist, _ = p.image.ReadFile("resource/man/warrior/ba2_act.png")
 	//加载玩家素材第二部分
+	plist, _ = p.image.ReadFile("resource/man/warrior/ba2_act.png")
 	plist_json, _ = p.image.ReadFile("resource/man/warrior/ba2_act.json")
 	plist_sheet_2, plist_png_2 = tools.GetImageFromPlistPaletted(plist, plist_json)
-	//skill load
-	// go func() {
-	// 	loadedSkill = "liehuo"
-	// 	plist, _ := p.image.ReadFile("resource/man/skill/liehuo.png")
-	// 	plist_json, _ := p.image.ReadFile("resource/man/skill/liehuo.json")
-	// 	plist_skill_sheet, plist_skill_png = tools.GetImageFromPlist(plist, plist_json)
-	// 	runtime.GC()
-	// 	wg.Done()
-	// }()
 	p.SetPlayerState(0, 0)
-}
-
-//TODO 加载技能素材
-func (p *Player) loadSkillImages(name string) {
-	go func() {
-		loadedSkill = name
-		plist, _ := p.image.ReadFile("resource/man/skill/" + name + ".png")
-		plist_json, _ := p.image.ReadFile("resource/man/skill/" + name + ".json")
-		plist_skill_sheet, plist_skill_png = tools.GetImageFromPlist(plist, plist_json)
-		runtime.GC()
-	}()
 }
 
 //设置玩家状态
@@ -127,13 +101,7 @@ func (p *Player) GetAnimator(flg, name string, block uint8) (*ebiten.Image, int,
 			return ebiten.NewImageFromImage(plist_png_2.SubImage(plist_sheet_2.Sprites[name].Frame)), plist_sheet_2.Sprites[name].SpriteSourceSize.Min.X, plist_sheet_2.Sprites[name].SpriteSourceSize.Min.Y
 		}
 	} else {
-		if p.SkillName != loadedSkill {
-			p.loadSkillImages(p.SkillName)
-		}
-		xy := strings.Split(plist_skill_sheet.Meta.Version, "_")
-		x, _ := strconv.Atoi(xy[0])
-		y, _ := strconv.Atoi(xy[1])
-		return ebiten.NewImageFromImage(plist_skill_png.SubImage(plist_skill_sheet.Sprites[name].Frame)), x, y
+		return nil, 0, 0
 	}
 }
 
@@ -153,154 +121,198 @@ func (p *Player) GetMouseController(dir uint8) {
 	}
 
 	if dir == 2 && p.status.Flg {
-		p.status.MoveOffsetX += -speed
-		p.status.MoveOffsetY += speed
-		p.Y -= speed
-		p.X += speed
+		if p.CanWalk(speed, -speed) {
+			p.status.MoveOffsetX += -speed
+			p.status.MoveOffsetY += speed
+			p.Y -= speed
+			p.X += speed
+		}
 		p.status.Flg = false
 	}
 
 	if dir == 3 && p.status.Flg {
-		p.status.MoveOffsetX += -speed
-		p.status.MoveOffsetY += -speed
-		p.Y += speed
-		p.X += speed
+		if p.CanWalk(speed, speed) {
+			p.status.MoveOffsetX += -speed
+			p.status.MoveOffsetY += -speed
+			p.Y += speed
+			p.X += speed
+		}
 		p.status.Flg = false
 	}
 	if dir == 0 && p.status.Flg {
-		p.status.MoveOffsetX += speed
-		p.status.MoveOffsetY += -speed
-		p.Y += speed
-		p.X -= speed
+		if p.CanWalk(-speed, speed) {
+			p.status.MoveOffsetX += speed
+			p.status.MoveOffsetY += -speed
+			p.Y += speed
+			p.X -= speed
+		}
 		p.status.Flg = false
 	}
 	if dir == 1 && p.status.Flg {
-		p.status.MoveOffsetX += speed
-		p.status.MoveOffsetY += speed
-		p.Y -= speed
-		p.X -= speed
+		if p.CanWalk(-speed, -speed) {
+			p.status.MoveOffsetX += speed
+			p.status.MoveOffsetY += speed
+			p.Y -= speed
+			p.X -= speed
+		}
 		p.status.Flg = false
 	}
 	if dir == 5 && p.status.Flg {
-		p.status.MoveOffsetX += speed
-		p.status.MoveOffsetY += 0
-		p.X -= speed
+		if p.CanWalk(-speed, 0) {
+			p.status.MoveOffsetX += speed
+			p.status.MoveOffsetY += 0
+			p.X -= speed
+		}
 		p.status.Flg = false
 	}
 
 	if dir == 6 && p.status.Flg {
-		p.status.MoveOffsetX += 0
-		p.status.MoveOffsetY += speed
-		p.Y -= speed
+		if p.CanWalk(0, -speed) {
+			p.status.MoveOffsetX += 0
+			p.status.MoveOffsetY += speed
+			p.Y -= speed
+		}
 		p.status.Flg = false
 	}
 
 	if dir == 7 && p.status.Flg {
-		p.status.MoveOffsetX += -speed
-		p.status.MoveOffsetY += 0
-		p.X += speed
+		if p.CanWalk(speed, 0) {
+			p.status.MoveOffsetX += -speed
+			p.status.MoveOffsetY += 0
+			p.X += speed
+		}
 		p.status.Flg = false
 	}
 
 	if dir == 4 && p.status.Flg {
-		p.status.MoveOffsetX += 0
-		p.status.MoveOffsetY += -speed
-		p.Y += speed
+		if p.CanWalk(0, speed) {
+			p.status.MoveOffsetX += 0
+			p.status.MoveOffsetY += -speed
+			p.Y += speed
+		}
 		p.status.Flg = false
 	}
 	if dir == 12 && p.status.Flg {
-		p.status.MoveOffsetX += 1 - speed
-		p.status.MoveOffsetY += speed
-		p.Y -= speed
-		p.X += speed - 1
+		if p.CanWalk(speed-1, -speed) {
+			p.status.MoveOffsetX += 1 - speed
+			p.status.MoveOffsetY += speed
+			p.Y -= speed
+			p.X += speed - 1
+		}
 		p.status.Flg = false
 	}
 	if dir == 2 && p.status.Flg {
-		p.status.MoveOffsetX += -speed
-		p.status.MoveOffsetY += speed
-		p.Y -= speed
-		p.X += speed
+		if p.CanWalk(speed, -speed) {
+			p.status.MoveOffsetX += -speed
+			p.status.MoveOffsetY += speed
+			p.Y -= speed
+			p.X += speed
+		}
 		p.status.Flg = false
 	}
 	if dir == 13 && p.status.Flg {
-		p.status.MoveOffsetX += -speed
-		p.status.MoveOffsetY += speed - 1
-		p.Y -= speed - 1
-		p.X += speed
+		if p.CanWalk(speed, 1-speed) {
+			p.status.MoveOffsetX += -speed
+			p.status.MoveOffsetY += speed - 1
+			p.Y -= speed - 1
+			p.X += speed
+		}
 		p.status.Flg = false
 	}
 	if dir == 10 && p.status.Flg {
-		p.status.MoveOffsetX += speed
-		p.status.MoveOffsetY += speed - 1
-		p.Y -= speed - 1
-		p.X -= speed
+		if p.CanWalk(-speed, 1-speed) {
+			p.status.MoveOffsetX += speed
+			p.status.MoveOffsetY += speed - 1
+			p.Y -= speed - 1
+			p.X -= speed
+		}
 		p.status.Flg = false
 	}
 	if dir == 1 && p.status.Flg {
-		p.status.MoveOffsetX += speed
-		p.status.MoveOffsetY += speed
-		p.Y -= speed
-		p.X -= speed
+		if p.CanWalk(-speed, -speed) {
+			p.status.MoveOffsetX += speed
+			p.status.MoveOffsetY += speed
+			p.Y -= speed
+			p.X -= speed
+		}
 		p.status.Flg = false
 	}
 	if dir == 11 && p.status.Flg {
-		p.status.MoveOffsetX += speed - 1
-		p.status.MoveOffsetY += speed
-		p.Y -= speed
-		p.X -= speed - 1
+		if p.CanWalk(1-speed, -speed) {
+			p.status.MoveOffsetX += speed - 1
+			p.status.MoveOffsetY += speed
+			p.Y -= speed
+			p.X -= speed - 1
+		}
 		p.status.Flg = false
 	}
 	if dir == 9 && p.status.Flg {
-		p.status.MoveOffsetX += speed
-		p.status.MoveOffsetY += 1 - speed
-		p.Y += speed - 1
-		p.X -= speed
+		if p.CanWalk(-speed, speed-1) {
+			p.status.MoveOffsetX += speed
+			p.status.MoveOffsetY += 1 - speed
+			p.Y += speed - 1
+			p.X -= speed
+		}
 		p.status.Flg = false
 	}
 	if dir == 0 && p.status.Flg {
-		p.status.MoveOffsetX += speed
-		p.status.MoveOffsetY += -speed
-		p.Y += speed
-		p.X -= speed
+		if p.CanWalk(-speed, speed) {
+			p.status.MoveOffsetX += speed
+			p.status.MoveOffsetY += -speed
+			p.Y += speed
+			p.X -= speed
+		}
 		p.status.Flg = false
 	}
 	if dir == 8 && p.status.Flg {
-		p.status.MoveOffsetX += speed - 1
-		p.status.MoveOffsetY += -speed
-		p.Y += speed
-		p.X -= speed - 1
+		if p.CanWalk(1-speed, speed) {
+			p.status.MoveOffsetX += speed - 1
+			p.status.MoveOffsetY += -speed
+			p.Y += speed
+			p.X -= speed - 1
+		}
 		p.status.Flg = false
 	}
 
 	if dir == 15 && p.status.Flg {
-		p.status.MoveOffsetX += 1 - speed
-		p.status.MoveOffsetY += -speed
-		p.Y += speed
-		p.X += speed - 1
+		if p.CanWalk(speed-1, speed) {
+			p.status.MoveOffsetX += 1 - speed
+			p.status.MoveOffsetY += -speed
+			p.Y += speed
+			p.X += speed - 1
+		}
 		p.status.Flg = false
 	}
 	if dir == 3 && p.status.Flg {
-		p.status.MoveOffsetX += -speed
-		p.status.MoveOffsetY += -speed
-		p.Y += speed
-		p.X += speed
+		if p.CanWalk(speed, speed) {
+			p.status.MoveOffsetX += -speed
+			p.status.MoveOffsetY += -speed
+			p.Y += speed
+			p.X += speed
+		}
 		p.status.Flg = false
 	}
 	if dir == 14 && p.status.Flg {
-		p.status.MoveOffsetX += -speed
-		p.status.MoveOffsetY += 1 - speed
-		p.Y += speed - 1
-		p.X += speed
+		if p.CanWalk(speed, speed-1) {
+			p.status.MoveOffsetX += -speed
+			p.status.MoveOffsetY += 1 - speed
+			p.Y += speed - 1
+			p.X += speed
+		}
 		p.status.Flg = false
 	}
 }
 
-//TODO
-func (p *Player) Attack() {
-
-}
-
-//TODO
-func (p *Player) DeadEvent() {
-
+func (p *Player) CanWalk(xS, yS float64) bool {
+	block1 := p.map_c.GetBlock1Aera()
+	block2 := p.map_c.GetBlock2Aera()
+	x, y := tools.GetFloorPositionAt(p.X+xS, p.Y+yS)
+	if block1[y][x].Img == nil {
+		if block2[y][x].Img != nil {
+			return false
+		}
+	} else {
+		return false
+	}
+	return true
 }

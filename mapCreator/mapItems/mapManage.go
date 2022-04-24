@@ -92,6 +92,16 @@ func (a *MapItems) LoadXyList() {
 	}
 }
 
+//渲染掉落物品
+func (a *MapItems) RenderDropItems(screen *ebiten.Image, offsetX, offsetY float64) {
+	//掉落物品
+	for i := 0; i < len(a.dropItemsList); i++ {
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Translate(a.dropItemsList[i].pos.x+offsetX, a.dropItemsList[i].pos.y+offsetY)
+		screen.DrawImage(a.dropAnm[16], op)
+	}
+}
+
 //渲染地图上物体
 func (a *MapItems) Render(screen *ebiten.Image, frameIndexFor20, frameIndexFor12 int, offsetX, offsetY float64) {
 	//普通火台
@@ -130,13 +140,6 @@ func (a *MapItems) Render(screen *ebiten.Image, frameIndexFor20, frameIndexFor12
 	a.op[16].GeoM.Scale(Scale, Scale)
 	screen.DrawImage(a.huodui[frameIndexFor20], a.op[16])
 
-	//掉落物品
-	for i := 0; i < len(a.dropItemsList); i++ {
-		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Translate(a.dropItemsList[i].pos.x+offsetX, a.dropItemsList[i].pos.y+offsetY)
-		screen.DrawImage(a.dropAnm[16], op)
-	}
-
 	//NPC
 	//shadow
 	op := &ebiten.DrawImageOptions{}
@@ -168,7 +171,7 @@ func (a *MapItems) GetCellXY(x, y int) (float64, float64, error) {
 				sumX += 80
 			}
 			if j == x && y == i {
-				return float64(i*(-80) + sumX), float64(startY + j*40), nil
+				return float64(3280 + i*(-80) + sumX), float64(startY + j*40), nil
 			}
 
 		}
@@ -178,7 +181,7 @@ func (a *MapItems) GetCellXY(x, y int) (float64, float64, error) {
 }
 
 //播放丢物品动画
-func (a *MapItems) PlayDropItemAnm(screen *ebiten.Image, x, y int) {
+func (a *MapItems) PlayDropItemAnm(screen *ebiten.Image, x, y float64) {
 	go func() {
 		countForMap := 0
 		countsForMap := 0
@@ -189,7 +192,7 @@ func (a *MapItems) PlayDropItemAnm(screen *ebiten.Image, x, y int) {
 			countForMap++
 			screen.DrawImage(a.dropAnm[countsForMap], op)
 			//切换图
-			if countForMap > 5990 {
+			if countForMap > 4000 {
 				countsForMap++
 				countForMap = 0
 				if countsForMap >= 16 {
@@ -202,11 +205,10 @@ func (a *MapItems) PlayDropItemAnm(screen *ebiten.Image, x, y int) {
 }
 
 //记录掉落在地面的物品信息
-func (a *MapItems) InsertOnLoadItesm(name string, x, y int) {
+func (a *MapItems) InsertOnLoadItesm(name string, x, y float64) {
 	var i dropItem
 	i.name = name
-	xx, yy, _ := a.GetCellXY(x-1, y-1)
-	i.pos.x = xx
-	i.pos.y = yy
+	i.pos.x = x
+	i.pos.y = y
 	a.dropItemsList = append(a.dropItemsList, i)
 }

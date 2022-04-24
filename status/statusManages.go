@@ -49,8 +49,8 @@ func NewStatusManage() *StatusManage {
 		IsTakeItem:      false,
 		Mouseoffset:     -1800,
 		//玩家初始位置偏移设置
-		MoveOffsetX: -1650,
-		MoveOffsetY: -1600,
+		MoveOffsetX: -4885, //-3280
+		MoveOffsetY: -1640,
 		//读取地图的尺寸
 		ReadMapSizeWidth:  0,
 		ReadMapSizeHeight: 0,
@@ -58,7 +58,7 @@ func NewStatusManage() *StatusManage {
 		MapTitleX: 36,
 		MapTitleY: 11,
 		//
-		MapZoom:           7,
+		MapZoom:           8,
 		CurrentGameScence: 1,
 		DisPlayDebugInfo:  false,
 		IsPlayDropAnmi:    false,

@@ -70,11 +70,9 @@ func (u *UI) GetAnimator(flg, name string) (*ebiten.Image, int, int) {
 		}
 	}()
 	if flg == "role" {
-
 		return ebiten.NewImageFromImage(plist_R_png.SubImage(plist_R_sheet.Sprites[name].Frame)), plist_R_sheet.Sprites[name].SpriteSourceSize.Min.X, plist_R_sheet.Sprites[name].SpriteSourceSize.Min.Y
 
 	} else {
-
 		return ebiten.NewImageFromImage(plist_png.SubImage(plist_sheet.Sprites[name].Frame)), plist_sheet.Sprites[name].SpriteSourceSize.Min.X, plist_sheet.Sprites[name].SpriteSourceSize.Min.Y
 	}
 }
