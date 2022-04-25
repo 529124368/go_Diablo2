@@ -7,8 +7,6 @@ require (
 	github.com/hajimehoshi/ebiten/v2 v2.2.7
 )
 
-require github.com/gofrs/flock v0.8.1 // indirect
-
 require (
 	github.com/OpenDiablo2/OpenDiablo2 v0.0.0-20211021131836-7f92c571bf04
 	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20220320163800-277f93cfa958 // indirect

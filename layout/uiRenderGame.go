@@ -202,7 +202,7 @@ func (u *UI) LoadGameImages() {
 				//恢复玩家中心位置
 				u.status.PLAYERCENTERX = 388
 				//恢复地图偏移
-				u.maps.ChangeMapTranslate(200, 0)
+				u.mapManage.ChangeMapTranslate(200, 0)
 				isClick = false
 			}()
 		}
@@ -335,7 +335,7 @@ func (u *UI) LoadGameImages() {
 							//设置因打开包裹导致的人物偏移
 							u.status.UIOFFSETX = -200
 							//修改地图偏移
-							u.maps.ChangeMapTranslate(-200, 0)
+							u.mapManage.ChangeMapTranslate(-200, 0)
 							//修改玩家中心位置
 							u.status.PLAYERCENTERX -= 200
 							//修改人物影子偏移

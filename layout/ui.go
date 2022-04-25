@@ -4,7 +4,7 @@ import (
 	"embed"
 	"fmt"
 	"game/fonts"
-	"game/maps"
+	"game/mapCreator/mapManage"
 	"game/status"
 	"game/tools"
 	"image"
@@ -37,13 +37,13 @@ type UI struct {
 	MiniPanelCompents []*Sprite            //MINI板的UI集合
 	ItemsCompents     []*SpriteItems       //Items的UI集合
 	status            *status.StatusManage //状态管理器
-	maps              *maps.MapBase        //地图
 	BagLayout         [5][10]string        //4*10 背包 + 1*10 装备栏
 	tempBag           [1]*SpriteItems      //临时Items存放
 	fCont             *fonts.FontBase
+	mapManage         mapManage.MapInterface
 }
 
-func NewUI(images *embed.FS, s *status.StatusManage, m *maps.MapBase, f *fonts.FontBase) *UI {
+func NewUI(images *embed.FS, s *status.StatusManage, f *fonts.FontBase, m mapManage.MapInterface) *UI {
 
 	ui := &UI{
 		image:             images,
@@ -52,8 +52,8 @@ func NewUI(images *embed.FS, s *status.StatusManage, m *maps.MapBase, f *fonts.F
 		MiniPanelCompents: make([]*Sprite, 0, 6),
 		ItemsCompents:     make([]*SpriteItems, 0, 10),
 		status:            s,
-		maps:              m,
 		fCont:             f,
+		mapManage:         m,
 	}
 	//鼠标Icon设置
 	opMouse = &ebiten.DrawImageOptions{}

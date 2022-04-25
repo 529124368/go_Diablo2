@@ -39,7 +39,7 @@ func (g *Game) ChangeScene(name string) {
 		}()
 		//Map Init
 		go func() {
-			g.maps.LoadMap()
+			g.mapManage.LoadMap()
 			//加载动画
 			g.mapManage.LoadAnm()
 			runtime.GC()
@@ -201,20 +201,20 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	g.status.MapTitleY = mapY
 	g.mapManage.SortLayer(mapX, mapY)
 	//Draw floor
-	g.maps.RenderFloor(screen, g.status.MoveOffsetX, g.status.MoveOffsetY)
+	g.mapManage.RenderFloor(screen, g.status.MoveOffsetX, g.status.MoveOffsetY)
 	//Draw drop items
 	g.mapManage.RenderDropItems(screen, g.status.MoveOffsetX, g.status.MoveOffsetY)
 	if g.status.DisplaySort {
 		//Draw player
 		g.player.Render(screen, counts)
 		//Draw Wall
-		g.maps.RenderWall(screen, g.status.MoveOffsetX, g.status.MoveOffsetY)
+		g.mapManage.RenderWall(screen, g.status.MoveOffsetX, g.status.MoveOffsetY)
 		//Draw map Anmi
 		g.mapManage.Render(screen, countsFor20, countsFor12, g.status.MoveOffsetX, g.status.MoveOffsetY)
 
 	} else {
 		//Draw Wall
-		g.maps.RenderWall(screen, g.status.MoveOffsetX, g.status.MoveOffsetY)
+		g.mapManage.RenderWall(screen, g.status.MoveOffsetX, g.status.MoveOffsetY)
 		//Draw map Anmi
 		g.mapManage.Render(screen, countsFor20, countsFor12, g.status.MoveOffsetX, g.status.MoveOffsetY)
 		//Draw player

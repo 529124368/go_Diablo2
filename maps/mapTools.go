@@ -12,7 +12,7 @@ import (
 )
 
 //获取floor层贴图
-func getTitleImage(tileData dt1.Tile, w d2interface.Palette) *ebiten.Image {
+func GetTitleImage(tileData dt1.Tile, w d2interface.Palette) *ebiten.Image {
 	tileYMinimum := int32(0)
 	for _, block := range tileData.Blocks {
 		tileYMinimum = tools.MinInt32(tileYMinimum, int32(block.Y))
@@ -29,7 +29,7 @@ func getTitleImage(tileData dt1.Tile, w d2interface.Palette) *ebiten.Image {
 }
 
 //获取wall层贴图
-func getWallTitleImage(tileData dt1.Tile, tile *ds1.Tile, w d2interface.Palette) (*ebiten.Image, int) {
+func GetWallTitleImage(tileData dt1.Tile, tile *ds1.Tile, w d2interface.Palette) (*ebiten.Image, int) {
 
 	tileMinY := int32(0)
 	tileMaxY := int32(0)

@@ -2,7 +2,7 @@ package role
 
 import (
 	"embed"
-	"game/maps"
+	"game/mapCreator/mapManage"
 	"game/status"
 	"game/tools"
 	"image"
@@ -26,23 +26,23 @@ var (
 )
 
 type Player struct {
-	X            float64              //玩家世界坐标X
-	Y            float64              //玩家世界坐标Y
-	State        uint8                //玩家状态
-	Direction    uint8                //玩家当前方向
-	OldDirection uint8                //玩家旧的方向
-	MouseX       int                  //鼠标X坐标
-	MouseY       int                  //鼠标Y坐标
-	SkillName    string               //技能名称
-	image        *embed.FS            //静态资源获取
-	map_c        *maps.MapBase        //地图
-	status       *status.StatusManage //状态
-	hp           float64              //血
-	mp           float64              //蓝
+	X            float64                //玩家世界坐标X
+	Y            float64                //玩家世界坐标Y
+	State        uint8                  //玩家状态
+	Direction    uint8                  //玩家当前方向
+	OldDirection uint8                  //玩家旧的方向
+	MouseX       int                    //鼠标X坐标
+	MouseY       int                    //鼠标Y坐标
+	SkillName    string                 //技能名称
+	image        *embed.FS              //静态资源获取
+	map_c        mapManage.MapInterface //地图
+	status       *status.StatusManage   //状态
+	hp           float64                //血
+	mp           float64                //蓝
 }
 
 //创建玩家
-func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m *maps.MapBase, s *status.StatusManage) *Player {
+func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m mapManage.MapInterface, s *status.StatusManage) *Player {
 	opS = &ebiten.DrawImageOptions{}
 	op = &ebiten.DrawImageOptions{}
 	play := &Player{
@@ -306,7 +306,7 @@ func (p *Player) GetMouseController(dir uint8) {
 func (p *Player) CanWalk(xS, yS float64, dir uint8) bool {
 	block1 := p.map_c.GetBlock1Aera()
 	x, y := tools.GetFloorPositionAt(p.X+xS-110, p.Y+yS+80)
-	if x >= p.status.ReadMapSizeWidth || y >= p.status.ReadMapSizeHeight {
+	if x >= p.status.ReadMapSizeWidth || y >= p.status.ReadMapSizeHeight || x < 0 || y < 0 {
 		p.SetPlayerState(tools.IDLE, dir)
 		return false
 	}
