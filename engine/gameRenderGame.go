@@ -9,6 +9,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 //切换游戏场景
@@ -103,6 +104,9 @@ func (g *Game) changeScenceGameUpdate() {
 	if _, x := ebiten.Wheel(); x != 0 {
 		g.status.MapZoom += int(x)
 	}
+	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
+		g.status.DisplaySort = !g.status.DisplaySort
+	}
 
 	//计算鼠标位置
 	dir := tools.CaluteDir(g.status.PLAYERCENTERX, g.status.PLAYERCENTERY, int64(g.player.MouseX), int64(g.player.MouseY))
@@ -190,16 +194,33 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 			fmt.Println("has error is :", r)
 		}
 	}()
+	//获取玩家当前的地图块坐标
+	mapX, mapY := tools.GetFloorPositionAt(g.player.X, g.player.Y)
+	//玩家所在地图的逻辑坐标
+	g.status.MapTitleX = mapX
+	g.status.MapTitleY = mapY
+	g.mapManage.SortLayer(mapX, mapY)
 	//Draw floor
 	g.maps.RenderFloor(screen, g.status.MoveOffsetX, g.status.MoveOffsetY)
-	//Draw Wall
-	g.maps.RenderWall(screen, g.status.MoveOffsetX, g.status.MoveOffsetY)
-	//Draw map Anmi
-	g.mapManage.Render(screen, countsFor20, countsFor12, g.status.MoveOffsetX, g.status.MoveOffsetY)
 	//Draw drop items
 	g.mapManage.RenderDropItems(screen, g.status.MoveOffsetX, g.status.MoveOffsetY)
-	//Draw player
-	g.player.Render(screen, counts)
+	if g.status.DisplaySort {
+		//Draw player
+		g.player.Render(screen, counts)
+		//Draw Wall
+		g.maps.RenderWall(screen, g.status.MoveOffsetX, g.status.MoveOffsetY)
+		//Draw map Anmi
+		g.mapManage.Render(screen, countsFor20, countsFor12, g.status.MoveOffsetX, g.status.MoveOffsetY)
+
+	} else {
+		//Draw Wall
+		g.maps.RenderWall(screen, g.status.MoveOffsetX, g.status.MoveOffsetY)
+		//Draw map Anmi
+		g.mapManage.Render(screen, countsFor20, countsFor12, g.status.MoveOffsetX, g.status.MoveOffsetY)
+		//Draw player
+		g.player.Render(screen, counts)
+
+	}
 	//Draw UI
 	g.ui.DrawUI(screen)
 	//Draw Drop items Anm
@@ -207,11 +228,6 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 		g.status.IsPlayDropAnmi = false
 		g.mapManage.PlayDropItemAnm(screen, g.player.X, g.player.Y)
 	}
-	//获取玩家当前的地图块坐标
-	mapX, mapY := tools.GetFloorPositionAt(g.player.X, g.player.Y)
-	//玩家所在地图的逻辑坐标
-	g.status.MapTitleX = mapX
-	g.status.MapTitleY = mapY
 	//Draw Debug
 	if g.status.DisPlayDebugInfo {
 		len := tools.Distance(g.status.PLAYERCENTERX, g.status.PLAYERCENTERY, int64(mouseX), int64(mouseY))

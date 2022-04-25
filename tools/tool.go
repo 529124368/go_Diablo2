@@ -260,6 +260,6 @@ func GetFloorPositionAt(x, y float64) (int, int) {
 	M_Minus_N := (x - 3280) / 80
 	M_Plus_N := y / 40
 	xx := math.Floor((M_Minus_N + M_Plus_N) / 2)
-	yy := math.Floor((M_Minus_N+M_Plus_N)/2 - M_Minus_N + 0.5)
+	yy := math.Floor((M_Minus_N+M_Plus_N)/2 - M_Minus_N)
 	return int(xx), int(yy)
 }

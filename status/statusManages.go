@@ -28,6 +28,7 @@ type StatusManage struct {
 	DisPlayDebugInfo  bool //是否显示Debug信息
 	IsPlayDropAnmi    bool //是否播放掉落物品动画
 	IsDropDeal        bool //是否掉落物品处理中
+	DisplaySort       bool //人物和物体渲染顺序
 }
 
 func NewStatusManage() *StatusManage {
@@ -49,8 +50,8 @@ func NewStatusManage() *StatusManage {
 		IsTakeItem:      false,
 		Mouseoffset:     -1800,
 		//玩家初始位置偏移设置
-		MoveOffsetX: -4885, //-3280
-		MoveOffsetY: -1640,
+		MoveOffsetX: -5280 + 395,
+		MoveOffsetY: -1880 + 240,
 		//读取地图的尺寸
 		ReadMapSizeWidth:  0,
 		ReadMapSizeHeight: 0,
@@ -63,6 +64,7 @@ func NewStatusManage() *StatusManage {
 		DisPlayDebugInfo:  false,
 		IsPlayDropAnmi:    false,
 		IsDropDeal:        false,
+		DisplaySort:       false,
 	}
 	return n
 }

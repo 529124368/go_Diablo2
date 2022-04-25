@@ -305,7 +305,7 @@ func (p *Player) GetMouseController(dir uint8) {
 
 func (p *Player) CanWalk(xS, yS float64, dir uint8) bool {
 	block1 := p.map_c.GetBlock1Aera()
-	x, y := tools.GetFloorPositionAt(p.X+xS, p.Y+yS)
+	x, y := tools.GetFloorPositionAt(p.X+xS-110, p.Y+yS+80)
 	if x >= p.status.ReadMapSizeWidth || y >= p.status.ReadMapSizeHeight {
 		p.SetPlayerState(tools.IDLE, dir)
 		return false

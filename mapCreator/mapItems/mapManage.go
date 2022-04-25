@@ -101,9 +101,17 @@ func (a *MapItems) RenderDropItems(screen *ebiten.Image, offsetX, offsetY float6
 		screen.DrawImage(a.dropAnm[16], op)
 	}
 }
+func (a *MapItems) SortLayer(mapX, mapY int) {
+	if mapY >= 26 || mapY == 16 && mapX >= 47 || mapX == 46 || mapX == 47 {
+		a.status.DisplaySort = true
+	} else {
+		a.status.DisplaySort = false
+	}
+}
 
 //渲染地图上物体
 func (a *MapItems) Render(screen *ebiten.Image, frameIndexFor20, frameIndexFor12 int, offsetX, offsetY float64) {
+
 	//普通火台
 	for i, k := range a.op {
 		if i <= 14 {
@@ -209,6 +217,6 @@ func (a *MapItems) InsertOnLoadItesm(name string, x, y float64) {
 	var i dropItem
 	i.name = name
 	i.pos.x = x
-	i.pos.y = y
+	i.pos.y = y - 80
 	a.dropItemsList = append(a.dropItemsList, i)
 }
