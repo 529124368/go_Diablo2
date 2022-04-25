@@ -199,6 +199,7 @@ func (m *MapBase) LoadDstMap() {
 			if !ds1Tile.Hidden() && ds1Tile.Prop1 != 0 {
 				ds := GetTiles(int(ds1Tile.Style), int(ds1Tile.Sequence), 0, ss.Tiles)
 				if ds != nil {
+					// fmt.Println(ds[ds1Tile.RandomIndex].SubTileFlags[0])
 					img[i][j] = getTitleImage(ds[ds1Tile.RandomIndex], ww)
 				}
 			}
@@ -297,9 +298,4 @@ func (m *MapBase) LoadDstMap() {
 //获取墙体区域
 func (m *MapBase) GetBlock1Aera() [][]imgWall {
 	return img2
-}
-
-//获取墙体区域
-func (m *MapBase) GetBlock2Aera() [][]imgWall {
-	return img3
 }

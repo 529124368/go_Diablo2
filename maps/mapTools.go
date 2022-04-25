@@ -11,6 +11,7 @@ import (
 	"github.com/OpenDiablo2/OpenDiablo2/d2common/d2enum"
 )
 
+//获取floor层贴图
 func getTitleImage(tileData dt1.Tile, w d2interface.Palette) *ebiten.Image {
 	tileYMinimum := int32(0)
 	for _, block := range tileData.Blocks {

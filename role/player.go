@@ -121,7 +121,7 @@ func (p *Player) GetMouseController(dir uint8) {
 	}
 
 	if dir == 2 && p.status.Flg {
-		if p.CanWalk(speed, -speed) {
+		if p.CanWalk(speed, -speed, dir) {
 			p.status.MoveOffsetX += -speed
 			p.status.MoveOffsetY += speed
 			p.Y -= speed
@@ -131,7 +131,7 @@ func (p *Player) GetMouseController(dir uint8) {
 	}
 
 	if dir == 3 && p.status.Flg {
-		if p.CanWalk(speed, speed) {
+		if p.CanWalk(speed, speed, dir) {
 			p.status.MoveOffsetX += -speed
 			p.status.MoveOffsetY += -speed
 			p.Y += speed
@@ -140,7 +140,7 @@ func (p *Player) GetMouseController(dir uint8) {
 		p.status.Flg = false
 	}
 	if dir == 0 && p.status.Flg {
-		if p.CanWalk(-speed, speed) {
+		if p.CanWalk(-speed, speed, dir) {
 			p.status.MoveOffsetX += speed
 			p.status.MoveOffsetY += -speed
 			p.Y += speed
@@ -149,7 +149,7 @@ func (p *Player) GetMouseController(dir uint8) {
 		p.status.Flg = false
 	}
 	if dir == 1 && p.status.Flg {
-		if p.CanWalk(-speed, -speed) {
+		if p.CanWalk(-speed, -speed, dir) {
 			p.status.MoveOffsetX += speed
 			p.status.MoveOffsetY += speed
 			p.Y -= speed
@@ -158,7 +158,7 @@ func (p *Player) GetMouseController(dir uint8) {
 		p.status.Flg = false
 	}
 	if dir == 5 && p.status.Flg {
-		if p.CanWalk(-speed, 0) {
+		if p.CanWalk(-speed, 0, dir) {
 			p.status.MoveOffsetX += speed
 			p.status.MoveOffsetY += 0
 			p.X -= speed
@@ -167,7 +167,7 @@ func (p *Player) GetMouseController(dir uint8) {
 	}
 
 	if dir == 6 && p.status.Flg {
-		if p.CanWalk(0, -speed) {
+		if p.CanWalk(0, -speed, dir) {
 			p.status.MoveOffsetX += 0
 			p.status.MoveOffsetY += speed
 			p.Y -= speed
@@ -176,7 +176,7 @@ func (p *Player) GetMouseController(dir uint8) {
 	}
 
 	if dir == 7 && p.status.Flg {
-		if p.CanWalk(speed, 0) {
+		if p.CanWalk(speed, 0, dir) {
 			p.status.MoveOffsetX += -speed
 			p.status.MoveOffsetY += 0
 			p.X += speed
@@ -185,7 +185,7 @@ func (p *Player) GetMouseController(dir uint8) {
 	}
 
 	if dir == 4 && p.status.Flg {
-		if p.CanWalk(0, speed) {
+		if p.CanWalk(0, speed, dir) {
 			p.status.MoveOffsetX += 0
 			p.status.MoveOffsetY += -speed
 			p.Y += speed
@@ -193,7 +193,7 @@ func (p *Player) GetMouseController(dir uint8) {
 		p.status.Flg = false
 	}
 	if dir == 12 && p.status.Flg {
-		if p.CanWalk(speed-1, -speed) {
+		if p.CanWalk(speed-1, -speed, dir) {
 			p.status.MoveOffsetX += 1 - speed
 			p.status.MoveOffsetY += speed
 			p.Y -= speed
@@ -202,7 +202,7 @@ func (p *Player) GetMouseController(dir uint8) {
 		p.status.Flg = false
 	}
 	if dir == 2 && p.status.Flg {
-		if p.CanWalk(speed, -speed) {
+		if p.CanWalk(speed, -speed, dir) {
 			p.status.MoveOffsetX += -speed
 			p.status.MoveOffsetY += speed
 			p.Y -= speed
@@ -211,7 +211,7 @@ func (p *Player) GetMouseController(dir uint8) {
 		p.status.Flg = false
 	}
 	if dir == 13 && p.status.Flg {
-		if p.CanWalk(speed, 1-speed) {
+		if p.CanWalk(speed, 1-speed, dir) {
 			p.status.MoveOffsetX += -speed
 			p.status.MoveOffsetY += speed - 1
 			p.Y -= speed - 1
@@ -220,7 +220,7 @@ func (p *Player) GetMouseController(dir uint8) {
 		p.status.Flg = false
 	}
 	if dir == 10 && p.status.Flg {
-		if p.CanWalk(-speed, 1-speed) {
+		if p.CanWalk(-speed, 1-speed, dir) {
 			p.status.MoveOffsetX += speed
 			p.status.MoveOffsetY += speed - 1
 			p.Y -= speed - 1
@@ -229,7 +229,7 @@ func (p *Player) GetMouseController(dir uint8) {
 		p.status.Flg = false
 	}
 	if dir == 1 && p.status.Flg {
-		if p.CanWalk(-speed, -speed) {
+		if p.CanWalk(-speed, -speed, dir) {
 			p.status.MoveOffsetX += speed
 			p.status.MoveOffsetY += speed
 			p.Y -= speed
@@ -238,7 +238,7 @@ func (p *Player) GetMouseController(dir uint8) {
 		p.status.Flg = false
 	}
 	if dir == 11 && p.status.Flg {
-		if p.CanWalk(1-speed, -speed) {
+		if p.CanWalk(1-speed, -speed, dir) {
 			p.status.MoveOffsetX += speed - 1
 			p.status.MoveOffsetY += speed
 			p.Y -= speed
@@ -247,7 +247,7 @@ func (p *Player) GetMouseController(dir uint8) {
 		p.status.Flg = false
 	}
 	if dir == 9 && p.status.Flg {
-		if p.CanWalk(-speed, speed-1) {
+		if p.CanWalk(-speed, speed-1, dir) {
 			p.status.MoveOffsetX += speed
 			p.status.MoveOffsetY += 1 - speed
 			p.Y += speed - 1
@@ -256,7 +256,7 @@ func (p *Player) GetMouseController(dir uint8) {
 		p.status.Flg = false
 	}
 	if dir == 0 && p.status.Flg {
-		if p.CanWalk(-speed, speed) {
+		if p.CanWalk(-speed, speed, dir) {
 			p.status.MoveOffsetX += speed
 			p.status.MoveOffsetY += -speed
 			p.Y += speed
@@ -265,7 +265,7 @@ func (p *Player) GetMouseController(dir uint8) {
 		p.status.Flg = false
 	}
 	if dir == 8 && p.status.Flg {
-		if p.CanWalk(1-speed, speed) {
+		if p.CanWalk(1-speed, speed, dir) {
 			p.status.MoveOffsetX += speed - 1
 			p.status.MoveOffsetY += -speed
 			p.Y += speed
@@ -275,7 +275,7 @@ func (p *Player) GetMouseController(dir uint8) {
 	}
 
 	if dir == 15 && p.status.Flg {
-		if p.CanWalk(speed-1, speed) {
+		if p.CanWalk(speed-1, speed, dir) {
 			p.status.MoveOffsetX += 1 - speed
 			p.status.MoveOffsetY += -speed
 			p.Y += speed
@@ -284,7 +284,7 @@ func (p *Player) GetMouseController(dir uint8) {
 		p.status.Flg = false
 	}
 	if dir == 3 && p.status.Flg {
-		if p.CanWalk(speed, speed) {
+		if p.CanWalk(speed, speed, dir) {
 			p.status.MoveOffsetX += -speed
 			p.status.MoveOffsetY += -speed
 			p.Y += speed
@@ -293,7 +293,7 @@ func (p *Player) GetMouseController(dir uint8) {
 		p.status.Flg = false
 	}
 	if dir == 14 && p.status.Flg {
-		if p.CanWalk(speed, speed-1) {
+		if p.CanWalk(speed, speed-1, dir) {
 			p.status.MoveOffsetX += -speed
 			p.status.MoveOffsetY += 1 - speed
 			p.Y += speed - 1
@@ -303,16 +303,17 @@ func (p *Player) GetMouseController(dir uint8) {
 	}
 }
 
-func (p *Player) CanWalk(xS, yS float64) bool {
+func (p *Player) CanWalk(xS, yS float64, dir uint8) bool {
 	block1 := p.map_c.GetBlock1Aera()
-	block2 := p.map_c.GetBlock2Aera()
 	x, y := tools.GetFloorPositionAt(p.X+xS, p.Y+yS)
-	if block1[y][x].Img == nil {
-		if block2[y][x].Img != nil {
-			return false
-		}
-	} else {
+	if x >= p.status.ReadMapSizeWidth || y >= p.status.ReadMapSizeHeight {
+		p.SetPlayerState(tools.IDLE, dir)
 		return false
 	}
-	return true
+	if block1[y][x].Img == nil {
+		return true
+	} else {
+		p.SetPlayerState(tools.IDLE, dir)
+		return false
+	}
 }

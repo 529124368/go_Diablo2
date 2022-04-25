@@ -165,7 +165,7 @@ func (u *UI) DrawUI(screen *ebiten.Image) {
 		if !u.status.IsTakeItem {
 			//渲染物品信息
 			for _, v := range u.ItemsCompents {
-				//TODO 是否显示物品详细
+				//是否显示物品详细
 				if v.contentIsDisplay {
 					screen.DrawImage(v.imageContent, v.opContent)
 					//Draw Text
