@@ -1,6 +1,7 @@
 package layout
 
 import (
+	"game/interfaces"
 	"game/tools"
 	"runtime"
 	"sync"
@@ -20,7 +21,7 @@ func (u *UI) LoadGameCharaSelectImages() {
 	//游戏开始按钮
 	s, _ = u.image.ReadFile("resource/UI/startGameButton.png")
 	mgUI = tools.GetEbitenImage(s)
-	op = QuickCreate(1250, 850, mgUI, 0, func(i spriteInterface) {
+	op = QuickCreate(1250, 850, mgUI, 0, func(i interfaces.SpriteInterface) {
 		if !isClick {
 			isClick = true
 			go func() {

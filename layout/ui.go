@@ -4,8 +4,10 @@ import (
 	"embed"
 	"fmt"
 	"game/fonts"
+	"game/interfaces"
 	"game/mapCreator/mapManage"
 	"game/status"
+	"game/storage"
 	"game/tools"
 	"image"
 	"image/color"
@@ -37,13 +39,13 @@ type UI struct {
 	MiniPanelCompents []*Sprite            //MINI板的UI集合
 	ItemsCompents     []*SpriteItems       //Items的UI集合
 	status            *status.StatusManage //状态管理器
-	BagLayout         [5][10]string        //4*10 背包 + 1*10 装备栏
 	tempBag           [1]*SpriteItems      //临时Items存放
 	fCont             *fonts.FontBase
 	mapManage         mapManage.MapInterface
+	bag               *storage.Bag
 }
 
-func NewUI(images *embed.FS, s *status.StatusManage, f *fonts.FontBase, m mapManage.MapInterface) *UI {
+func NewUI(images *embed.FS, s *status.StatusManage, f *fonts.FontBase, m mapManage.MapInterface, b *storage.Bag) *UI {
 
 	ui := &UI{
 		image:             images,
@@ -54,6 +56,7 @@ func NewUI(images *embed.FS, s *status.StatusManage, f *fonts.FontBase, m mapMan
 		status:            s,
 		fCont:             f,
 		mapManage:         m,
+		bag:               b,
 	}
 	//鼠标Icon设置
 	opMouse = &ebiten.DrawImageOptions{}
@@ -78,7 +81,7 @@ func (u *UI) GetAnimator(flg, name string) (*ebiten.Image, int, int) {
 }
 
 //组件注册
-func (u *UI) AddComponent(s spriteInterface, ImageType uint8) {
+func (u *UI) AddComponent(s interfaces.SpriteInterface, ImageType uint8) {
 	if ImageType == tools.ISHIDDEN {
 		//将UI压入通用集合
 		u.Compents = append(u.Compents, s.(*Sprite))
@@ -238,10 +241,10 @@ func (u *UI) AddItemToBag(mousex, mousey int, itemName string) bool {
 	sizeX, sizeY := tools.GetItemsCellSize(itemName)
 	if sizeX != 0 && sizeY != 0 {
 		//x y这个单元格有位置是否
-		if x >= 0 && x <= 3 && y >= 0 && y <= 9 && u.BagLayout[x][y] == "" {
+		if x >= 0 && x <= 3 && y >= 0 && y <= 9 && u.bag.BagLayout[x][y] == "" {
 			//是否相同size的时候
 			if sizeX == 1 && sizeY == 1 {
-				u.BagLayout[x][y] = itemName
+				u.bag.BagLayout[x][y] = itemName
 				s, _ := u.image.ReadFile("resource/items/" + itemName + ".png")
 				mgUI := tools.GetEbitenImage(s)
 				layoutX := 413 + y*29
@@ -252,7 +255,7 @@ func (u *UI) AddItemToBag(mousex, mousey int, itemName string) bool {
 				//循环判断是否可以放下
 				for i := 0; i < sizeX; i++ {
 					for j := 0; j < sizeY; j++ {
-						if x+j > 3 || y+i > 9 || u.BagLayout[x+j][y+i] != "" {
+						if x+j > 3 || y+i > 9 || u.bag.BagLayout[x+j][y+i] != "" {
 							return false
 						}
 					}
@@ -260,7 +263,7 @@ func (u *UI) AddItemToBag(mousex, mousey int, itemName string) bool {
 				name := strconv.Itoa(x) + "," + strconv.Itoa(y)
 				for i := 0; i < sizeX; i++ {
 					for j := 0; j < sizeY; j++ {
-						u.BagLayout[x+j][y+i] = itemName + "_" + name
+						u.bag.BagLayout[x+j][y+i] = itemName + "_" + name
 					}
 				}
 				s, _ := u.image.ReadFile("resource/items/" + itemName + ".png")
@@ -286,18 +289,18 @@ func (u *UI) DelItemFromBag(imageX, imageY int) {
 	//屏幕坐标转换成包裹坐标
 	x := int(imageY-254) / 29
 	y := int(imageX-413) / 29
-	if x >= 0 && x <= 3 && y >= 0 && y <= 9 && u.BagLayout[x][y] != "" {
-		if strings.Contains(u.BagLayout[x][y], "_") {
-			itemName := u.BagLayout[x][y]
+	if x >= 0 && x <= 3 && y >= 0 && y <= 9 && u.bag.BagLayout[x][y] != "" {
+		if strings.Contains(u.bag.BagLayout[x][y], "_") {
+			itemName := u.bag.BagLayout[x][y]
 			for i := 0; i < 4; i++ {
 				for j := 0; j < 10; j++ {
-					if u.BagLayout[i][j] == itemName {
-						u.BagLayout[i][j] = ""
+					if u.bag.BagLayout[i][j] == itemName {
+						u.bag.BagLayout[i][j] = ""
 					}
 				}
 			}
 		} else {
-			u.BagLayout[x][y] = ""
+			u.bag.BagLayout[x][y] = ""
 		}
 		layoutX := 413 + y*29
 		layoutY := 254 + x*29
@@ -321,7 +324,7 @@ func (u *UI) DelItemFromBag(imageX, imageY int) {
 				} else {
 					u.ItemsCompents = u.ItemsCompents[0:k]
 				}
-				u.BagLayout[4][key] = ""
+				u.bag.BagLayout[4][key] = ""
 				return
 			}
 		}
@@ -340,7 +343,7 @@ func (u *UI) DrawMouseIcon(screen *ebiten.Image, mouseX, mouseY int) {
 //判断是否可以放入装备栏
 func (u *UI) JudgeCanToEquip(mousex, mousey int, itemName string) bool {
 	x, y, key := u.JudgeIsEquipArea(mousex, mousey)
-	if x != 0 && u.BagLayout[4][key] == "" {
+	if x != 0 && u.bag.BagLayout[4][key] == "" {
 		s, _ := u.image.ReadFile("resource/items/" + itemName + ".png")
 		mgUI := tools.GetEbitenImage(s)
 		_, yy := mgUI.Size()
@@ -351,7 +354,7 @@ func (u *UI) JudgeCanToEquip(mousex, mousey int, itemName string) bool {
 			//左右手武器并且图片高度为4格的情况下
 			y -= 15
 		}
-		u.BagLayout[4][key] = itemName
+		u.bag.BagLayout[4][key] = itemName
 		u.AddComponent(QuickCreateItems(float64(x), float64(y), itemName, mgUI, 1, u.ItemsEvent(), 0, true), 0)
 		return true
 	} else {
@@ -373,7 +376,7 @@ func (u *UI) InsertToEquip(mousex, mousey int, itemName string) bool {
 			//左右手武器并且图片高度为4格的情况下
 			y -= 15
 		}
-		u.BagLayout[4][key] = itemName
+		u.bag.BagLayout[4][key] = itemName
 		u.AddComponent(QuickCreateItems(float64(x), float64(y), itemName, mgUI, 1, u.ItemsEvent(), 0, true), 0)
 		return true
 	} else {
@@ -382,9 +385,9 @@ func (u *UI) InsertToEquip(mousex, mousey int, itemName string) bool {
 }
 
 //物品事件
-func (u *UI) ItemsEvent() func(i spriteInterface, x, y int) {
+func (u *UI) ItemsEvent() func(i interfaces.SpriteInterface, x, y int) {
 	//注册监听
-	item_event := func(i spriteInterface, x, y int) {
+	item_event := func(i interfaces.SpriteInterface, x, y int) {
 		if !isClick {
 			isClick = true
 			go func() {

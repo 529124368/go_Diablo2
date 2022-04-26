@@ -41,8 +41,8 @@ const (
 //Calculate Direction
 func CaluteDir(x, y, x_tar, y_tar int64) uint8 {
 	len := Distance(x, y, x_tar, y_tar)
-	//TODO  242 is PLAYERCENTERY
-	a := Angle(math.Abs(float64(int64(y_tar)-242)), len)
+	//TODO  240 is PLAYERCENTERY
+	a := Angle(math.Abs(float64(int64(y_tar)-240)), len)
 
 	if x < x_tar && y > y_tar {
 		if a > 0 && a <= 30 {
@@ -237,4 +237,44 @@ func GetFloorPositionAt(x, y float64) (int, int) {
 	xx := math.Floor((M_Minus_N + M_Plus_N) / 2)
 	yy := math.Floor((M_Minus_N+M_Plus_N)/2 - M_Minus_N)
 	return int(xx), int(yy)
+}
+
+//根据方向计算偏移距离
+func CalculateSpeed(dir uint8, speed float64) (float64, float64) {
+	moveX, moveY := 0.0, 0.0
+	switch dir {
+	case 0:
+		moveX, moveY = -speed, speed
+	case 1:
+		moveX, moveY = -speed, -speed
+	case 2:
+		moveX, moveY = speed, -speed
+	case 3:
+		moveX, moveY = speed, speed
+	case 4:
+		moveX, moveY = 0, speed
+	case 5:
+		moveX, moveY = -speed, 0
+	case 6:
+		moveX, moveY = 0, -speed
+	case 7:
+		moveX, moveY = speed, 0
+	case 8:
+		moveX, moveY = 1-speed, speed
+	case 9:
+		moveX, moveY = -speed, speed-1
+	case 10:
+		moveX, moveY = -speed, 1-speed
+	case 11:
+		moveX, moveY = 1-speed, -speed
+	case 12:
+		moveX, moveY = speed-1, -speed
+	case 13:
+		moveX, moveY = speed, 1-speed
+	case 14:
+		moveX, moveY = speed, speed-1
+	case 15:
+		moveX, moveY = speed-1, speed
+	}
+	return moveX, moveY
 }

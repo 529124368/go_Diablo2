@@ -43,10 +43,10 @@ func NewStatusManage() *StatusManage {
 		IsWalk:          true,
 		CalculateEnd:    false,
 		UIOFFSETX:       0,
-		ShadowOffsetX:   -348,
-		ShadowOffsetY:   361,
-		PLAYERCENTERX:   388, //LAYOUTX/2
-		PLAYERCENTERY:   242, //LAYOUTY/2
+		ShadowOffsetX:   -345,
+		ShadowOffsetY:   345,
+		PLAYERCENTERX:   395, //LAYOUTX/2
+		PLAYERCENTERY:   240, //LAYOUTY/2
 		IsTakeItem:      false,
 		Mouseoffset:     -1800,
 		//玩家初始位置偏移设置

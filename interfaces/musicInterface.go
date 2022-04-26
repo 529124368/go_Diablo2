@@ -1,4 +1,4 @@
-package music
+package interfaces
 
 import "github.com/hajimehoshi/ebiten/v2/audio"
 

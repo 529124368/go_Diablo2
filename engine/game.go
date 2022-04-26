@@ -3,11 +3,13 @@ package engine
 import (
 	"embed"
 	"game/fonts"
+	"game/interfaces"
 	"game/layout"
 	"game/mapCreator/mapManage"
 	"game/music"
 	"game/role"
 	"game/status"
+	"game/storage"
 	"game/tools"
 	"runtime"
 	"sync"
@@ -26,12 +28,12 @@ const (
 
 type Game struct {
 	count, countForMap int
-	player             *role.Player           //玩家
-	mapManage          mapManage.MapInterface //地图等管理
-	ui                 *layout.UI             //UI
-	music              music.MusicInterface   //音乐
-	status             *status.StatusManage   //状态管理器
-	font_style         *fonts.FontBase        //字体
+	player             *role.Player              //玩家
+	mapManage          mapManage.MapInterface    //地图等管理
+	ui                 *layout.UI                //UI
+	music              interfaces.MusicInterface //音乐
+	status             *status.StatusManage      //状态管理器
+	font_style         *fonts.FontBase           //字体
 }
 
 var (
@@ -51,21 +53,22 @@ var asset embed.FS
 func NewGame() *Game {
 	//statueManage
 	sta := status.NewStatusManage()
+	bag := storage.New()
 	//场景
 	// rand.Seed(time.Now().Unix()) // unix 时间戳，秒
 	// data := rand.Int31n(50)
 	//var m mapManage.MapInterface
 	//	if data%2 == 0 {
-	//		m = mapManage.NewN1(&asset, sta)
+	//		m = mapManage.NewN1(&asset, sta,bag)
 	//	} else {
-	m := mapManage.NewE1(&asset, sta)
+	m := mapManage.NewE1(&asset, sta, bag)
 	//}
 	//Player  设置初始状态和坐标
 	r := role.NewPlayer(5280, 1880, tools.IDLE, 0, 0, 0, &asset, m, sta)
 	//字体
 	f := fonts.NewFont(&asset)
 	//UI
-	u := layout.NewUI(&asset, sta, f, m)
+	u := layout.NewUI(&asset, sta, f, m, bag)
 	//BGM
 	bgm := music.NewMusicBGM(&asset)
 

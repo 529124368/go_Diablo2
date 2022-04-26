@@ -9,8 +9,9 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
+
+var dropItemName = ""
 
 //切换游戏场景
 func (g *Game) ChangeScene(name string) {
@@ -94,7 +95,7 @@ func (g *Game) changeScenceGameUpdate() {
 					//播放掉落物品动画
 					g.status.IsPlayDropAnmi = true
 					//丢弃物品
-					g.ui.ClearTempBag()
+					dropItemName = g.ui.ClearTempBag()
 				}
 			}
 		}
@@ -103,9 +104,6 @@ func (g *Game) changeScenceGameUpdate() {
 	//鼠标滚轮控制
 	if _, x := ebiten.Wheel(); x != 0 {
 		g.status.MapZoom += int(x)
-	}
-	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
-		g.status.DisplaySort = !g.status.DisplaySort
 	}
 
 	//计算鼠标位置
@@ -142,7 +140,6 @@ func (g *Game) changeScenceGameUpdate() {
 	if g.player.State == tools.IDLE {
 		frameNums = 16
 		frameSpeed = 5
-		g.player.SetPlayerState(tools.IDLE, dir)
 
 	} else if g.player.State == tools.ATTACK {
 		frameNums = 16
@@ -173,7 +170,8 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	//Draw floor
 	g.mapManage.RenderFloor(screen, g.status.MoveOffsetX, g.status.MoveOffsetY)
 	//Draw drop items
-	g.mapManage.RenderDropItems(screen, g.status.MoveOffsetX, g.status.MoveOffsetY)
+	g.mapManage.RenderDropItems(screen, g.status.MoveOffsetX, g.status.MoveOffsetY, g.player.X, g.player.Y)
+	//切换渲染顺序
 	if g.status.DisplaySort {
 		//Draw player
 		g.player.Render(screen, counts)
@@ -196,7 +194,7 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	//Draw Drop items Anm
 	if g.status.IsPlayDropAnmi {
 		g.status.IsPlayDropAnmi = false
-		g.mapManage.PlayDropItemAnm(screen, g.player.X, g.player.Y)
+		g.mapManage.PlayDropItemAnm(screen, g.player.X, g.player.Y, dropItemName)
 	}
 	//Draw Debug
 	if g.status.DisPlayDebugInfo {

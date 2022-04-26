@@ -9,6 +9,7 @@ import (
 	"game/mapCreator/dt1"
 	"game/maps"
 	"game/status"
+	"game/storage"
 	"game/tools"
 	"strconv"
 	"strings"
@@ -36,13 +37,14 @@ type TownE1 struct {
 	huodui        []*ebiten.Image //火堆动画图集
 	NPC           []*ebiten.Image //NPC图集
 	dropAnm       []*ebiten.Image //掉落动画图集
-	dropItemsList []dropItem      //掉落物品一栏
+	dropItemsList []dropItem      //掉落物品一览
 	op            []*ebiten.DrawImageOptions
 	xyPos         [17]postion
 	image         *embed.FS //静态资源获取
+	bag           *storage.Bag
 }
 
-func NewE1(images *embed.FS, sta *status.StatusManage) *TownE1 {
+func NewE1(images *embed.FS, sta *status.StatusManage, b *storage.Bag) *TownE1 {
 	a := &TownE1{
 		anmiList:      make([]*ebiten.Image, 0),
 		wayList:       make([]*ebiten.Image, 0),
@@ -52,6 +54,7 @@ func NewE1(images *embed.FS, sta *status.StatusManage) *TownE1 {
 		dropItemsList: make([]dropItem, 0),
 		op:            make([]*ebiten.DrawImageOptions, 0),
 		image:         images,
+		bag:           b,
 	}
 	a.Image = images
 	a.Status = sta
@@ -102,16 +105,28 @@ func (t *TownE1) LoadXyList() {
 }
 
 //渲染掉落物品
-func (t *TownE1) RenderDropItems(screen *ebiten.Image, offsetX, offsetY float64) {
+func (t *TownE1) RenderDropItems(screen *ebiten.Image, offsetX, offsetY float64, playX, playY float64) {
 	//掉落物品
 	for i := 0; i < len(t.dropItemsList); i++ {
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Translate(t.dropItemsList[i].pos.x+offsetX, t.dropItemsList[i].pos.y+offsetY)
 		screen.DrawImage(t.dropAnm[16], op)
+		if tools.Distance(int64(playX), int64(playY), int64(t.dropItemsList[i].pos.x), int64(t.dropItemsList[i].pos.y+130)) <= 35 {
+			fmt.Println("get !!!!" + t.dropItemsList[i].name)
+			t.bag.InsertBag(t.dropItemsList[i].name)
+			if i != len(t.dropItemsList)-1 {
+				t.dropItemsList = append(t.dropItemsList[0:i], t.dropItemsList[i+1:]...)
+			} else {
+				t.dropItemsList = t.dropItemsList[0:i]
+			}
+
+		}
 	}
 }
+
+//切换渲染顺序
 func (t *TownE1) SortLayer(mapX, mapY int) {
-	if mapY >= 26 || mapY == 16 && mapX >= 47 || mapX == 46 || mapX == 47 {
+	if mapY > 26 || mapY == 16 && mapX >= 47 || mapX == 46 || mapX == 47 || mapY == 8 && mapX == 30 || mapY == 7 && mapX == 30 || mapY == 6 && mapX == 30 {
 		t.Status.DisplaySort = true
 	} else {
 		t.Status.DisplaySort = false
@@ -198,7 +213,7 @@ func (t *TownE1) GetCellXY(x, y int) (float64, float64, error) {
 }
 
 //播放丢物品动画
-func (t *TownE1) PlayDropItemAnm(screen *ebiten.Image, x, y float64) {
+func (t *TownE1) PlayDropItemAnm(screen *ebiten.Image, x, y float64, name string) {
 	go func() {
 		countForMap := 0
 		countsForMap := 0
@@ -213,7 +228,7 @@ func (t *TownE1) PlayDropItemAnm(screen *ebiten.Image, x, y float64) {
 				countsForMap++
 				countForMap = 0
 				if countsForMap >= 16 {
-					t.InsertOnLoadItesm("dun", x, y)
+					t.InsertOnLoadItesm(name, x, y)
 					return
 				}
 			}
@@ -225,8 +240,8 @@ func (t *TownE1) PlayDropItemAnm(screen *ebiten.Image, x, y float64) {
 func (t *TownE1) InsertOnLoadItesm(name string, x, y float64) {
 	var i dropItem
 	i.name = name
-	i.pos.x = x
-	i.pos.y = y - 80
+	i.pos.x = x - 40
+	i.pos.y = y - 130 + 40
 	t.dropItemsList = append(t.dropItemsList, i)
 }
 
@@ -418,4 +433,13 @@ func (t *TownE1) RenderWall(screen *ebiten.Image, offsetX, offsetY float64) {
 		}
 	}
 	t.MapBase.RenderWall(screen, offsetX, offsetY)
+}
+
+//后期加入自定义的可行走区域
+func (t *TownE1) GetBlock1AeraUpdate(x, y int) bool {
+	if y == 15 && x == 44 || y == 16 && x == 47 || y == 24 && x == 35 || y == 22 && x == 32 || y == 26 && x == 21 || y == 20 && x == 30 || y == 20 && x == 24 {
+		return true
+	} else {
+		return false
+	}
 }

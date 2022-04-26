@@ -1,6 +1,7 @@
 package layout
 
 import (
+	"game/interfaces"
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -24,8 +25,8 @@ type SpriteItems struct {
 	bgIsDisplay      bool                     //背景图是否显示
 	contentIsDisplay bool                     //装备描述是否显示
 	bgColor          *RGBColor
-	touchEvent       func(i spriteInterface, x, y int)
-	clickEvent       func(i spriteInterface, x, y int)
+	touchEvent       func(i interfaces.SpriteInterface, x, y int)
+	clickEvent       func(i interfaces.SpriteInterface, x, y int)
 	itemName         string
 }
 
@@ -51,7 +52,7 @@ func newSpriteItems() *SpriteItems {
 }
 
 //快速创建items精灵组件
-func QuickCreateItems(x, y float64, name string, img *ebiten.Image, layer uint8, clickEvnet func(i spriteInterface, x, y int), d uint8, needClickRange ...bool) *SpriteItems {
+func QuickCreateItems(x, y float64, name string, img *ebiten.Image, layer uint8, clickEvnet func(i interfaces.SpriteInterface, x, y int), d uint8, needClickRange ...bool) *SpriteItems {
 	op := newSpriteItems()
 	op.SetPosition(x, y)
 	//判断是否有注册的UI事件
@@ -66,7 +67,7 @@ func QuickCreateItems(x, y float64, name string, img *ebiten.Image, layer uint8,
 	op.size.width, op.size.height = img.Size()
 	if len(needClickRange) == 1 && needClickRange[0] {
 		//添加点击范围
-		op.addClickRange()
+		op.AddClickRange()
 	}
 	//添加items背景图
 	//如果图片位置位于左右手武器栏
@@ -119,7 +120,7 @@ func QuickCreateItems(x, y float64, name string, img *ebiten.Image, layer uint8,
 	//
 	op.hasEvent = 1
 	//添加鼠标悬停事件
-	op.touchEvent = func(i spriteInterface, x, y int) {
+	op.touchEvent = func(i interfaces.SpriteInterface, x, y int) {
 		//装备栏位置
 		if i.(*SpriteItems).imagey < 238 {
 			if x >= op.clickMinX && x <= op.clickMaxX && y >= op.clickMinY && y <= op.clickMaxY {
@@ -137,6 +138,6 @@ func QuickCreateItems(x, y float64, name string, img *ebiten.Image, layer uint8,
 
 	}
 	//保存图片
-	op.addImage(img)
+	op.AddImage(img)
 	return op
 }

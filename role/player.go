@@ -13,7 +13,7 @@ import (
 
 const (
 	OFFSETX int = -30
-	OFFSETY int = -30
+	OFFSETY int = -50
 )
 
 var (
@@ -85,7 +85,6 @@ func (p *Player) SetPlayerState(s, d uint8) {
 	if p.status.Flg {
 		p.Direction = d
 	}
-
 }
 
 //更新玩家旧的方向
@@ -109,8 +108,8 @@ func (p *Player) GetAnimator(flg, name string, block uint8) (*ebiten.Image, int,
 
 //暗黑破坏神 16方位 移动 鼠标控制
 func (p *Player) GetMouseController(dir uint8) {
-	speed := 0.0
 	if p.status.Flg {
+		speed := 0.0
 		//判断是否走路
 		if p.status.IsWalk && (p.Direction != dir || p.State != tools.Walk) {
 			speed = tools.SPEED
@@ -121,41 +120,7 @@ func (p *Player) GetMouseController(dir uint8) {
 			p.SetPlayerState(tools.RUN, dir)
 		}
 		//移动判断
-		moveX, moveY := 0.0, 0.0
-		switch dir {
-		case 0:
-			moveX, moveY = -speed, speed
-		case 1:
-			moveX, moveY = -speed, -speed
-		case 2:
-			moveX, moveY = speed, -speed
-		case 3:
-			moveX, moveY = speed, speed
-		case 4:
-			moveX, moveY = 0, speed
-		case 5:
-			moveX, moveY = -speed, 0
-		case 6:
-			moveX, moveY = 0, -speed
-		case 7:
-			moveX, moveY = speed, 0
-		case 8:
-			moveX, moveY = 1-speed, speed
-		case 9:
-			moveX, moveY = -speed, speed-1
-		case 10:
-			moveX, moveY = -speed, 1-speed
-		case 11:
-			moveX, moveY = 1-speed, -speed
-		case 12:
-			moveX, moveY = speed-1, -speed
-		case 13:
-			moveX, moveY = speed, 1-speed
-		case 14:
-			moveX, moveY = speed, speed-1
-		case 15:
-			moveX, moveY = speed-1, speed
-		}
+		moveX, moveY := tools.CalculateSpeed(dir, speed)
 		if p.CanWalk(moveX, moveY, dir) {
 			p.status.MoveOffsetX += -moveX
 			p.status.MoveOffsetY += -moveY
@@ -169,12 +134,12 @@ func (p *Player) GetMouseController(dir uint8) {
 //判断是否可以行走
 func (p *Player) CanWalk(xS, yS float64, dir uint8) bool {
 	block1 := p.map_c.GetBlock1Aera()
-	x, y := tools.GetFloorPositionAt(p.X+xS-110, p.Y+yS+80)
+	x, y := tools.GetFloorPositionAt(p.X+xS-110, p.Y+yS+70)
 	if x >= p.status.ReadMapSizeWidth || y >= p.status.ReadMapSizeHeight || x < 0 || y < 0 {
 		p.SetPlayerState(tools.IDLE, dir)
 		return false
 	}
-	if block1[y][x].Img == nil {
+	if block1[y][x].Img == nil || p.map_c.GetBlock1AeraUpdate(x, y) {
 		return true
 	} else {
 		p.SetPlayerState(tools.IDLE, dir)
@@ -203,16 +168,15 @@ func (p *Player) PlayerMove(mouseX int, dir *uint8) {
 				turnLoop++
 				p.SetPlayerState(tools.IDLE, *dir)
 			} else {
+				//直接切换方向
 				p.status.CalculateEnd = false
 				turnLoop = 0
 				p.UpdateOldPlayerDir(p.Direction)
-				p.GetMouseController(*dir)
+				p.GetMouseController(p.Direction)
 			}
-
 		} else {
 			p.status.CalculateEnd = false
 			turnLoop = 0
-			p.UpdateOldPlayerDir(p.Direction)
 			p.GetMouseController(*dir)
 		}
 	}

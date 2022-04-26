@@ -13,8 +13,9 @@ type MapInterface interface {
 	RenderWall(screen *ebiten.Image, offsetX, offsetY float64)
 	GetBlock1Aera() [][]maps.ImgWall
 	SortLayer(mapX, mapY int)
-	RenderDropItems(screen *ebiten.Image, offsetX, offsetY float64)
+	RenderDropItems(screen *ebiten.Image, offsetX, offsetY float64, playX, playY float64)
 	Render(screen *ebiten.Image, frameIndexFor20, frameIndexFor12 int, offsetX, offsetY float64)
 	LoadAnm()
-	PlayDropItemAnm(screen *ebiten.Image, x, y float64)
+	PlayDropItemAnm(screen *ebiten.Image, x, y float64, name string)
+	GetBlock1AeraUpdate(x, y int) bool
 }

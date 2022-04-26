@@ -25,8 +25,8 @@ type TownN1 struct {
 	dropAnm       []*ebiten.Image //掉落动画图集
 	dropItemsList []dropItem      //掉落物品一栏
 	op            []*ebiten.DrawImageOptions
-	xyPos         [17]postion
-	image         *embed.FS //静态资源获取
+	//xyPos         [17]postion
+	image *embed.FS //静态资源获取
 }
 
 func NewN1(images *embed.FS, sta *status.StatusManage) *TownN1 {
@@ -61,7 +61,7 @@ func (t *TownN1) LoadXyList() {
 }
 
 //渲染掉落物品
-func (t *TownN1) RenderDropItems(screen *ebiten.Image, offsetX, offsetY float64) {
+func (t *TownN1) RenderDropItems(screen *ebiten.Image, offsetX, offsetY float64, playX, playY float64) {
 	//掉落物品
 	for i := 0; i < len(t.dropItemsList); i++ {
 		op := &ebiten.DrawImageOptions{}
@@ -110,7 +110,7 @@ func (t *TownN1) GetCellXY(x, y int) (float64, float64, error) {
 }
 
 //播放丢物品动画
-func (t *TownN1) PlayDropItemAnm(screen *ebiten.Image, x, y float64) {
+func (t *TownN1) PlayDropItemAnm(screen *ebiten.Image, x, y float64, name string) {
 	go func() {
 		countForMap := 0
 		countsForMap := 0
@@ -125,7 +125,7 @@ func (t *TownN1) PlayDropItemAnm(screen *ebiten.Image, x, y float64) {
 				countsForMap++
 				countForMap = 0
 				if countsForMap >= 16 {
-					t.InsertOnLoadItesm("dun", x, y)
+					t.InsertOnLoadItesm(name, x, y)
 					return
 				}
 			}
@@ -137,8 +137,8 @@ func (t *TownN1) PlayDropItemAnm(screen *ebiten.Image, x, y float64) {
 func (t *TownN1) InsertOnLoadItesm(name string, x, y float64) {
 	var i dropItem
 	i.name = name
-	i.pos.x = x
-	i.pos.y = y - 80
+	i.pos.x = x - 40
+	i.pos.y = y - 130 + 40
 	t.dropItemsList = append(t.dropItemsList, i)
 }
 
@@ -189,11 +189,6 @@ func (t *TownN1) LoadMap() {
 	dd, _ := t.image.ReadFile(tools.ObjectPath + "/mapSucai/townN1.ds1")
 	d, _ := ds1.Unmarshal(dd)
 
-	//加载素材信息提取
-	// for i := 0; i < len(d.Files); i++ {
-	// 	fmt.Println(strings.ReplaceAll(d.Files[i], "tg1", "dt1"))
-	// }
-
 	w, h := d.Floors[0].Size()
 	//保存地图大小
 	t.Status.ReadMapSizeWidth = w
@@ -207,7 +202,6 @@ func (t *TownN1) LoadMap() {
 			if !ds1Tile.Hidden() && ds1Tile.Prop1 != 0 {
 				ds := maps.GetTiles(int(ds1Tile.Style), int(ds1Tile.Sequence), 0, ss.Tiles)
 				if ds != nil {
-					// fmt.Println(ds[ds1Tile.RandomIndex].SubTileFlags[0])
 					t.Img[i][j] = maps.GetTitleImage(ds[ds1Tile.RandomIndex], ww)
 				}
 			}
@@ -250,4 +244,9 @@ func (t *TownN1) LoadMap() {
 func (t *TownN1) RenderWall(screen *ebiten.Image, offsetX, offsetY float64) {
 
 	t.MapBase.RenderWall(screen, offsetX, offsetY)
+}
+
+//后期加入的可行走区域
+func (t *TownN1) GetBlock1AeraUpdate(x, y int) bool {
+	return false
 }

@@ -1,6 +1,7 @@
 package layout
 
 import (
+	"game/interfaces"
 	"game/tools"
 	"runtime"
 	"strings"
@@ -10,18 +11,6 @@ import (
 //加载进入游戏UI
 func (u *UI) LoadGameImages() {
 	u.ClearSlice(10)
-	//初始化背包 数据
-	itemsLayout := [5][10]string{
-		//包裹区
-		{"dun-2_0,0", "dun-2_0,0", "book_0,2", "MP0", "MP0", "", "", "", "", ""},
-		{"dun-2_0,0", "dun-2_0,0", "book_0,2", "box_1,3", "box_1,3", "", "dun-4_1,6", "dun-4_1,6", "", ""},
-		{"dun-2_0,0", "dun-2_0,0", "box_1,3", "box_1,3", "", "", "dun-4_1,6", "dun-4_1,6", "", ""},
-		{"dun-2_0,0", "dun-2_0,0", "HP0", "HP0", "HP0", "HP0", "dun-4_1,6", "dun-4_1,6", "", ""},
-		//装备区域
-		{"head-5", "futou-2", "dun-6", "neck", "body-4", "hand", "ring", "blet", "ring", "shose"},
-		//头盔526,8  左手武器412,54 右手武器644,54 项链599,36 铠甲526,80 手套413,182 左戒指485,181 腰带527,181 右戒指599,183 靴子644,183
-	}
-	u.BagLayout = itemsLayout
 	//
 	var len float64 = 0
 	s, _ := u.image.ReadFile("resource/UI/0000.png")
@@ -85,7 +74,7 @@ func (u *UI) LoadGameImages() {
 
 	s, _ = u.image.ReadFile("resource/UI/skill_btn.png")
 	mgUI = tools.GetEbitenImage(s)
-	u.AddComponent(QuickCreate(204, 441, mgUI, 0, func(i spriteInterface) {
+	u.AddComponent(QuickCreate(204, 441, mgUI, 0, func(i interfaces.SpriteInterface) {
 		if !isClick {
 			isClick = true
 			go func() {
@@ -100,7 +89,7 @@ func (u *UI) LoadGameImages() {
 			}()
 		}
 	}, true), tools.ISNORCOM)
-	u.AddComponent(QuickCreate(562, 441, mgUI, 0, func(i spriteInterface) {
+	u.AddComponent(QuickCreate(562, 441, mgUI, 0, func(i interfaces.SpriteInterface) {
 		if !isClick {
 			isClick = true
 			go func() {
@@ -119,7 +108,7 @@ func (u *UI) LoadGameImages() {
 	//注册跑步走路动作切换
 	s, _ = u.image.ReadFile("resource/UI/walk_button.png")
 	mgUI = tools.GetEbitenImage(s)
-	u.AddComponent(QuickCreate(254, 451, mgUI, 0, func(i spriteInterface) {
+	u.AddComponent(QuickCreate(254, 451, mgUI, 0, func(i interfaces.SpriteInterface) {
 		if !isClick {
 			isClick = true
 			go func() {
@@ -172,7 +161,7 @@ func (u *UI) LoadGameImages() {
 	//关闭装备栏按钮
 	s, _ = u.image.ReadFile("resource/UI/close_btn_on.png")
 	mgUI = tools.GetEbitenImage(s)
-	u.AddComponent(QuickCreate(414, 384, mgUI, 0, func(i spriteInterface) {
+	u.AddComponent(QuickCreate(414, 384, mgUI, 0, func(i interfaces.SpriteInterface) {
 		if !isClick {
 			isClick = true
 			go func() {
@@ -197,8 +186,8 @@ func (u *UI) LoadGameImages() {
 				//恢复因打开包裹导致的人物偏移
 				u.status.UIOFFSETX = 0
 				//恢复影子偏移
-				u.status.ShadowOffsetX = -350
-				u.status.ShadowOffsetY = 365
+				u.status.ShadowOffsetX = -345
+				u.status.ShadowOffsetY = 345
 				//恢复玩家中心位置
 				u.status.PLAYERCENTERX = 388
 				//恢复地图偏移
@@ -211,7 +200,7 @@ func (u *UI) LoadGameImages() {
 	//背包物品LOOP Start
 	//临时Map
 	TempArray := make(map[string]int, 10)
-	items := u.BagLayout
+	items := u.bag.BagLayout
 	for i := 0; i < 4; i++ {
 		for j := 0; j < 10; j++ {
 			if strings.Contains(items[i][j], "_") {
@@ -239,7 +228,7 @@ func (u *UI) LoadGameImages() {
 	xx, yy := 0, 0
 	for i := 0; i < 10; i++ {
 		//装备栏初始化
-		if u.BagLayout[4][i] != "" {
+		if u.bag.BagLayout[4][i] != "" {
 			if i == 0 {
 				xx, yy = 530, 3
 			}
@@ -272,14 +261,14 @@ func (u *UI) LoadGameImages() {
 			}
 
 			//插入装备
-			u.InsertToEquip(xx, yy, u.BagLayout[4][i])
+			u.InsertToEquip(xx, yy, u.bag.BagLayout[4][i])
 		}
 	}
 
 	//注册mini板打开按钮
 	s, _ = u.image.ReadFile("resource/UI/open_minipanel_btn.png")
 	mgUI = tools.GetEbitenImage(s)
-	u.AddComponent(QuickCreate(390, 443, mgUI, 0, func(i spriteInterface) {
+	u.AddComponent(QuickCreate(390, 443, mgUI, 0, func(i interfaces.SpriteInterface) {
 		if !isClick {
 			isClick = true
 			go func() {
@@ -321,7 +310,7 @@ func (u *UI) LoadGameImages() {
 	baseX += float64(mgUI.Bounds().Max.X) + 4
 	s, _ = u.image.ReadFile("resource/UI/mini_menu_eq.png")
 	mgUI = tools.GetEbitenImage(s)
-	u.AddComponent(QuickCreate(baseX, 410, mgUI, 0, func(i spriteInterface) {
+	u.AddComponent(QuickCreate(baseX, 410, mgUI, 0, func(i interfaces.SpriteInterface) {
 		if !isClick {
 			isClick = true
 			go func() {

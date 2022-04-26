@@ -1,6 +1,7 @@
 package layout
 
 import (
+	"game/interfaces"
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -18,7 +19,7 @@ type Sprite struct {
 	images                                     *ebiten.Image
 	hasEvent, layer                            uint8
 	isDisplay                                  bool
-	f                                          func(i spriteInterface)
+	f                                          func(i interfaces.SpriteInterface)
 	clickMinX, clickMinY, clickMaxX, clickMaxY int
 	imagex, imagey                             float64 //图片的位置x 图片的位置y
 	size                                       imageSize
@@ -57,19 +58,19 @@ func (s *Sprite) SetPosition(x, y float64) {
 }
 
 //添加图片
-func (s *Sprite) addImage(m *ebiten.Image) {
+func (s *Sprite) AddImage(m *ebiten.Image) {
 	s.images = m
 }
 
 //给UI添加事件
-func (s *Sprite) addEvent(fu func(s spriteInterface)) {
+func (s *Sprite) AddEvent(fu func(s interfaces.SpriteInterface)) {
 	s.hasEvent = 1
 	s.f = fu
 
 }
 
 //添加按钮点击范围
-func (s *Sprite) addClickRange() {
+func (s *Sprite) AddClickRange() {
 	s.clickMinX = int(s.imagex)
 	s.clickMinY = int(s.imagey)
 	s.clickMaxX = int(s.imagex) + s.size.width
@@ -84,12 +85,12 @@ func (s *Sprite) addClickRange() {
 ** callBack 回调函数
 ** needClickRange 是否需要点击范围
 **/
-func QuickCreate(x, y float64, img *ebiten.Image, layer uint8, callBack func(i spriteInterface), needClickRange ...bool) *Sprite {
+func QuickCreate(x, y float64, img *ebiten.Image, layer uint8, callBack func(i interfaces.SpriteInterface), needClickRange ...bool) *Sprite {
 	op := newSprite()
 	op.SetPosition(x, y)
 	//判断是否有注册的UI事件
 	if callBack != nil {
-		op.addEvent(callBack)
+		op.AddEvent(callBack)
 	}
 	//添加UI显示层级
 	op.layer = layer
@@ -99,10 +100,10 @@ func QuickCreate(x, y float64, img *ebiten.Image, layer uint8, callBack func(i s
 	op.size.height = height
 	if len(needClickRange) == 1 && needClickRange[0] {
 		//添加点击范围
-		op.addClickRange()
+		op.AddClickRange()
 	}
 	//保存图片
-	op.addImage(img)
+	op.AddImage(img)
 	return op
 }
 
@@ -136,6 +137,6 @@ func (s *Sprite) QuickDrawItemsBg(screen *ebiten.Image) {
 }
 
 //调用回调函数
-func (s *Sprite) CallFunc() func(i spriteInterface) {
+func (s *Sprite) CallFunc() func(i interfaces.SpriteInterface) {
 	return s.f
 }
