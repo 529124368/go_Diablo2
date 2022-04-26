@@ -23,6 +23,8 @@ var (
 	plist_png_2   *image.Paletted
 	opS           *ebiten.DrawImageOptions
 	op            *ebiten.DrawImageOptions
+	newPath       []uint8
+	turnLoop      uint8 = 0
 )
 
 type Player struct {
@@ -118,191 +120,53 @@ func (p *Player) GetMouseController(dir uint8) {
 			speed = tools.SPEED_RUN
 			p.SetPlayerState(tools.RUN, dir)
 		}
-	}
-
-	if dir == 2 && p.status.Flg {
-		if p.CanWalk(speed, -speed, dir) {
-			p.status.MoveOffsetX += -speed
-			p.status.MoveOffsetY += speed
-			p.Y -= speed
-			p.X += speed
+		//移动判断
+		moveX, moveY := 0.0, 0.0
+		switch dir {
+		case 0:
+			moveX, moveY = -speed, speed
+		case 1:
+			moveX, moveY = -speed, -speed
+		case 2:
+			moveX, moveY = speed, -speed
+		case 3:
+			moveX, moveY = speed, speed
+		case 4:
+			moveX, moveY = 0, speed
+		case 5:
+			moveX, moveY = -speed, 0
+		case 6:
+			moveX, moveY = 0, -speed
+		case 7:
+			moveX, moveY = speed, 0
+		case 8:
+			moveX, moveY = 1-speed, speed
+		case 9:
+			moveX, moveY = -speed, speed-1
+		case 10:
+			moveX, moveY = -speed, 1-speed
+		case 11:
+			moveX, moveY = 1-speed, -speed
+		case 12:
+			moveX, moveY = speed-1, -speed
+		case 13:
+			moveX, moveY = speed, 1-speed
+		case 14:
+			moveX, moveY = speed, speed-1
+		case 15:
+			moveX, moveY = speed-1, speed
 		}
-		p.status.Flg = false
-	}
-
-	if dir == 3 && p.status.Flg {
-		if p.CanWalk(speed, speed, dir) {
-			p.status.MoveOffsetX += -speed
-			p.status.MoveOffsetY += -speed
-			p.Y += speed
-			p.X += speed
-		}
-		p.status.Flg = false
-	}
-	if dir == 0 && p.status.Flg {
-		if p.CanWalk(-speed, speed, dir) {
-			p.status.MoveOffsetX += speed
-			p.status.MoveOffsetY += -speed
-			p.Y += speed
-			p.X -= speed
-		}
-		p.status.Flg = false
-	}
-	if dir == 1 && p.status.Flg {
-		if p.CanWalk(-speed, -speed, dir) {
-			p.status.MoveOffsetX += speed
-			p.status.MoveOffsetY += speed
-			p.Y -= speed
-			p.X -= speed
-		}
-		p.status.Flg = false
-	}
-	if dir == 5 && p.status.Flg {
-		if p.CanWalk(-speed, 0, dir) {
-			p.status.MoveOffsetX += speed
-			p.status.MoveOffsetY += 0
-			p.X -= speed
-		}
-		p.status.Flg = false
-	}
-
-	if dir == 6 && p.status.Flg {
-		if p.CanWalk(0, -speed, dir) {
-			p.status.MoveOffsetX += 0
-			p.status.MoveOffsetY += speed
-			p.Y -= speed
-		}
-		p.status.Flg = false
-	}
-
-	if dir == 7 && p.status.Flg {
-		if p.CanWalk(speed, 0, dir) {
-			p.status.MoveOffsetX += -speed
-			p.status.MoveOffsetY += 0
-			p.X += speed
-		}
-		p.status.Flg = false
-	}
-
-	if dir == 4 && p.status.Flg {
-		if p.CanWalk(0, speed, dir) {
-			p.status.MoveOffsetX += 0
-			p.status.MoveOffsetY += -speed
-			p.Y += speed
-		}
-		p.status.Flg = false
-	}
-	if dir == 12 && p.status.Flg {
-		if p.CanWalk(speed-1, -speed, dir) {
-			p.status.MoveOffsetX += 1 - speed
-			p.status.MoveOffsetY += speed
-			p.Y -= speed
-			p.X += speed - 1
-		}
-		p.status.Flg = false
-	}
-	if dir == 2 && p.status.Flg {
-		if p.CanWalk(speed, -speed, dir) {
-			p.status.MoveOffsetX += -speed
-			p.status.MoveOffsetY += speed
-			p.Y -= speed
-			p.X += speed
-		}
-		p.status.Flg = false
-	}
-	if dir == 13 && p.status.Flg {
-		if p.CanWalk(speed, 1-speed, dir) {
-			p.status.MoveOffsetX += -speed
-			p.status.MoveOffsetY += speed - 1
-			p.Y -= speed - 1
-			p.X += speed
-		}
-		p.status.Flg = false
-	}
-	if dir == 10 && p.status.Flg {
-		if p.CanWalk(-speed, 1-speed, dir) {
-			p.status.MoveOffsetX += speed
-			p.status.MoveOffsetY += speed - 1
-			p.Y -= speed - 1
-			p.X -= speed
-		}
-		p.status.Flg = false
-	}
-	if dir == 1 && p.status.Flg {
-		if p.CanWalk(-speed, -speed, dir) {
-			p.status.MoveOffsetX += speed
-			p.status.MoveOffsetY += speed
-			p.Y -= speed
-			p.X -= speed
-		}
-		p.status.Flg = false
-	}
-	if dir == 11 && p.status.Flg {
-		if p.CanWalk(1-speed, -speed, dir) {
-			p.status.MoveOffsetX += speed - 1
-			p.status.MoveOffsetY += speed
-			p.Y -= speed
-			p.X -= speed - 1
-		}
-		p.status.Flg = false
-	}
-	if dir == 9 && p.status.Flg {
-		if p.CanWalk(-speed, speed-1, dir) {
-			p.status.MoveOffsetX += speed
-			p.status.MoveOffsetY += 1 - speed
-			p.Y += speed - 1
-			p.X -= speed
-		}
-		p.status.Flg = false
-	}
-	if dir == 0 && p.status.Flg {
-		if p.CanWalk(-speed, speed, dir) {
-			p.status.MoveOffsetX += speed
-			p.status.MoveOffsetY += -speed
-			p.Y += speed
-			p.X -= speed
-		}
-		p.status.Flg = false
-	}
-	if dir == 8 && p.status.Flg {
-		if p.CanWalk(1-speed, speed, dir) {
-			p.status.MoveOffsetX += speed - 1
-			p.status.MoveOffsetY += -speed
-			p.Y += speed
-			p.X -= speed - 1
-		}
-		p.status.Flg = false
-	}
-
-	if dir == 15 && p.status.Flg {
-		if p.CanWalk(speed-1, speed, dir) {
-			p.status.MoveOffsetX += 1 - speed
-			p.status.MoveOffsetY += -speed
-			p.Y += speed
-			p.X += speed - 1
-		}
-		p.status.Flg = false
-	}
-	if dir == 3 && p.status.Flg {
-		if p.CanWalk(speed, speed, dir) {
-			p.status.MoveOffsetX += -speed
-			p.status.MoveOffsetY += -speed
-			p.Y += speed
-			p.X += speed
-		}
-		p.status.Flg = false
-	}
-	if dir == 14 && p.status.Flg {
-		if p.CanWalk(speed, speed-1, dir) {
-			p.status.MoveOffsetX += -speed
-			p.status.MoveOffsetY += 1 - speed
-			p.Y += speed - 1
-			p.X += speed
+		if p.CanWalk(moveX, moveY, dir) {
+			p.status.MoveOffsetX += -moveX
+			p.status.MoveOffsetY += -moveY
+			p.Y += moveY
+			p.X += moveX
 		}
 		p.status.Flg = false
 	}
 }
 
+//判断是否可以行走
 func (p *Player) CanWalk(xS, yS float64, dir uint8) bool {
 	block1 := p.map_c.GetBlock1Aera()
 	x, y := tools.GetFloorPositionAt(p.X+xS-110, p.Y+yS+80)
@@ -315,5 +179,41 @@ func (p *Player) CanWalk(xS, yS float64, dir uint8) bool {
 	} else {
 		p.SetPlayerState(tools.IDLE, dir)
 		return false
+	}
+}
+
+//玩家移动
+func (p *Player) PlayerMove(mouseX int, dir *uint8) {
+	//鼠标人物移动控制
+	if !p.status.OpenBag || p.status.OpenBag && mouseX <= tools.LAYOUTX/2 {
+		//判断人物方位
+		if p.OldDirection != p.Direction && !ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
+			if !p.status.CalculateEnd {
+				newPath = tools.CalculateDirPath(p.OldDirection, p.Direction)
+				p.status.CalculateEnd = true
+			}
+			if len(newPath) >= 3 {
+				if turnLoop >= uint8(len(newPath)) {
+					turnLoop = uint8(len(newPath) - 1)
+					*dir = newPath[turnLoop]
+					p.UpdateOldPlayerDir(p.Direction)
+				} else {
+					*dir = newPath[turnLoop]
+				}
+				turnLoop++
+				p.SetPlayerState(tools.IDLE, *dir)
+			} else {
+				p.status.CalculateEnd = false
+				turnLoop = 0
+				p.UpdateOldPlayerDir(p.Direction)
+				p.GetMouseController(*dir)
+			}
+
+		} else {
+			p.status.CalculateEnd = false
+			turnLoop = 0
+			p.UpdateOldPlayerDir(p.Direction)
+			p.GetMouseController(*dir)
+		}
 	}
 }

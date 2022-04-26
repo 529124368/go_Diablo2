@@ -9,10 +9,8 @@ import (
 	"game/role"
 	"game/status"
 	"game/tools"
-	"math/rand"
 	"runtime"
 	"sync"
-	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -44,8 +42,6 @@ var (
 	frameSpeed  int = 5
 	mouseX      int
 	mouseY      int
-	newPath     []uint8
-	turnLoop    uint8 = 0
 )
 
 //go:embed resource
@@ -56,14 +52,14 @@ func NewGame() *Game {
 	//statueManage
 	sta := status.NewStatusManage()
 	//场景
-	rand.Seed(time.Now().Unix()) // unix 时间戳，秒
-	data := rand.Int31n(50)
-	var m mapManage.MapInterface
-	if data%2 == 0 {
-		m = mapManage.NewN1(&asset, sta)
-	} else {
-		m = mapManage.NewE1(&asset, sta)
-	}
+	// rand.Seed(time.Now().Unix()) // unix 时间戳，秒
+	// data := rand.Int31n(50)
+	//var m mapManage.MapInterface
+	//	if data%2 == 0 {
+	//		m = mapManage.NewN1(&asset, sta)
+	//	} else {
+	m := mapManage.NewE1(&asset, sta)
+	//}
 	//Player  设置初始状态和坐标
 	r := role.NewPlayer(5280, 1880, tools.IDLE, 0, 0, 0, &asset, m, sta)
 	//字体

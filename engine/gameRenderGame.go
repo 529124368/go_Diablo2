@@ -135,39 +135,9 @@ func (g *Game) changeScenceGameUpdate() {
 	}
 	//事件循环监听 是否有按钮点击事件
 	g.ui.EventLoop(mouseX, mouseY)
-	//鼠标移动控制
-	if !g.status.OpenBag || g.status.OpenBag && mouseX <= tools.LAYOUTX/2 {
-		//
-		if g.player.OldDirection != g.player.Direction && !ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
-			if !g.status.CalculateEnd {
-				newPath = tools.CalculateDirPath(g.player.OldDirection, g.player.Direction)
-				g.status.CalculateEnd = true
-			}
-			if len(newPath) >= 3 {
-				if turnLoop >= uint8(len(newPath)) {
-					turnLoop = uint8(len(newPath) - 1)
-					dir = newPath[turnLoop]
-					g.player.UpdateOldPlayerDir(g.player.Direction)
-				} else {
-					dir = newPath[turnLoop]
-				}
-				turnLoop++
-				g.player.SetPlayerState(tools.IDLE, dir)
-			} else {
-				g.status.CalculateEnd = false
-				turnLoop = 0
-				g.player.UpdateOldPlayerDir(g.player.Direction)
-				g.player.GetMouseController(dir)
-			}
+	//鼠标人物移动控制
+	g.player.PlayerMove(mouseX, &dir)
 
-		} else {
-			g.status.CalculateEnd = false
-			turnLoop = 0
-			g.player.UpdateOldPlayerDir(g.player.Direction)
-			g.player.GetMouseController(dir)
-		}
-
-	}
 	//根据状态改变帧数
 	if g.player.State == tools.IDLE {
 		frameNums = 16

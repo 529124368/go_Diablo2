@@ -2,6 +2,7 @@ package tools
 
 import (
 	"bytes"
+	"container/ring"
 	"image"
 	_ "image/png"
 	"log"
@@ -145,66 +146,40 @@ func Angle(y float64, len float64) float64 {
 
 //计算转头角度一栏
 func CalculateDirPath(oldDir, newDir uint8) []uint8 {
-	newPath := make([]uint8, 0, 16)
+	pathList := ring.New(16)
 	dirList := []uint8{1, 11, 6, 12, 2, 13, 7, 14, 3, 15, 4, 8, 0, 9, 5, 10}
-	newDirIndex := 17
-	oldDirIndex := 17
+	path1 := make([]uint8, 0)
+	path2 := make([]uint8, 0)
+	for i := 0; i < 16; i++ {
+		if pathList.Value == nil {
+			pathList.Value = dirList[i]
+			pathList = pathList.Next()
+		}
+	}
+	var oldDir_k, newDir_k int
 	for k, v := range dirList {
-		if v == newDir {
-			newDirIndex = k
-		}
 		if v == oldDir {
-			oldDirIndex = k
+			oldDir_k = k
+		}
+		if v == newDir {
+			newDir_k = k
 		}
 	}
-	if math.Abs(float64(newDirIndex-oldDirIndex)) < 16-math.Abs(float64(newDirIndex-oldDirIndex)) {
-		if oldDirIndex < newDirIndex {
-			for i := oldDirIndex; i <= newDirIndex; i++ {
-				newPath = append(newPath, dirList[i])
-			}
-		} else {
-			for i := oldDirIndex; i >= newDirIndex; i-- {
-
-				newPath = append(newPath, dirList[i])
-			}
-		}
-
+	pathList = pathList.Move(oldDir_k)
+	for pathList.Value != newDir {
+		pathList = pathList.Next()
+		path1 = append(path1, pathList.Value.(uint8))
+	}
+	pathList = pathList.Move(16 - newDir_k + oldDir_k)
+	for pathList.Value != newDir {
+		pathList = pathList.Prev()
+		path2 = append(path2, pathList.Value.(uint8))
+	}
+	if len(path1) < len(path2) {
+		return path1[0 : len(path1)-1]
 	} else {
-		if oldDirIndex < newDirIndex {
-			if oldDirIndex == 0 {
-				newPath = append(newPath, dirList[oldDirIndex])
-				i := 15
-				for i >= newDirIndex {
-					newPath = append(newPath, dirList[i])
-					i--
-				}
-			} else {
-				i := oldDirIndex
-				for i >= 0 {
-					newPath = append(newPath, dirList[i])
-					i--
-				}
-				j := 15
-				for j >= newDirIndex {
-					newPath = append(newPath, dirList[j])
-					j--
-				}
-			}
-		} else {
-			i := oldDirIndex
-			for i <= 15 {
-				newPath = append(newPath, dirList[i])
-				i++
-			}
-			j := 0
-			for j <= newDirIndex {
-				newPath = append(newPath, dirList[j])
-				j++
-			}
-		}
-
+		return path2[0 : len(path2)-1]
 	}
-	return newPath[1 : len(newPath)-1]
 }
 
 //获取物品的尺寸
