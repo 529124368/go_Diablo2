@@ -69,6 +69,7 @@ func NewGame() *Game {
 	f := fonts.NewFont(&asset)
 	//UI
 	u := layout.NewUI(&asset, sta, f, m, bag)
+	bag.UI = u
 	//BGM
 	bgm := music.NewMusicBGM(&asset)
 

@@ -249,7 +249,7 @@ func (u *UI) AddItemToBag(mousex, mousey int, itemName string) bool {
 				mgUI := tools.GetEbitenImage(s)
 				layoutX := 413 + y*29
 				layoutY := 254 + x*29
-				u.AddComponent(QuickCreateItems(float64(layoutX), float64(layoutY), itemName, mgUI, 1, u.ItemsEvent(), 1, true), 0)
+				u.AddComponent(QuickCreateItems(float64(layoutX), float64(layoutY), itemName, mgUI, 1, u.ItemsEvent(), 1, true), tools.ISITEMS)
 				return true
 			} else {
 				//循环判断是否可以放下
@@ -270,7 +270,7 @@ func (u *UI) AddItemToBag(mousex, mousey int, itemName string) bool {
 				mgUI := tools.GetEbitenImage(s)
 				layoutX := 413 + y*29
 				layoutY := 254 + x*29
-				u.AddComponent(QuickCreateItems(float64(layoutX), float64(layoutY), itemName, mgUI, 1, u.ItemsEvent(), 1, true), 0)
+				u.AddComponent(QuickCreateItems(float64(layoutX), float64(layoutY), itemName, mgUI, 1, u.ItemsEvent(), 1, true), tools.ISITEMS)
 				return true
 			}
 		} else if mousex >= 397 && mousey >= 5 && mousex <= 705 && mousey <= 247 {
@@ -282,6 +282,15 @@ func (u *UI) AddItemToBag(mousex, mousey int, itemName string) bool {
 	} else {
 		return false
 	}
+}
+
+//捡取物品到包裹
+func (u *UI) AddItemToBagByHand(x, y int, itemName string) {
+	s, _ := u.image.ReadFile("resource/items/" + itemName + ".png")
+	mgUI := tools.GetEbitenImage(s)
+	xx := 413 + y*29
+	yy := 254 + x*29
+	u.AddComponent(QuickCreateItems(float64(xx), float64(yy), itemName, mgUI, 1, u.ItemsEvent(), 1, true), tools.ISITEMS)
 }
 
 //从包裹删除物品

@@ -211,14 +211,14 @@ func (u *UI) LoadGameImages() {
 					mgUI = tools.GetEbitenImage(s)
 					x := 413 + j*29
 					y := 254 + i*29
-					u.AddComponent(QuickCreateItems(float64(x), float64(y), t[0], mgUI, 1, u.ItemsEvent(), 1, true), 0)
+					u.AddComponent(QuickCreateItems(float64(x), float64(y), t[0], mgUI, 1, u.ItemsEvent(), 1, true), tools.ISITEMS)
 				}
 			} else if items[i][j] != "" {
 				s, _ = u.image.ReadFile("resource/items/" + items[i][j] + ".png")
 				mgUI = tools.GetEbitenImage(s)
 				x := 413 + j*29
 				y := 254 + i*29
-				u.AddComponent(QuickCreateItems(float64(x), float64(y), items[i][j], mgUI, 1, u.ItemsEvent(), 1, true), 0)
+				u.AddComponent(QuickCreateItems(float64(x), float64(y), items[i][j], mgUI, 1, u.ItemsEvent(), 1, true), tools.ISITEMS)
 			}
 		}
 	}

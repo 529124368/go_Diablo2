@@ -158,7 +158,7 @@ func (g *Game) changeScenceGameUpdate() {
 func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	defer func() {
 		if r := recover(); r != nil {
-			fmt.Println("has error is :", r)
+			fmt.Println("has error is x:", r)
 		}
 	}()
 	//获取玩家当前的地图块坐标
