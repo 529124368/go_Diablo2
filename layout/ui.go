@@ -310,11 +310,9 @@ func (u *UI) DelItemFromBag(imageX, imageY int) {
 		} else {
 			u.bag.BagLayout[x][y] = ""
 		}
-		layoutX := 413 + y*29
-		layoutY := 254 + x*29
 		for k, v := range u.ItemsCompents {
 			//根据具体的图片坐标删除 支持唯一性
-			if v.imagex == float64(layoutX) && v.imagey == float64(layoutY) {
+			if v.imagex == float64(imageX) && v.imagey == float64(imageY) {
 				if k != len(u.ItemsCompents)-1 {
 					u.ItemsCompents = append(u.ItemsCompents[0:k], u.ItemsCompents[k+1:]...)
 				} else {
