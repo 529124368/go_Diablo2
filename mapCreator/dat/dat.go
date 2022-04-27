@@ -1,8 +1,6 @@
 package dat
 
-import (
-	"game/mapCreator/d2interface"
-)
+import "game/interfaces"
 
 const (
 	// index offset helpers
@@ -13,7 +11,7 @@ const (
 )
 
 // Load loads a DAT file.
-func Load(data []byte) (d2interface.Palette, error) {
+func Load(data []byte) (interfaces.Palette, error) {
 	palette := &DATPalette{}
 
 	for i := 0; i < 256; i++ {

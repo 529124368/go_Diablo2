@@ -2,7 +2,7 @@ package dat
 
 import (
 	"fmt"
-	"game/mapCreator/d2interface"
+	"game/interfaces"
 )
 
 const (
@@ -11,7 +11,7 @@ const (
 
 // DATPalette represents a 256 color palette.
 type DATPalette struct {
-	colors [numColors]d2interface.Color
+	colors [numColors]interfaces.Color
 }
 
 // New creates a new dat palette
@@ -30,12 +30,12 @@ func (p *DATPalette) NumColors() int {
 }
 
 // GetColors returns the slice of colors in the palette
-func (p *DATPalette) GetColors() [numColors]d2interface.Color {
+func (p *DATPalette) GetColors() [numColors]interfaces.Color {
 	return p.colors
 }
 
 // GetColor returns a color by index
-func (p *DATPalette) GetColor(idx int) (d2interface.Color, error) {
+func (p *DATPalette) GetColor(idx int) (interfaces.Color, error) {
 	if color := p.colors[idx]; color != nil {
 		return color, nil
 	}

@@ -29,7 +29,7 @@ const (
 type Game struct {
 	count, countForMap int
 	player             *role.Player              //玩家
-	mapManage          mapManage.MapInterface    //地图等管理
+	mapManage          interfaces.MapInterface   //地图等管理
 	ui                 *layout.UI                //UI
 	music              interfaces.MusicInterface //音乐
 	status             *status.StatusManage      //状态管理器
@@ -57,7 +57,7 @@ func NewGame() *Game {
 	//场景
 	// rand.Seed(time.Now().Unix()) // unix 时间戳，秒
 	// data := rand.Int31n(50)
-	//var m mapManage.MapInterface
+	//var m interfaces.MapInterface
 	//	if data%2 == 0 {
 	//		m = mapManage.NewN1(&asset, sta,bag)
 	//	} else {

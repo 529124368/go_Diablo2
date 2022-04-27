@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"game/fonts"
 	"game/interfaces"
-	"game/mapCreator/mapManage"
 	"game/status"
 	"game/storage"
 	"game/tools"
@@ -41,11 +40,11 @@ type UI struct {
 	status            *status.StatusManage //状态管理器
 	tempBag           [1]*SpriteItems      //临时Items存放
 	fCont             *fonts.FontBase
-	mapManage         mapManage.MapInterface
+	mapManage         interfaces.MapInterface
 	bag               *storage.Bag
 }
 
-func NewUI(images *embed.FS, s *status.StatusManage, f *fonts.FontBase, m mapManage.MapInterface, b *storage.Bag) *UI {
+func NewUI(images *embed.FS, s *status.StatusManage, f *fonts.FontBase, m interfaces.MapInterface, b *storage.Bag) *UI {
 
 	ui := &UI{
 		image:             images,

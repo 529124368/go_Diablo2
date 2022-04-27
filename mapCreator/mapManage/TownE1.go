@@ -125,7 +125,7 @@ func (t *TownE1) RenderDropItems(screen *ebiten.Image, offsetX, offsetY float64,
 
 //切换渲染顺序
 func (t *TownE1) SortLayer(mapX, mapY int) {
-	if mapY > 26 || mapY == 16 && mapX >= 47 || mapX == 46 || mapX == 47 || mapY == 8 && mapX == 30 || mapY == 7 && mapX == 30 || mapY == 6 && mapX == 30 {
+	if mapY >= 26 || mapY == 16 && mapX >= 47 || mapX == 46 || mapX == 47 || mapY == 8 && mapX == 30 || mapY == 7 && mapX == 30 || mapY == 6 && mapX == 30 {
 		t.Status.DisplaySort = true
 	} else {
 		t.Status.DisplaySort = false
@@ -436,7 +436,7 @@ func (t *TownE1) RenderWall(screen *ebiten.Image, offsetX, offsetY float64) {
 
 //后期加入自定义的可行走区域
 func (t *TownE1) GetBlock1AeraUpdate(x, y int) bool {
-	if y == 15 && x == 44 || y == 16 && x == 47 || y == 24 && x == 35 || y == 22 && x == 32 || y == 26 && x == 21 || y == 20 && x == 30 || y == 20 && x == 24 {
+	if y == 8 && x == 22 || y == 8 && x == 21 || y == 20 && x == 22 || y == 17 && x == 19 || y == 20 && x == 21 || y == 26 && x == 22 || y == 18 && x == 47 || y == 18 && x == 48 || y == 15 && x == 44 || y == 16 && x == 47 || y == 24 && x == 35 || y == 22 && x == 32 || y == 26 && x == 21 || y == 20 && x == 30 || y == 20 && x == 24 {
 		return true
 	} else {
 		return false

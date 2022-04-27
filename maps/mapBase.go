@@ -94,6 +94,6 @@ func (m *MapBase) RenderWall(screen *ebiten.Image, offsetX, offsetY float64) {
 }
 
 //获取墙体区域
-func (m *MapBase) GetBlock1Aera() [][]ImgWall {
-	return m.Img2
+func (m *MapBase) GetBlock1Aera(x, y int) bool {
+	return m.Img2[y][x].Img == nil
 }

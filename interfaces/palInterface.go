@@ -1,4 +1,4 @@
-package d2interface
+package interfaces
 
 const numColors = 256
 

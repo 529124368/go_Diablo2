@@ -2,7 +2,7 @@ package dt1
 
 import (
 	"fmt"
-	"game/mapCreator/d2interface"
+	"game/interfaces"
 	"game/tools"
 
 	"log"
@@ -244,7 +244,7 @@ func LoadDT1(fileData []byte) (*DT1, error) {
 	return result, nil
 }
 
-func ImgIndexToRGBA(indexData []byte, palette d2interface.Palette) []byte {
+func ImgIndexToRGBA(indexData []byte, palette interfaces.Palette) []byte {
 	bytesPerPixel := 4
 	colorData := make([]byte, len(indexData)*bytesPerPixel)
 

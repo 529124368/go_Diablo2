@@ -1,7 +1,7 @@
 package maps
 
 import (
-	"game/mapCreator/d2interface"
+	"game/interfaces"
 	"game/mapCreator/ds1"
 	"game/mapCreator/dt1"
 	"game/tools"
@@ -12,7 +12,7 @@ import (
 )
 
 //获取floor层贴图
-func GetTitleImage(tileData dt1.Tile, w d2interface.Palette) *ebiten.Image {
+func GetTitleImage(tileData dt1.Tile, w interfaces.Palette) *ebiten.Image {
 	tileYMinimum := int32(0)
 	for _, block := range tileData.Blocks {
 		tileYMinimum = tools.MinInt32(tileYMinimum, int32(block.Y))
@@ -29,7 +29,7 @@ func GetTitleImage(tileData dt1.Tile, w d2interface.Palette) *ebiten.Image {
 }
 
 //获取wall层贴图
-func GetWallTitleImage(tileData dt1.Tile, tile *ds1.Tile, w d2interface.Palette) (*ebiten.Image, int) {
+func GetWallTitleImage(tileData dt1.Tile, tile *ds1.Tile, w interfaces.Palette) (*ebiten.Image, int) {
 
 	tileMinY := int32(0)
 	tileMaxY := int32(0)
