@@ -36,6 +36,8 @@ const (
 	GAMESCENESELECTROLE int           = 2 //选择场景
 	GAMESCENEOPENDOOR   int           = 3 //开门场景
 	GAMESCENESTART      int           = 4 //游戏场景
+	BgmMusic            uint8         = 0 //音乐类型 背景音乐
+	SceneMusic          uint8         = 1 //音乐类型 背景音乐
 )
 
 //Calculate Direction

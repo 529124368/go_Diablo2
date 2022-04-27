@@ -2,6 +2,7 @@ package engine
 
 import (
 	"fmt"
+	"game/tools"
 	"runtime"
 	"strconv"
 	"sync"
@@ -52,7 +53,7 @@ func (g *Game) ChangeScenceOpenDoorUpdate() {
 		go func() {
 			//close music
 			g.status.MusicIsPlay = false
-			g.music.CloseMusic()
+			g.music.CloseMusic(tools.BgmMusic)
 			g.ChangeScene("game")
 			w.Done()
 		}()

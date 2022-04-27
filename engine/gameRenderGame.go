@@ -60,8 +60,14 @@ func (g *Game) changeScenceGameUpdate() {
 	if !g.status.MusicIsPlay {
 		//音乐
 		g.status.MusicIsPlay = true
-		g.music.PlayMusic("Bar_act2_complete_tombs.wav", tools.MUSICWAV)
+		g.music.PlayMusic("Bar_act2_complete_tombs.wav", tools.MUSICWAV, tools.SceneMusic)
 	}
+	//背景音乐是否还在播放
+	// if !g.music.IsPlayingMusic(tools.BgmMusic) {
+	// 	go func() {
+	// 		g.music.PlayMusic("town1.wav", tools.MUSICWAV, tools.BgmMusic)
+	// 	}()
+	// }
 	if g.player.State != tools.ATTACK && g.player.State != tools.SkILL {
 		g.player.State = tools.IDLE
 	}
@@ -94,6 +100,10 @@ func (g *Game) changeScenceGameUpdate() {
 					g.status.IsDropDeal = true
 					//播放掉落物品动画
 					g.status.IsPlayDropAnmi = true
+					//音乐
+					if !g.music.IsPlayingMusic(tools.SceneMusic) {
+						g.music.PlayMusic("diaoluo.mp3", tools.MUSICMP3, tools.SceneMusic)
+					}
 					//丢弃物品
 					dropItemName = g.ui.ClearTempBag()
 				}
@@ -122,6 +132,10 @@ func (g *Game) changeScenceGameUpdate() {
 	}
 	//技能
 	if ebiten.IsKeyPressed(ebiten.KeyF1) && !g.status.IsTakeItem {
+		//音乐
+		if !g.music.IsPlayingMusic(tools.SceneMusic) {
+			g.music.PlayMusic("File00002184.wav", tools.MUSICWAV, tools.SceneMusic)
+		}
 		//g.player.SkillName = "狂风"
 		if g.player.State != tools.SkILL {
 			counts = 0

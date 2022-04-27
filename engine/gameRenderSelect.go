@@ -2,7 +2,6 @@ package engine
 
 import (
 	"fmt"
-	"game/tools"
 	"image/color"
 	"strconv"
 
@@ -21,11 +20,6 @@ func (g *Game) ChangeScenceSelectUpdate() {
 			//按钮内注册了切换场景
 			f(g.ui.Compents[1])
 		}
-	}
-	//音乐播放控制
-	if !g.status.MusicIsPlay {
-		g.status.MusicIsPlay = true
-		g.music.PlayMusic("Act0-Intro.mp3", tools.MUSICMP3)
 	}
 	//轮图控制
 	g.count++
