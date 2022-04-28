@@ -2,7 +2,6 @@ package engine
 
 import (
 	"fmt"
-	"game/tools"
 	"runtime"
 	"strconv"
 	"sync"
@@ -10,6 +9,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
+
+var clearFlg = false
 
 //Draw OpenDoor Scence
 func (g *Game) ChangeScenceOpenDoorDraw(screen *ebiten.Image) {
@@ -29,11 +30,15 @@ func (g *Game) ChangeScenceOpenDoorDraw(screen *ebiten.Image) {
 
 //Draw OpenDoor Update
 func (g *Game) ChangeScenceOpenDoorUpdate() {
-	go func() {
-		g.ui.ClearSlice(0)
-		g.ui.ClearGlobalVariable()
-		runtime.GC()
-	}()
+	if !clearFlg {
+		clearFlg = true
+		go func() {
+			g.ui.ClearSlice(0)
+			g.ui.ClearGlobalVariable()
+			g.music.CloseBGMusic()
+			runtime.GC()
+		}()
+	}
 	if !g.status.DoorCountFlg {
 		counts = 0
 		g.status.DoorCountFlg = true
@@ -53,8 +58,8 @@ func (g *Game) ChangeScenceOpenDoorUpdate() {
 		go func() {
 			//close music
 			g.status.MusicIsPlay = false
-			g.music.CloseMusic(tools.BgmMusic)
 			g.ChangeScene("game")
+			runtime.GC()
 			w.Done()
 		}()
 		w.Wait()

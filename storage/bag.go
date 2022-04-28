@@ -26,7 +26,7 @@ func New() *Bag {
 	return n
 }
 
-//插入DB
+//插入Bag Storage 数据
 func (b *Bag) InsertBag(name string) bool {
 	w, h := tools.GetItemsCellSize(name)
 	//是否1*1 size的时候
@@ -42,7 +42,7 @@ func (b *Bag) InsertBag(name string) bool {
 		}
 		return false
 	} else {
-		//
+		//1*1 size 之外的情况
 		sum_err := 0
 		for i := 0; i < 4; i++ {
 			for j := 0; j < 10; j++ {

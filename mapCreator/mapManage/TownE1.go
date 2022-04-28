@@ -88,7 +88,7 @@ func (t *TownE1) LoadAnm() {
 //加载动画坐标
 func (t *TownE1) LoadXyList() {
 	syList := [17]string{
-		"22,24", "23,21", "22,16", "21,12", "24,10", "27,15", "33,12", "34,8", "38,10", "41,10", "43,8", "41,13", "46,15", "48,19", "44,24", "35,10", "31,16",
+		"22,24", "23,21", "22,16", "21,12", "24,10", "27,15", "33,12", "34,8", "38,10", "41,10", "43,8", "41,13", "46,17", "46,14", "44,24", "35,10", "31,16",
 	}
 	for i, k := range syList {
 		re := strings.Split(k, ",")
@@ -212,27 +212,18 @@ func (t *TownE1) GetCellXY(x, y int) (float64, float64, error) {
 }
 
 //播放丢物品动画
-func (t *TownE1) PlayDropItemAnm(screen *ebiten.Image, x, y float64, name string) {
-	go func() {
-		countForMap := 0
-		countsForMap := 0
-		op := &ebiten.DrawImageOptions{}
-		op.Filter = ebiten.FilterLinear
-		op.GeoM.Translate(float64(tools.LAYOUTX/2-220), float64(tools.LAYOUTY/2)-50)
-		for {
-			countForMap++
-			screen.DrawImage(t.dropAnm[countsForMap], op)
-			//切换图
-			if countForMap > 4000 {
-				countsForMap++
-				countForMap = 0
-				if countsForMap >= 16 {
-					t.InsertOnLoadItesm(name, x, y)
-					return
-				}
-			}
-		}
-	}()
+func (t *TownE1) PlayDropItemAnm(screen *ebiten.Image, x, y float64, name string, countsFor17 int) bool {
+	op := &ebiten.DrawImageOptions{}
+	op.Filter = ebiten.FilterLinear
+	op.GeoM.Translate(float64(tools.LAYOUTX/2-220), float64(tools.LAYOUTY/2)-50)
+	screen.DrawImage(t.dropAnm[countsFor17], op)
+	//判断是否掉落动画最后一帧
+	if countsFor17 == 16 {
+		t.InsertOnLoadItesm(name, x, y)
+		return true
+	} else {
+		return false
+	}
 }
 
 //记录掉落在地面的物品信息
@@ -291,11 +282,6 @@ func (t *TownE1) LoadMap() {
 	dd, _ := t.image.ReadFile(tools.ObjectPath + "/mapSucai/townE1.ds1")
 	d, _ := ds1.Unmarshal(dd)
 
-	//加载素材信息提取
-	// for i := 0; i < len(d.Files); i++ {
-	// 	fmt.Println(strings.ReplaceAll(d.Files[i], "tg1", "dt1"))
-	// }
-
 	w, h := d.Floors[0].Size()
 	//保存地图大小
 	t.Status.ReadMapSizeWidth = w
@@ -309,7 +295,6 @@ func (t *TownE1) LoadMap() {
 			if !ds1Tile.Hidden() && ds1Tile.Prop1 != 0 {
 				ds := maps.GetTiles(int(ds1Tile.Style), int(ds1Tile.Sequence), 0, ss.Tiles)
 				if ds != nil {
-					// fmt.Println(ds[ds1Tile.RandomIndex].SubTileFlags[0])
 					t.Img[i][j] = maps.GetTitleImage(ds[ds1Tile.RandomIndex], ww)
 				}
 			}

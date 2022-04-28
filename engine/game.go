@@ -40,6 +40,7 @@ var (
 	counts      int = 0
 	countsFor20 int = 0
 	countsFor12 int = 0
+	countsFor17 int = 0
 	frameNums   int = 4
 	frameSpeed  int = 5
 	mouseX      int
@@ -136,12 +137,10 @@ func (g *Game) Update() error {
 	if inpututil.IsKeyJustPressed(ebiten.KeyD) {
 		g.status.DisPlayDebugInfo = !g.status.DisPlayDebugInfo
 	}
-
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-
 	//判断是否切换场景
 	if !g.status.ChangeScenceFlg {
 		switch g.status.CurrentGameScence {

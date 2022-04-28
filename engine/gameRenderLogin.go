@@ -24,7 +24,7 @@ func (g *Game) ChangeScenceLoginUpdate() {
 	//音乐控制
 	if !g.status.MusicIsPlay {
 		g.status.MusicIsPlay = true
-		g.music.PlayMusic("Act0-Intro.mp3", tools.MUSICMP3, tools.BgmMusic)
+		g.music.PlayBGMusic("Act0-Intro.mp3", tools.MUSICMP3)
 	}
 	g.count++
 	//Change Frame

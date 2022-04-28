@@ -60,12 +60,12 @@ func (g *Game) changeScenceGameUpdate() {
 	if !g.status.MusicIsPlay {
 		//音乐
 		g.status.MusicIsPlay = true
-		g.music.PlayMusic("Bar_act2_complete_tombs.wav", tools.MUSICWAV, tools.SceneMusic)
+		g.music.PlayMusic("Bar_act2_complete_tombs.wav", tools.MUSICWAV)
 	}
 	//背景音乐是否还在播放
-	// if !g.music.IsPlayingMusic(tools.BgmMusic) {
+	// if !g.music.IsPlayingBGMusic() {
 	// 	go func() {
-	// 		g.music.PlayMusic("town1.wav", tools.MUSICWAV, tools.BgmMusic)
+	// 		g.music.PlayBGMusic("town1.wav", tools.MUSICWAV)
 	// 	}()
 	// }
 	if g.player.State != tools.ATTACK && g.player.State != tools.SkILL {
@@ -101,9 +101,7 @@ func (g *Game) changeScenceGameUpdate() {
 					//播放掉落物品动画
 					g.status.IsPlayDropAnmi = true
 					//音乐
-					if !g.music.IsPlayingMusic(tools.SceneMusic) {
-						g.music.PlayMusic("diaoluo.mp3", tools.MUSICMP3, tools.SceneMusic)
-					}
+					g.music.PlayMusic("diaoluo.mp3", tools.MUSICMP3)
 					//丢弃物品
 					dropItemName = g.ui.ClearTempBag()
 				}
@@ -133,9 +131,7 @@ func (g *Game) changeScenceGameUpdate() {
 	//技能
 	if ebiten.IsKeyPressed(ebiten.KeyF1) && !g.status.IsTakeItem {
 		//音乐
-		if !g.music.IsPlayingMusic(tools.SceneMusic) {
-			g.music.PlayMusic("File00002184.wav", tools.MUSICWAV, tools.SceneMusic)
-		}
+		g.music.PlayMusic("File00002184.wav", tools.MUSICWAV)
 		//g.player.SkillName = "狂风"
 		if g.player.State != tools.SkILL {
 			counts = 0
@@ -207,8 +203,10 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	g.ui.DrawUI(screen)
 	//Draw Drop items Anm
 	if g.status.IsPlayDropAnmi {
-		g.status.IsPlayDropAnmi = false
-		g.mapManage.PlayDropItemAnm(screen, g.player.X, g.player.Y, dropItemName)
+		if g.mapManage.PlayDropItemAnm(screen, g.player.X, g.player.Y, dropItemName, countsFor17) {
+			countsFor17 = 0
+			g.status.IsPlayDropAnmi = false
+		}
 	}
 	//Draw Debug
 	if g.status.DisPlayDebugInfo {
@@ -227,9 +225,13 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	}
 
 	//Change map Frame
-	if g.countForMap > 5 {
+	if g.countForMap > 4 {
 		countsFor20++
 		countsFor12++
+		//播放掉落动画
+		if g.status.IsPlayDropAnmi {
+			countsFor17++
+		}
 		g.countForMap = 0
 		if countsFor20 >= 20 {
 			countsFor20 = 0
@@ -237,5 +239,6 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 		if countsFor12 >= 12 {
 			countsFor12 = 0
 		}
+
 	}
 }

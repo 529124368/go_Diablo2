@@ -67,7 +67,6 @@ func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m i
 
 //Load Images
 func (p *Player) LoadImages() {
-
 	//加载玩家素材第一部分
 	plist, _ := p.image.ReadFile("resource/man/warrior/ba2.png")
 	plist_json, _ := p.image.ReadFile("resource/man/warrior/ba2.json")
