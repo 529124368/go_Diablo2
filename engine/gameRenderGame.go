@@ -188,13 +188,13 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 		//Draw Wall
 		g.mapManage.RenderWall(screen, g.status.MoveOffsetX, g.status.MoveOffsetY)
 		//Draw map Anmi
-		g.mapManage.Render(screen, countsFor20, countsFor12, g.status.MoveOffsetX, g.status.MoveOffsetY)
+		g.mapManage.Render(screen, countsFor20, countsFor8, g.status.MoveOffsetX, g.status.MoveOffsetY)
 
 	} else {
 		//Draw Wall
 		g.mapManage.RenderWall(screen, g.status.MoveOffsetX, g.status.MoveOffsetY)
 		//Draw map Anmi
-		g.mapManage.Render(screen, countsFor20, countsFor12, g.status.MoveOffsetX, g.status.MoveOffsetY)
+		g.mapManage.Render(screen, countsFor20, countsFor8, g.status.MoveOffsetX, g.status.MoveOffsetY)
 		//Draw player
 		g.player.Render(screen, counts)
 
@@ -227,7 +227,7 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	//Change map Frame
 	if g.countForMap > 4 {
 		countsFor20++
-		countsFor12++
+		countsFor8++
 		//播放掉落动画
 		if g.status.IsPlayDropAnmi {
 			countsFor17++
@@ -236,8 +236,8 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 		if countsFor20 >= 20 {
 			countsFor20 = 0
 		}
-		if countsFor12 >= 12 {
-			countsFor12 = 0
+		if countsFor8 >= 8 {
+			countsFor8 = 0
 		}
 
 	}

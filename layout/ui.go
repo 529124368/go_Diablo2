@@ -314,9 +314,9 @@ func (u *UI) DelItemFromBag(imageX, imageY int) {
 			//根据具体的图片坐标删除 支持唯一性
 			if v.imagex == float64(imageX) && v.imagey == float64(imageY) {
 				if k != len(u.ItemsCompents)-1 {
-					u.ItemsCompents = append(u.ItemsCompents[0:k], u.ItemsCompents[k+1:]...)
+					u.ItemsCompents = append(u.ItemsCompents[:k], u.ItemsCompents[k+1:]...)
 				} else {
-					u.ItemsCompents = u.ItemsCompents[0:k]
+					u.ItemsCompents = u.ItemsCompents[:k]
 				}
 			}
 		}
@@ -326,9 +326,9 @@ func (u *UI) DelItemFromBag(imageX, imageY int) {
 			//根据具体的图片坐标删除 支持唯一性
 			if v.imagex == float64(imageX) && v.imagey == float64(imageY) {
 				if k != len(u.ItemsCompents)-1 {
-					u.ItemsCompents = append(u.ItemsCompents[0:k], u.ItemsCompents[k+1:]...)
+					u.ItemsCompents = append(u.ItemsCompents[:k], u.ItemsCompents[k+1:]...)
 				} else {
-					u.ItemsCompents = u.ItemsCompents[0:k]
+					u.ItemsCompents = u.ItemsCompents[:k]
 				}
 				u.bag.BagLayout[4][key] = ""
 				return

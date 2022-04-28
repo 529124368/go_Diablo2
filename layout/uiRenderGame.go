@@ -328,8 +328,8 @@ func (u *UI) LoadGameImages() {
 							//修改玩家中心位置
 							u.status.PLAYERCENTERX -= 200
 							//修改人物影子偏移
-							u.status.ShadowOffsetX = u.status.ShadowOffsetX + 14
-							u.status.ShadowOffsetY = u.status.ShadowOffsetY - 79
+							u.status.ShadowOffsetX = u.status.ShadowOffsetX + 24
+							u.status.ShadowOffsetY = u.status.ShadowOffsetY - 84
 							for _, v := range u.MiniPanelCompents {
 								v.SetPosition(-100, 0)
 								if v.clickMaxX != 0 {
