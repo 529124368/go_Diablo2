@@ -27,7 +27,13 @@ var (
 	mouseIcon     *ebiten.Image
 	mouseIconCopy ebiten.Image
 	opMouse       *ebiten.DrawImageOptions
-	mouseRoate    float64 = -0.5
+	mouseRoate    float64                  = -0.5
+	HPImage       *ebiten.Image            = nil //血条备份
+	HPop          *ebiten.DrawImageOptions       //血条备份
+	DeletedHPSum  int                      = 0
+	MPImage       *ebiten.Image            = nil //蓝条备份
+	MPop          *ebiten.DrawImageOptions       //蓝条备份
+	DeletedMPSum  int                      = 0
 )
 
 //UI类
@@ -62,6 +68,28 @@ func NewUI(images *embed.FS, s *status.StatusManage, f *fonts.FontBase, m interf
 	ss, _ := ui.image.ReadFile("resource/UI/mouse.png")
 	mouseIcon = tools.GetEbitenImage(ss)
 	return ui
+}
+
+//减血
+func (u *UI) DeleHP(num int) {
+	//u.Compents[1] hard code
+	if DeletedHPSum < 95 {
+		DeletedHPSum += num
+		HPImage = u.Compents[1].images.SubImage(image.Rectangle{image.Point{0, DeletedHPSum}, image.Point{80, 80}}).(*ebiten.Image)
+		HPop = new(ebiten.DrawImageOptions)
+		HPop.GeoM.Translate(28, float64(387+DeletedHPSum))
+	}
+}
+
+//减蓝
+func (u *UI) DeleMP(num int) {
+	//u.Compents[1] hard code
+	if DeletedMPSum < 95 {
+		DeletedMPSum += num
+		MPImage = u.Compents[9].images.SubImage(image.Rectangle{image.Point{0, DeletedMPSum}, image.Point{80, 80}}).(*ebiten.Image)
+		MPop = new(ebiten.DrawImageOptions)
+		MPop.GeoM.Translate(684, float64(387+DeletedMPSum))
+	}
 }
 
 //图集获取图片
@@ -143,15 +171,25 @@ func (u *UI) ClearSlice(cap int) {
 //渲染UI
 func (u *UI) DrawUI(screen *ebiten.Image) {
 	//渲染UI
-	for _, v := range u.Compents {
+	for k, v := range u.Compents {
 		if v.layer == 0 && v.isDisplay {
-			screen.DrawImage(v.images, v.op)
+			if k == 1 && HPImage != nil {
+				screen.DrawImage(HPImage, HPop)
+			} else {
+				screen.DrawImage(v.images, v.op)
+			}
 		}
 	}
+
 	//渲染层级为1的UI
-	for _, v := range u.Compents {
+	for k, v := range u.Compents {
 		if v.layer == 1 && v.isDisplay {
-			screen.DrawImage(v.images, v.op)
+			if k == 9 && MPImage != nil {
+				screen.DrawImage(MPImage, MPop)
+			} else {
+				screen.DrawImage(v.images, v.op)
+			}
+
 		}
 	}
 	//当包裹打开的时候，渲染包裹内物品和装备 TODO

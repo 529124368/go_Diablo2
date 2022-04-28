@@ -78,6 +78,8 @@ func (u *UI) LoadGameImages() {
 		if !isClick {
 			isClick = true
 			go func() {
+				//减血
+				u.DeleHP(10)
 				on := *i.(*Sprite).images
 				s, _ = u.image.ReadFile("resource/UI/skill_btn_down.png")
 				mgUI = tools.GetEbitenImage(s)
@@ -93,6 +95,8 @@ func (u *UI) LoadGameImages() {
 		if !isClick {
 			isClick = true
 			go func() {
+				//减蓝
+				u.DeleMP(10)
 				on := *i.(*Sprite).images
 				s, _ = u.image.ReadFile("resource/UI/skill_btn_down.png")
 				mgUI = tools.GetEbitenImage(s)

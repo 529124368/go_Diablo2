@@ -39,8 +39,6 @@ type Player struct {
 	image        *embed.FS               //静态资源获取
 	map_c        interfaces.MapInterface //地图
 	status       *status.StatusManage    //状态
-	hp           float64                 //血
-	mp           float64                 //蓝
 }
 
 //创建玩家
@@ -59,8 +57,6 @@ func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m i
 		image:        images,
 		map_c:        m,
 		status:       s,
-		hp:           100,
-		mp:           100,
 	}
 	return play
 }

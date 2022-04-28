@@ -125,7 +125,6 @@ func (g *Game) changeScenceGameUpdate() {
 		g.status.Flg = false
 		if g.player.Direction != dir || g.player.State != tools.ATTACK {
 			g.player.SetPlayerState(tools.ATTACK, dir)
-
 		}
 	}
 	//技能
