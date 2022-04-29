@@ -13,8 +13,8 @@ import (
 //Draw Login Update
 func (g *Game) ChangeScenceLoginUpdate() {
 	//切换场景判定
-	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-		if mouseX > 286 && mouseX < 503 && mouseY > 150 && mouseY < 218 {
+	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) || g.IsTouch() {
+		if mouseX > 286 && mouseX < 503 && mouseY > 150 && mouseY < 218 || g.Touch(286, 150, 503, 218) {
 			g.status.ChangeScenceFlg = true
 			//切换场景
 			g.ChangeScene("select")

@@ -13,8 +13,8 @@ import (
 //Draw Select Update
 func (g *Game) ChangeScenceSelectUpdate() {
 	//鼠标点击监听
-	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-		if mouseX > 622 && mouseX < 702 && mouseY > 428 && mouseY < 456 {
+	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) || g.IsTouch() {
+		if mouseX > 622 && mouseX < 702 && mouseY > 428 && mouseY < 456 || g.Touch(622, 428, 702, 456) {
 			//获取按钮的回调函数
 			f := g.ui.Compents[1].CallFunc()
 			//按钮内注册了切换场景
