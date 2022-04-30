@@ -2,6 +2,7 @@ package engine
 
 import (
 	"fmt"
+	"game/tools"
 	"image/color"
 	"strconv"
 
@@ -44,7 +45,7 @@ func (g *Game) ChangeScenceSelectDraw(screen *ebiten.Image) {
 	g.ui.DrawUI(screen)
 	//Draw Fire 场景火堆
 	name := "fire_" + strconv.Itoa(counts)
-	fire, _, _ := g.ui.GetAnimator("logo", name)
+	fire, _, _ := g.ui.GetAnimator(tools.PlistN, name)
 	opf := &ebiten.DrawImageOptions{}
 	opf.Filter = ebiten.FilterLinear
 	opf.GeoM.Translate(350, 375)
@@ -54,7 +55,7 @@ func (g *Game) ChangeScenceSelectDraw(screen *ebiten.Image) {
 
 	//Draw Role 野蛮人战士
 	name = "ba_" + strconv.Itoa(counts)
-	ba, _, _ := g.ui.GetAnimator("R", name)
+	ba, _, _ := g.ui.GetAnimator(tools.PlistR, name)
 	opBa := &ebiten.DrawImageOptions{}
 	opBa.Filter = ebiten.FilterLinear
 	opBa.GeoM.Translate(356, 120)

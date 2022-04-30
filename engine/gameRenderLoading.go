@@ -2,6 +2,7 @@ package engine
 
 import (
 	"fmt"
+	"game/tools"
 	"runtime"
 	"strconv"
 	"sync"
@@ -20,7 +21,7 @@ func (g *Game) ChangeScenceOpenDoorDraw(screen *ebiten.Image) {
 	}
 	//Draw Open Door
 	name := "loading_" + strconv.Itoa(counts)
-	door, _, _ := g.ui.GetAnimator("logo", name)
+	door, _, _ := g.ui.GetAnimator(tools.PlistN, name)
 	op := &ebiten.DrawImageOptions{}
 	op.Filter = ebiten.FilterLinear
 	op.GeoM.Translate(268, 120)

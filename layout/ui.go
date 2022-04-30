@@ -2,6 +2,7 @@ package layout
 
 import (
 	"embed"
+	"errors"
 	"fmt"
 	"game/fonts"
 	"game/interfaces"
@@ -29,10 +30,9 @@ var (
 	mouseRoate                 float64                  = -0.5
 	HPImage                    *ebiten.Image            = nil //血条备份
 	HPop                       *ebiten.DrawImageOptions       //血条备份
-	DeletedHPSum               int                      = 0
+	DeletedHPSum, DeletedMPSum int                      = 0, 0
 	MPImage                    *ebiten.Image            = nil //蓝条备份
 	MPop                       *ebiten.DrawImageOptions       //蓝条备份
-	DeletedMPSum               int                      = 0
 )
 
 //UI类
@@ -79,12 +79,22 @@ func (u *UI) GCSelectBGImage() {
 	selectSenceBg = nil
 }
 
+//获取plist的图片大小信息
+func (u *UI) GetImagesSize(types uint8, name string) (int, int, error) {
+	if types == tools.PlistR {
+		return plist_R_sheet.Sprites[name+".png"].SourceSize.X, plist_R_sheet.Sprites[name+".png"].SourceSize.Y, nil
+	} else if types == tools.PlistN {
+		return plist_sheet.Sprites[name+".png"].SourceSize.X, plist_sheet.Sprites[name+".png"].SourceSize.Y, nil
+	}
+	return 0, 0, errors.New("has error")
+}
+
 //减血
 func (u *UI) DeleHP(num int) {
 	//u.Compents[1] hard code
 	if DeletedHPSum < 95 {
 		DeletedHPSum += num
-		img, _, _ := u.GetAnimator("UI", u.Compents[1].imagesName)
+		img, _, _ := u.GetAnimator(tools.PlistN, u.Compents[1].imagesName)
 		HPImage = img.SubImage(image.Rectangle{image.Point{176, 1033 + DeletedHPSum}, image.Point{256, 1113}}).(*ebiten.Image)
 		HPop = new(ebiten.DrawImageOptions)
 		HPop.GeoM.Translate(28, float64(387+DeletedHPSum))
@@ -96,7 +106,7 @@ func (u *UI) DeleMP(num int) {
 	//u.Compents[1] hard code
 	if DeletedMPSum < 95 {
 		DeletedMPSum += num
-		img, _, _ := u.GetAnimator("UI", u.Compents[9].imagesName)
+		img, _, _ := u.GetAnimator(tools.PlistN, u.Compents[9].imagesName)
 		MPImage = img.SubImage(image.Rectangle{image.Point{165, 1115 + DeletedMPSum}, image.Point{245, 1195}}).(*ebiten.Image)
 		MPop = new(ebiten.DrawImageOptions)
 		MPop.GeoM.Translate(684, float64(387+DeletedMPSum))
@@ -104,17 +114,18 @@ func (u *UI) DeleMP(num int) {
 }
 
 //图集获取图片
-func (u *UI) GetAnimator(flg, name string) (*ebiten.Image, int, int) {
+func (u *UI) GetAnimator(flg uint8, name string) (*ebiten.Image, int, int) {
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println(r)
 		}
 	}()
-	if flg == "R" {
+	if flg == tools.PlistR {
 		return plist_R_png.SubImage(plist_R_sheet.Sprites[name+".png"].Frame).(*ebiten.Image), plist_R_sheet.Sprites[name+".png"].SpriteSourceSize.Min.X, plist_R_sheet.Sprites[name+".png"].SpriteSourceSize.Min.Y
-	} else {
+	} else if flg == tools.PlistN {
 		return plist_png.SubImage(plist_sheet.Sprites[name+".png"].Frame).(*ebiten.Image), plist_sheet.Sprites[name+".png"].SpriteSourceSize.Min.X, plist_sheet.Sprites[name+".png"].SpriteSourceSize.Min.Y
 	}
+	return nil, 0, 0
 }
 
 //组件注册
@@ -186,7 +197,7 @@ func (u *UI) DrawUI(screen *ebiten.Image) {
 			if k == 1 && HPImage != nil {
 				screen.DrawImage(HPImage, HPop)
 			} else {
-				img, _, _ := u.GetAnimator("UI", v.imagesName)
+				img, _, _ := u.GetAnimator(tools.PlistN, v.imagesName)
 				screen.DrawImage(img, v.op)
 			}
 		}
@@ -198,7 +209,7 @@ func (u *UI) DrawUI(screen *ebiten.Image) {
 			if k == 9 && MPImage != nil {
 				screen.DrawImage(MPImage, MPop)
 			} else {
-				img, _, _ := u.GetAnimator("UI", v.imagesName)
+				img, _, _ := u.GetAnimator(tools.PlistN, v.imagesName)
 				screen.DrawImage(img, v.op)
 			}
 
@@ -212,7 +223,7 @@ func (u *UI) DrawUI(screen *ebiten.Image) {
 				screen.DrawImage(v.imageBg, v.opBg)
 			}
 			//再渲染物品
-			img, _, _ := u.GetAnimator("R", v.imagesName)
+			img, _, _ := u.GetAnimator(tools.PlistR, v.imagesName)
 			screen.DrawImage(img, v.op)
 		}
 		if !u.status.IsTakeItem {
@@ -444,7 +455,7 @@ func (u *UI) ItemsEvent() func(i interfaces.SpriteInterface, x, y int) {
 					//将拿起的物品放入临时区
 					u.tempBag[0] = s
 					mouseIconCopy = *mouseIcon
-					img, _, _ := u.GetAnimator("R", s.imagesName)
+					img, _, _ := u.GetAnimator(tools.PlistR, s.imagesName)
 					mouseIcon = img
 					mouseRoate = 0
 					//拿起物品，从包裹中删除物品

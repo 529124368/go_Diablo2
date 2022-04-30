@@ -29,44 +29,55 @@ func (u *UI) LoadGameImages() {
 	//
 	var len float64 = 0
 	name := "0000"
-	u.AddComponent(QuickCreate(len, 480-float64(plist_sheet.Sprites[name+".png"].SourceSize.Y), name, plist_sheet, 0, nil), tools.ISNORCOM)
+	_, Y, _ := u.GetImagesSize(tools.PlistN, name)
+	u.AddComponent(QuickCreate(len, 480-float64(Y), name, plist_sheet, 0, nil), tools.ISNORCOM)
 
 	name = "HP"
-	u.AddComponent(QuickCreate(28, 480-float64(plist_sheet.Sprites[name+".png"].SourceSize.Y+13), name, plist_sheet, 0, nil), tools.ISNORCOM)
+	_, Y, _ = u.GetImagesSize(tools.PlistN, name)
+	u.AddComponent(QuickCreate(28, 480-float64(Y+13), name, plist_sheet, 0, nil), tools.ISNORCOM)
 
 	len += 115
 
 	name = "chisha"
-	u.AddComponent(QuickCreate(len, 480-float64(plist_sheet.Sprites[name+".png"].SourceSize.Y), name, plist_sheet, 0, nil), tools.ISNORCOM)
+	X, Y, _ := u.GetImagesSize(tools.PlistN, name)
+	u.AddComponent(QuickCreate(len, 480-float64(Y), name, plist_sheet, 0, nil), tools.ISNORCOM)
 
-	len += float64(plist_sheet.Sprites[name+".png"].SourceSize.X)
+	len += float64(X)
 
 	name = "0001"
-	u.AddComponent(QuickCreate(len, 480-float64(plist_sheet.Sprites[name+".png"].SourceSize.Y), name, plist_sheet, 0, nil), tools.ISNORCOM)
+	X, Y, _ = u.GetImagesSize(tools.PlistN, name)
+	u.AddComponent(QuickCreate(len, 480-float64(Y), name, plist_sheet, 0, nil), tools.ISNORCOM)
 
-	len += float64(plist_sheet.Sprites[name+".png"].SourceSize.X)
+	len += float64(X)
 
 	name = "0002"
-	u.AddComponent(QuickCreate(len, 480-float64(plist_sheet.Sprites[name+".png"].SourceSize.Y), name, plist_sheet, 0, nil), tools.ISNORCOM)
+	X, Y, _ = u.GetImagesSize(tools.PlistN, name)
+	u.AddComponent(QuickCreate(len, 480-float64(Y), name, plist_sheet, 0, nil), tools.ISNORCOM)
 
-	len += float64(plist_sheet.Sprites[name+".png"].SourceSize.X)
+	len += float64(X)
 
 	name = "0003"
-	u.AddComponent(QuickCreate(len, 480-float64(plist_sheet.Sprites[name+".png"].SourceSize.Y), name, plist_sheet, 0, nil), tools.ISNORCOM)
+	X, Y, _ = u.GetImagesSize(tools.PlistN, name)
+	u.AddComponent(QuickCreate(len, 480-float64(Y), name, plist_sheet, 0, nil), tools.ISNORCOM)
 
-	len += float64(plist_sheet.Sprites[name+".png"].SourceSize.X)
+	len += float64(X)
 
 	name = "0004"
-	u.AddComponent(QuickCreate(len, 480-float64(plist_sheet.Sprites[name+".png"].SourceSize.Y), name, plist_sheet, 0, nil), tools.ISNORCOM)
-	len += float64(plist_sheet.Sprites[name+".png"].SourceSize.X)
+	X, Y, _ = u.GetImagesSize(tools.PlistN, name)
+	u.AddComponent(QuickCreate(len, 480-float64(Y), name, plist_sheet, 0, nil), tools.ISNORCOM)
+	len += float64(X)
+
 	name = "liehuo"
-	u.AddComponent(QuickCreate(629, 480-float64(plist_sheet.Sprites[name+".png"].SourceSize.Y), name, plist_sheet, 0, nil), tools.ISNORCOM)
+	_, Y, _ = u.GetImagesSize(tools.PlistN, name)
+	u.AddComponent(QuickCreate(629, 480-float64(Y), name, plist_sheet, 0, nil), tools.ISNORCOM)
 
 	name = "0005"
-	u.AddComponent(QuickCreate(len, 480-float64(plist_sheet.Sprites[name+".png"].SourceSize.Y), name, plist_sheet, 0, nil), tools.ISNORCOM)
+	_, Y, _ = u.GetImagesSize(tools.PlistN, name)
+	u.AddComponent(QuickCreate(len, 480-float64(Y), name, plist_sheet, 0, nil), tools.ISNORCOM)
 
 	name = "MP"
-	u.AddComponent(QuickCreate(684, 480-float64(plist_sheet.Sprites[name+".png"].SourceSize.Y+13), name, plist_sheet, 1, nil), tools.ISNORCOM)
+	_, Y, _ = u.GetImagesSize(tools.PlistN, name)
+	u.AddComponent(QuickCreate(684, 480-float64(Y+13), name, plist_sheet, 1, nil), tools.ISNORCOM)
 
 	name = "skill_btn"
 	u.AddComponent(QuickCreate(204, 441, name, plist_sheet, 0, func(i interfaces.SpriteInterface) {
@@ -125,18 +136,20 @@ func (u *UI) LoadGameImages() {
 
 	//描画装备栏和包裹UI
 	name = "eq_0"
+	X, _, _ = u.GetImagesSize(tools.PlistN, name)
 	u.AddComponent(QuickCreate(395, 0, name, plist_sheet, 0, nil), tools.ISHIDDEN)
 
-	len += float64(plist_sheet.Sprites[name+".png"].SourceSize.X)
+	len += float64(X)
 
 	name = "eq_1"
 	u.AddComponent(QuickCreate(395+256, 0, name, plist_sheet, 0, nil), tools.ISHIDDEN)
 
 	len = 395
 	name = "bag_0"
+	X, _, _ = u.GetImagesSize(tools.PlistN, name)
 	u.AddComponent(QuickCreate(395, 176, name, plist_sheet, 0, nil), tools.ISHIDDEN)
 
-	len += float64(plist_sheet.Sprites[name+".png"].SourceSize.X)
+	len += float64(X)
 	name = "bag_1"
 	u.AddComponent(QuickCreate(395+256, 176, name, plist_sheet, 0, nil), tools.ISHIDDEN)
 
@@ -264,14 +277,16 @@ func (u *UI) LoadGameImages() {
 	}, true), tools.ISNORCOM)
 	//注册mini板
 	name = "miniPanel"
-	baseX := float64(tools.LAYOUTX/2 - plist_sheet.Sprites[name+".png"].SourceSize.X/2)
+	X, _, _ = u.GetImagesSize(tools.PlistN, name)
+	baseX := float64(tools.LAYOUTX/2 - X/2)
 	u.AddComponent(QuickCreate(baseX, 406, name, plist_sheet, 0, nil), tools.ISMINICOM)
 	baseX += 4
 	//
 	name = "mini_menu_man"
+	X, _, _ = u.GetImagesSize(tools.PlistN, name)
 	u.AddComponent(QuickCreate(baseX, 410, name, plist_sheet, 0, nil), tools.ISMINICOM)
 	//
-	baseX += float64(plist_sheet.Sprites[name+".png"].SourceSize.X) + 4
+	baseX += float64(X) + 4
 	name = "mini_menu_eq"
 	u.AddComponent(QuickCreate(baseX, 410, name, plist_sheet, 0, func(i interfaces.SpriteInterface) {
 		if !isClick {
@@ -310,19 +325,24 @@ func (u *UI) LoadGameImages() {
 			}()
 		}
 	}, true), tools.ISMINICOM)
-	baseX += float64(plist_sheet.Sprites[name+".png"].SourceSize.X) + 4
+	X, _, _ = u.GetImagesSize(tools.PlistN, name)
+	baseX += float64(X) + 4
 	name = "mini_menu_j"
+	X, _, _ = u.GetImagesSize(tools.PlistN, name)
 	u.AddComponent(QuickCreate(baseX, 410, name, plist_sheet, 0, nil), tools.ISMINICOM)
-	baseX += float64(plist_sheet.Sprites[name+".png"].SourceSize.X) + 4
+	baseX += float64(X) + 4
 	name = "mini_menu_m"
+	X, _, _ = u.GetImagesSize(tools.PlistN, name)
 	u.AddComponent(QuickCreate(baseX, 410, name, plist_sheet, 0, nil), tools.ISMINICOM)
-	baseX += float64(plist_sheet.Sprites[name+".png"].SourceSize.X) + 4
+	baseX += float64(X) + 4
 	name = "mini_menu_mess"
+	X, _, _ = u.GetImagesSize(tools.PlistN, name)
 	u.AddComponent(QuickCreate(baseX, 410, name, plist_sheet, 0, nil), tools.ISMINICOM)
-	baseX += float64(plist_sheet.Sprites[name+".png"].SourceSize.X) + 4
+	baseX += float64(X) + 4
 	name = "mini_menu_s"
+	X, _, _ = u.GetImagesSize(tools.PlistN, name)
 	u.AddComponent(QuickCreate(baseX, 410, name, plist_sheet, 0, nil), tools.ISMINICOM)
-	baseX += float64(plist_sheet.Sprites[name+".png"].SourceSize.X) + 4
+	baseX += float64(X) + 4
 	name = "mini_menu_st"
 	u.AddComponent(QuickCreate(baseX, 410, name, plist_sheet, 0, nil), tools.ISMINICOM)
 

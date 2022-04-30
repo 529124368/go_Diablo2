@@ -38,6 +38,8 @@ const (
 	GAMESCENESTART      int           = 4 //游戏场景
 	BgmMusic            uint8         = 0 //音乐类型 背景音乐
 	SceneMusic          uint8         = 1 //音乐类型 背景音乐
+	PlistN              uint8         = 1
+	PlistR              uint8         = 2
 )
 
 //Calculate Direction
