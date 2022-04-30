@@ -14,8 +14,12 @@ var clearFlg = false
 
 //Draw OpenDoor Scence
 func (g *Game) ChangeScenceOpenDoorDraw(screen *ebiten.Image) {
+	if !g.status.DoorCountFlg {
+		counts = 0
+		g.status.DoorCountFlg = true
+	}
 	//Draw Open Door
-	name := "loading_" + strconv.Itoa(counts) + ".png"
+	name := "loading_" + strconv.Itoa(counts)
 	door, _, _ := g.ui.GetAnimator("logo", name)
 	op := &ebiten.DrawImageOptions{}
 	op.Filter = ebiten.FilterLinear
@@ -25,7 +29,6 @@ func (g *Game) ChangeScenceOpenDoorDraw(screen *ebiten.Image) {
 	if g.status.DisPlayDebugInfo {
 		ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nmouse position %d,%d", int64(ebiten.CurrentFPS()), mouseX, mouseY))
 	}
-
 }
 
 //Draw OpenDoor Update
@@ -33,15 +36,11 @@ func (g *Game) ChangeScenceOpenDoorUpdate() {
 	if !clearFlg {
 		clearFlg = true
 		go func() {
+			g.ui.GCSelectBGImage()
 			g.ui.ClearSlice(0)
-			g.ui.ClearGlobalVariable()
 			g.music.CloseBGMusic()
 			runtime.GC()
 		}()
-	}
-	if !g.status.DoorCountFlg {
-		counts = 0
-		g.status.DoorCountFlg = true
 	}
 	g.count++
 	//Change Frame

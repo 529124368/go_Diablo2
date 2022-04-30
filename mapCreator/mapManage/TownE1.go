@@ -294,6 +294,7 @@ func (t *TownE1) LoadMap() {
 	//保存地图大小
 	t.Status.ReadMapSizeWidth = w
 	t.Status.ReadMapSizeHeight = h
+
 	//floor
 	t.Img = make([][]*ebiten.Image, h)
 	for i := 0; i < h; i++ {
@@ -396,6 +397,11 @@ func (t *TownE1) LoadMap() {
 
 		}
 	}
+	//GC
+	ss2 = nil
+	ss = nil
+	d = nil
+	ww = nil
 }
 
 //渲染地图的建筑
@@ -412,9 +418,9 @@ func (t *TownE1) RenderWall(screen *ebiten.Image, offsetX, offsetY float64) {
 			if j > 0 {
 				sumX += 80
 			}
-			s := t.Img3[i][j].Img
 			//视野剔除
 			if j > t.Status.MapTitleX-t.Status.MapZoom && j < t.Status.MapTitleX+t.Status.MapZoom && i > t.Status.MapTitleY-t.Status.MapZoom && i < t.Status.MapTitleY+t.Status.MapZoom {
+				s := t.Img3[i][j].Img
 				if s != nil {
 					op := &ebiten.DrawImageOptions{}
 					op.GeoM.Translate(3280+float64(i)*(-80)+float64(sumX)+offsetX, float64(startY)+float64(j)*40+offsetY+float64(t.Img3[i][j].H))
@@ -424,6 +430,7 @@ func (t *TownE1) RenderWall(screen *ebiten.Image, offsetX, offsetY float64) {
 			}
 		}
 	}
+	//父类
 	t.MapBase.RenderWall(screen, offsetX, offsetY)
 }
 

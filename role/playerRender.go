@@ -14,26 +14,26 @@ func (p *Player) Render(screen *ebiten.Image, counts int) {
 	//nameSkill := ""
 	switch p.State {
 	case tools.ATTACK:
-		name = strconv.Itoa(int(p.Direction)) + "_attack_" + strconv.Itoa(counts) + ".png"
+		name = strconv.Itoa(int(p.Direction)) + "_attack_" + strconv.Itoa(counts)
 	case tools.SkILL:
 		block = 2
 		if counts >= 14 {
 			counts = 0
 		}
-		name = strconv.Itoa(int(p.Direction)) + "_skill_" + strconv.Itoa(counts) + ".png"
+		name = strconv.Itoa(int(p.Direction)) + "_skill_" + strconv.Itoa(counts)
 	case tools.IDLE:
-		name = strconv.Itoa(int(p.Direction)) + "_stand_" + strconv.Itoa(counts) + ".png"
+		name = strconv.Itoa(int(p.Direction)) + "_stand_" + strconv.Itoa(counts)
 	case tools.Walk:
 		if counts >= 8 {
 			counts = 0
 		}
-		name = strconv.Itoa(int(p.Direction)) + "_run_" + strconv.Itoa(counts) + ".png"
+		name = strconv.Itoa(int(p.Direction)) + "_run_" + strconv.Itoa(counts)
 	case tools.RUN:
 		block = 2
 		if counts >= 8 {
 			counts = 0
 		}
-		name = strconv.Itoa(int(p.Direction)) + "_run2_" + strconv.Itoa(counts) + ".png"
+		name = strconv.Itoa(int(p.Direction)) + "_run2_" + strconv.Itoa(counts)
 	}
 
 	imagess, x, y := p.GetAnimator("man", name, uint8(block))

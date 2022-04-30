@@ -43,7 +43,7 @@ func (g *Game) ChangeScenceLoginDraw(screen *ebiten.Image) {
 	g.ui.DrawUI(screen)
 
 	//Draw Logo Left
-	name := "logoFireLeft_" + strconv.Itoa(counts) + ".png"
+	name := "logoFireLeft_" + strconv.Itoa(counts)
 	left, _, _ := g.ui.GetAnimator("logo", name)
 	opLo := &ebiten.DrawImageOptions{}
 	opLo.Filter = ebiten.FilterLinear
@@ -52,11 +52,11 @@ func (g *Game) ChangeScenceLoginDraw(screen *ebiten.Image) {
 	opLo.GeoM.Scale(1, 0.7)
 	screen.DrawImage(left, opLo)
 	//Draw Logo Right
-	name = "logoFireRight_" + strconv.Itoa(counts) + ".png"
+	name = "logoFireRight_" + strconv.Itoa(counts)
 	right, _, _ := g.ui.GetAnimator("logo", name)
 	opRo := &ebiten.DrawImageOptions{}
 	opRo.Filter = ebiten.FilterLinear
-	opRo.GeoM.Translate(float64(220+right.Bounds().Max.X), 0)
+	opRo.GeoM.Translate(float64(220+right.Bounds().Size().X), 0)
 	opRo.CompositeMode = ebiten.CompositeModeLighter
 	opRo.GeoM.Scale(1, 0.7)
 	screen.DrawImage(right, opRo)

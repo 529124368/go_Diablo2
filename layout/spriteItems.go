@@ -4,6 +4,7 @@ import (
 	"game/interfaces"
 	"image/color"
 
+	"github.com/fzipp/texturepacker"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -27,7 +28,6 @@ type SpriteItems struct {
 	bgColor          *RGBColor
 	touchEvent       func(i interfaces.SpriteInterface, x, y int)
 	clickEvent       func(i interfaces.SpriteInterface, x, y int)
-	itemName         string
 }
 
 //创建精灵
@@ -52,19 +52,18 @@ func newSpriteItems() *SpriteItems {
 }
 
 //快速创建items精灵组件
-func QuickCreateItems(x, y float64, name string, img *ebiten.Image, layer uint8, clickEvnet func(i interfaces.SpriteInterface, x, y int), d uint8, needClickRange ...bool) *SpriteItems {
+func QuickCreateItems(x, y float64, name string, sheet *texturepacker.SpriteSheet, layer uint8, clickEvnet func(i interfaces.SpriteInterface, x, y int), d uint8, needClickRange ...bool) *SpriteItems {
 	op := newSpriteItems()
 	op.SetPosition(x, y)
 	//判断是否有注册的UI事件
 	if clickEvnet != nil {
 		op.clickEvent = clickEvnet
 	}
-	//item名字设定
-	op.itemName = name
 	//添加UI显示层级
 	op.layer = layer
 	//添加图片长度
-	op.size.width, op.size.height = img.Size()
+	op.size.width = sheet.Sprites[name+".png"].SourceSize.X
+	op.size.height = sheet.Sprites[name+".png"].SourceSize.Y
 	if len(needClickRange) == 1 && needClickRange[0] {
 		//添加点击范围
 		op.AddClickRange()
@@ -138,6 +137,6 @@ func QuickCreateItems(x, y float64, name string, img *ebiten.Image, layer uint8,
 
 	}
 	//保存图片
-	op.AddImage(img)
+	op.AddImage(name)
 	return op
 }

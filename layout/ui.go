@@ -19,21 +19,20 @@ import (
 )
 
 var (
-	plist_png     *image.NRGBA
-	plist_R_png   *image.NRGBA
-	plist_sheet   *texturepacker.SpriteSheet
-	plist_R_sheet *texturepacker.SpriteSheet
-	isClick       bool = false
-	mouseIcon     *ebiten.Image
-	mouseIconCopy ebiten.Image
-	opMouse       *ebiten.DrawImageOptions
-	mouseRoate    float64                  = -0.5
-	HPImage       *ebiten.Image            = nil //血条备份
-	HPop          *ebiten.DrawImageOptions       //血条备份
-	DeletedHPSum  int                      = 0
-	MPImage       *ebiten.Image            = nil //蓝条备份
-	MPop          *ebiten.DrawImageOptions       //蓝条备份
-	DeletedMPSum  int                      = 0
+	selectSenceBg              *ebiten.Image
+	plist_png, plist_R_png     *ebiten.Image
+	plist_sheet, plist_R_sheet *texturepacker.SpriteSheet
+	isClick                    bool = false
+	mouseIcon                  *ebiten.Image
+	mouseIconCopy              ebiten.Image
+	opMouse                    *ebiten.DrawImageOptions
+	mouseRoate                 float64                  = -0.5
+	HPImage                    *ebiten.Image            = nil //血条备份
+	HPop                       *ebiten.DrawImageOptions       //血条备份
+	DeletedHPSum               int                      = 0
+	MPImage                    *ebiten.Image            = nil //蓝条备份
+	MPop                       *ebiten.DrawImageOptions       //蓝条备份
+	DeletedMPSum               int                      = 0
 )
 
 //UI类
@@ -70,12 +69,23 @@ func NewUI(images *embed.FS, s *status.StatusManage, f *fonts.FontBase, m interf
 	return ui
 }
 
+//获取选择角色的背景图片
+func (u *UI) GetSelectBGImage() *ebiten.Image {
+	return selectSenceBg
+}
+
+//清除选择角色的背景图片
+func (u *UI) GCSelectBGImage() {
+	selectSenceBg = nil
+}
+
 //减血
 func (u *UI) DeleHP(num int) {
 	//u.Compents[1] hard code
 	if DeletedHPSum < 95 {
 		DeletedHPSum += num
-		HPImage = u.Compents[1].images.SubImage(image.Rectangle{image.Point{0, DeletedHPSum}, image.Point{80, 80}}).(*ebiten.Image)
+		img, _, _ := u.GetAnimator("UI", u.Compents[1].imagesName)
+		HPImage = img.SubImage(image.Rectangle{image.Point{0, DeletedHPSum}, image.Point{80, 80}}).(*ebiten.Image)
 		HPop = new(ebiten.DrawImageOptions)
 		HPop.GeoM.Translate(28, float64(387+DeletedHPSum))
 	}
@@ -86,7 +96,8 @@ func (u *UI) DeleMP(num int) {
 	//u.Compents[1] hard code
 	if DeletedMPSum < 95 {
 		DeletedMPSum += num
-		MPImage = u.Compents[9].images.SubImage(image.Rectangle{image.Point{0, DeletedMPSum}, image.Point{80, 80}}).(*ebiten.Image)
+		img, _, _ := u.GetAnimator("UI", u.Compents[1].imagesName)
+		MPImage = img.SubImage(image.Rectangle{image.Point{0, DeletedMPSum}, image.Point{80, 80}}).(*ebiten.Image)
 		MPop = new(ebiten.DrawImageOptions)
 		MPop.GeoM.Translate(684, float64(387+DeletedMPSum))
 	}
@@ -99,11 +110,10 @@ func (u *UI) GetAnimator(flg, name string) (*ebiten.Image, int, int) {
 			fmt.Println(r)
 		}
 	}()
-	if flg == "role" {
-		return ebiten.NewImageFromImage(plist_R_png.SubImage(plist_R_sheet.Sprites[name].Frame)), plist_R_sheet.Sprites[name].SpriteSourceSize.Min.X, plist_R_sheet.Sprites[name].SpriteSourceSize.Min.Y
-
+	if flg == "R" {
+		return plist_R_png.SubImage(plist_R_sheet.Sprites[name+".png"].Frame).(*ebiten.Image), plist_R_sheet.Sprites[name+".png"].SpriteSourceSize.Min.X, plist_R_sheet.Sprites[name+".png"].SpriteSourceSize.Min.Y
 	} else {
-		return ebiten.NewImageFromImage(plist_png.SubImage(plist_sheet.Sprites[name].Frame)), plist_sheet.Sprites[name].SpriteSourceSize.Min.X, plist_sheet.Sprites[name].SpriteSourceSize.Min.Y
+		return plist_png.SubImage(plist_sheet.Sprites[name+".png"].Frame).(*ebiten.Image), plist_sheet.Sprites[name+".png"].SpriteSourceSize.Min.X, plist_sheet.Sprites[name+".png"].SpriteSourceSize.Min.Y
 	}
 }
 
@@ -176,7 +186,8 @@ func (u *UI) DrawUI(screen *ebiten.Image) {
 			if k == 1 && HPImage != nil {
 				screen.DrawImage(HPImage, HPop)
 			} else {
-				screen.DrawImage(v.images, v.op)
+				img, _, _ := u.GetAnimator("UI", v.imagesName)
+				screen.DrawImage(img, v.op)
 			}
 		}
 	}
@@ -187,7 +198,8 @@ func (u *UI) DrawUI(screen *ebiten.Image) {
 			if k == 9 && MPImage != nil {
 				screen.DrawImage(MPImage, MPop)
 			} else {
-				screen.DrawImage(v.images, v.op)
+				img, _, _ := u.GetAnimator("UI", v.imagesName)
+				screen.DrawImage(img, v.op)
 			}
 
 		}
@@ -200,7 +212,8 @@ func (u *UI) DrawUI(screen *ebiten.Image) {
 				screen.DrawImage(v.imageBg, v.opBg)
 			}
 			//再渲染物品
-			screen.DrawImage(v.images, v.op)
+			img, _, _ := u.GetAnimator("R", v.imagesName)
+			screen.DrawImage(img, v.op)
 		}
 		if !u.status.IsTakeItem {
 			//渲染物品信息
@@ -245,7 +258,7 @@ func (u *UI) EventLoop(mouseX, mouseY int) {
 		if u.status.OpenBag && mouseX >= 408 && mouseY >= 6 && mouseX <= 698 && mouseY <= 372 && u.tempBag[0] != nil && u.status.IsTakeItem {
 			s := u.tempBag[0]
 			//给鼠标加一个假偏移，防止双击
-			if u.AddItemToBag(mouseX+u.status.Mouseoffset, mouseY+u.status.Mouseoffset, s.itemName) {
+			if u.AddItemToBag(mouseX+u.status.Mouseoffset, mouseY+u.status.Mouseoffset, s.imagesName) {
 				//清空缓冲区
 				u.ClearTempBag()
 			}
@@ -264,12 +277,6 @@ func (u *UI) EventLoop(mouseX, mouseY int) {
 
 }
 
-//GC 清理变量
-func (u *UI) ClearGlobalVariable() {
-	plist_R_sheet = nil
-	plist_R_png = nil
-}
-
 //添加物品到包裹 or 装备栏
 func (u *UI) AddItemToBag(mousex, mousey int, itemName string) bool {
 	//屏幕坐标转换成包裹坐标
@@ -282,11 +289,9 @@ func (u *UI) AddItemToBag(mousex, mousey int, itemName string) bool {
 			//是否相同size的时候
 			if sizeX == 1 && sizeY == 1 {
 				u.bag.BagLayout[x][y] = itemName
-				s, _ := u.image.ReadFile("resource/items/" + itemName + ".png")
-				mgUI := tools.GetEbitenImage(s)
 				layoutX := 413 + y*29
 				layoutY := 254 + x*29
-				u.AddComponent(QuickCreateItems(float64(layoutX), float64(layoutY), itemName, mgUI, 1, u.ItemsEvent(), 1, true), tools.ISITEMS)
+				u.AddComponent(QuickCreateItems(float64(layoutX), float64(layoutY), itemName, plist_R_sheet, 1, u.ItemsEvent(), 1, true), tools.ISITEMS)
 				return true
 			} else {
 				//循环判断是否可以放下
@@ -303,11 +308,9 @@ func (u *UI) AddItemToBag(mousex, mousey int, itemName string) bool {
 						u.bag.BagLayout[x+j][y+i] = itemName + "_" + name
 					}
 				}
-				s, _ := u.image.ReadFile("resource/items/" + itemName + ".png")
-				mgUI := tools.GetEbitenImage(s)
 				layoutX := 413 + y*29
 				layoutY := 254 + x*29
-				u.AddComponent(QuickCreateItems(float64(layoutX), float64(layoutY), itemName, mgUI, 1, u.ItemsEvent(), 1, true), tools.ISITEMS)
+				u.AddComponent(QuickCreateItems(float64(layoutX), float64(layoutY), itemName, plist_R_sheet, 1, u.ItemsEvent(), 1, true), tools.ISITEMS)
 				return true
 			}
 		} else if mousex >= 397 && mousey >= 5 && mousex <= 705 && mousey <= 247 {
@@ -323,11 +326,9 @@ func (u *UI) AddItemToBag(mousex, mousey int, itemName string) bool {
 
 //捡取物品到包裹
 func (u *UI) AddItemToBagByHand(x, y int, itemName string) {
-	s, _ := u.image.ReadFile("resource/items/" + itemName + ".png")
-	mgUI := tools.GetEbitenImage(s)
 	xx := 413 + y*29
 	yy := 254 + x*29
-	u.AddComponent(QuickCreateItems(float64(xx), float64(yy), itemName, mgUI, 1, u.ItemsEvent(), 1, true), tools.ISITEMS)
+	u.AddComponent(QuickCreateItems(float64(xx), float64(yy), itemName, plist_R_sheet, 1, u.ItemsEvent(), 1, true), tools.ISITEMS)
 }
 
 //从包裹删除物品
@@ -382,15 +383,14 @@ func (u *UI) DrawMouseIcon(screen *ebiten.Image, mouseX, mouseY int) {
 	opMouse.Filter = ebiten.FilterLinear
 	opMouse.GeoM.Translate(float64(mouseX), float64(mouseY))
 	screen.DrawImage(mouseIcon, opMouse)
+
 }
 
 //判断是否可以放入装备栏
 func (u *UI) JudgeCanToEquip(mousex, mousey int, itemName string) bool {
 	x, y, key := u.JudgeIsEquipArea(mousex, mousey)
 	if x != 0 && u.bag.BagLayout[4][key] == "" {
-		s, _ := u.image.ReadFile("resource/items/" + itemName + ".png")
-		mgUI := tools.GetEbitenImage(s)
-		_, yy := mgUI.Size()
+		yy := plist_R_sheet.Sprites[itemName+".png"].SourceSize.Y
 		//左右手武器并且图片高度为2格的情况下
 		if (key == 1 || key == 2) && yy/28 == 2 {
 			y += 20
@@ -399,7 +399,7 @@ func (u *UI) JudgeCanToEquip(mousex, mousey int, itemName string) bool {
 			y -= 15
 		}
 		u.bag.BagLayout[4][key] = itemName
-		u.AddComponent(QuickCreateItems(float64(x), float64(y), itemName, mgUI, 1, u.ItemsEvent(), 0, true), 0)
+		u.AddComponent(QuickCreateItems(float64(x), float64(y), itemName, plist_R_sheet, 1, u.ItemsEvent(), 0, true), 0)
 		return true
 	} else {
 		return false
@@ -410,9 +410,7 @@ func (u *UI) JudgeCanToEquip(mousex, mousey int, itemName string) bool {
 func (u *UI) InsertToEquip(mousex, mousey int, itemName string) bool {
 	x, y, key := u.JudgeIsEquipArea(mousex, mousey)
 	if x != 0 {
-		s, _ := u.image.ReadFile("resource/items/" + itemName + ".png")
-		mgUI := tools.GetEbitenImage(s)
-		_, yy := mgUI.Size()
+		yy := plist_R_sheet.Sprites[itemName+".png"].SourceSize.Y
 		//左右手武器并且图片高度为2格的情况下
 		if (key == 1 || key == 2) && yy/28 == 2 {
 			y += 20
@@ -421,7 +419,7 @@ func (u *UI) InsertToEquip(mousex, mousey int, itemName string) bool {
 			y -= 15
 		}
 		u.bag.BagLayout[4][key] = itemName
-		u.AddComponent(QuickCreateItems(float64(x), float64(y), itemName, mgUI, 1, u.ItemsEvent(), 0, true), 0)
+		u.AddComponent(QuickCreateItems(float64(x), float64(y), itemName, plist_R_sheet, 1, u.ItemsEvent(), 0, true), 0)
 		return true
 	} else {
 		return false
@@ -446,7 +444,8 @@ func (u *UI) ItemsEvent() func(i interfaces.SpriteInterface, x, y int) {
 					//将拿起的物品放入临时区
 					u.tempBag[0] = s
 					mouseIconCopy = *mouseIcon
-					mouseIcon = s.images
+					img, _, _ := u.GetAnimator("R", s.imagesName)
+					mouseIcon = img
 					mouseRoate = 0
 					//拿起物品，从包裹中删除物品
 					u.DelItemFromBag(int(s.imagex), int(s.imagey))
@@ -504,7 +503,7 @@ func (u *UI) ClearTempBag() string {
 	//鼠标还原
 	mouseIcon = &mouseIconCopy
 	//清理临时区
-	name = u.tempBag[0].itemName
+	name = u.tempBag[0].imagesName
 	u.tempBag[0] = nil
 	mouseRoate = -0.5
 	//恢复防止双击的鼠标偏移量

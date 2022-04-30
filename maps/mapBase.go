@@ -97,3 +97,38 @@ func (m *MapBase) RenderWall(screen *ebiten.Image, offsetX, offsetY float64) {
 func (m *MapBase) GetBlock1Aera(x, y int) bool {
 	return m.Img2[y][x].Img == nil
 }
+
+//
+// func (m *MapBase) GetWall(i, j int) (*ebiten.Image, int) {
+// 	ds1Tile := m.MapDetail.Walls[0].Tile(j, i)
+// 	if !ds1Tile.Hidden() && ds1Tile.Prop1 != 0 {
+// 		ds := GetTiles(int(ds1Tile.Style), int(ds1Tile.Sequence), ds1Tile.Type, m.WallBox.Tiles)
+// 		if ds != nil {
+// 			if ds1Tile.Type == d2enum.TileRightPartOfNorthCornerWall {
+// 				dss := GetTiles(int(ds1Tile.Style), int(ds1Tile.Sequence), d2enum.TileLeftPartOfNorthCornerWall, m.WallBox.Tiles)
+// 				if dss != nil && dss[ds1Tile.RandomIndex].Height < ds[ds1Tile.RandomIndex].Height {
+// 					m, h := GetWallTitleImage(dss[ds1Tile.RandomIndex], ds1Tile, m.ColorMap)
+// 					return m, h
+// 				} else {
+// 					m, h := GetWallTitleImage(ds[ds1Tile.RandomIndex], ds1Tile, m.ColorMap)
+// 					return m, h
+// 				}
+// 			} else {
+// 				m, h := GetWallTitleImage(ds[ds1Tile.RandomIndex], ds1Tile, m.ColorMap)
+// 				return m, h
+// 			}
+// 		}
+// 	}
+// 	return nil, 0
+// }
+
+// func (m *MapBase) GetFloor(i, j int) *ebiten.Image {
+// 	ds1Tile := m.MapDetail.Floors[0].Tile(j, i)
+// 	if !ds1Tile.Hidden() && ds1Tile.Prop1 != 0 {
+// 		ds := GetTiles(int(ds1Tile.Style), int(ds1Tile.Sequence), 0, m.FloorBox.Tiles)
+// 		if ds != nil {
+// 			return GetTitleImage(ds[ds1Tile.RandomIndex], m.ColorMap)
+// 		}
+// 	}
+// 	return nil
+// }

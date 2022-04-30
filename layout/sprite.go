@@ -4,6 +4,7 @@ import (
 	"game/interfaces"
 	"image/color"
 
+	"github.com/fzipp/texturepacker"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -16,7 +17,7 @@ type imageSize struct {
 //精灵类
 type Sprite struct {
 	op                                         *ebiten.DrawImageOptions
-	images                                     *ebiten.Image
+	imagesName                                 string
 	hasEvent, layer                            uint8
 	isDisplay                                  bool
 	f                                          func(i interfaces.SpriteInterface)
@@ -58,8 +59,8 @@ func (s *Sprite) SetPosition(x, y float64) {
 }
 
 //添加图片
-func (s *Sprite) AddImage(m *ebiten.Image) {
-	s.images = m
+func (s *Sprite) AddImage(m string) {
+	s.imagesName = m
 }
 
 //给UI添加事件
@@ -85,7 +86,7 @@ func (s *Sprite) AddClickRange() {
 ** callBack 回调函数
 ** needClickRange 是否需要点击范围
 **/
-func QuickCreate(x, y float64, img *ebiten.Image, layer uint8, callBack func(i interfaces.SpriteInterface), needClickRange ...bool) *Sprite {
+func QuickCreate(x, y float64, imgName string, sheet *texturepacker.SpriteSheet, layer uint8, callBack func(i interfaces.SpriteInterface), needClickRange ...bool) *Sprite {
 	op := newSprite()
 	op.SetPosition(x, y)
 	//判断是否有注册的UI事件
@@ -95,7 +96,8 @@ func QuickCreate(x, y float64, img *ebiten.Image, layer uint8, callBack func(i i
 	//添加UI显示层级
 	op.layer = layer
 	//添加图片长度
-	width, height := img.Size()
+	width := sheet.Sprites[imgName+".png"].SourceSize.X
+	height := sheet.Sprites[imgName+".png"].SourceSize.Y
 	op.size.width = width
 	op.size.height = height
 	if len(needClickRange) == 1 && needClickRange[0] {
@@ -103,7 +105,7 @@ func QuickCreate(x, y float64, img *ebiten.Image, layer uint8, callBack func(i i
 		op.AddClickRange()
 	}
 	//保存图片
-	op.AddImage(img)
+	op.AddImage(imgName)
 	return op
 }
 

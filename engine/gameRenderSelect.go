@@ -16,9 +16,9 @@ func (g *Game) ChangeScenceSelectUpdate() {
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) || g.IsTouch() {
 		if mouseX > 622 && mouseX < 702 && mouseY > 428 && mouseY < 456 || g.Touch(622, 428, 702, 456) {
 			//获取按钮的回调函数
-			f := g.ui.Compents[1].CallFunc()
+			f := g.ui.Compents[0].CallFunc()
 			//按钮内注册了切换场景
-			f(g.ui.Compents[1])
+			f(g.ui.Compents[0])
 		}
 	}
 	//轮图控制
@@ -27,7 +27,7 @@ func (g *Game) ChangeScenceSelectUpdate() {
 	if g.count > 5 {
 		counts++
 		g.count = 0
-		if counts >= 30 {
+		if counts >= 25 {
 			counts = 0
 		}
 	}
@@ -35,10 +35,15 @@ func (g *Game) ChangeScenceSelectUpdate() {
 
 //Draw Select Scence
 func (g *Game) ChangeScenceSelectDraw(screen *ebiten.Image) {
+	//背景图
+	opm := new(ebiten.DrawImageOptions)
+	opm.GeoM.Translate(0, 0)
+	opm.GeoM.Scale(1, 0.8)
+	screen.DrawImage(g.ui.GetSelectBGImage(), opm)
 	//Draw UI
 	g.ui.DrawUI(screen)
 	//Draw Fire 场景火堆
-	name := "fire_" + strconv.Itoa(counts) + ".png"
+	name := "fire_" + strconv.Itoa(counts)
 	fire, _, _ := g.ui.GetAnimator("logo", name)
 	opf := &ebiten.DrawImageOptions{}
 	opf.Filter = ebiten.FilterLinear
@@ -48,8 +53,8 @@ func (g *Game) ChangeScenceSelectDraw(screen *ebiten.Image) {
 	screen.DrawImage(fire, opf)
 
 	//Draw Role 野蛮人战士
-	name = "ba_" + strconv.Itoa(counts) + ".png"
-	ba, _, _ := g.ui.GetAnimator("role", name)
+	name = "ba_" + strconv.Itoa(counts)
+	ba, _, _ := g.ui.GetAnimator("R", name)
 	opBa := &ebiten.DrawImageOptions{}
 	opBa.Filter = ebiten.FilterLinear
 	opBa.GeoM.Translate(356, 120)

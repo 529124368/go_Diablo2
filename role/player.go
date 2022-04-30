@@ -5,7 +5,6 @@ import (
 	"game/interfaces"
 	"game/status"
 	"game/tools"
-	"image"
 
 	"github.com/fzipp/texturepacker"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -19,8 +18,8 @@ const (
 var (
 	plist_sheet   *texturepacker.SpriteSheet
 	plist_sheet_2 *texturepacker.SpriteSheet
-	plist_png     *image.Paletted
-	plist_png_2   *image.Paletted
+	plist_png     *ebiten.Image
+	plist_png_2   *ebiten.Image
 	opS           *ebiten.DrawImageOptions
 	op            *ebiten.DrawImageOptions
 	newPath       []uint8
@@ -66,11 +65,15 @@ func (p *Player) LoadImages() {
 	//加载玩家素材第一部分
 	plist, _ := p.image.ReadFile("resource/man/warrior/ba2.png")
 	plist_json, _ := p.image.ReadFile("resource/man/warrior/ba2.json")
-	plist_sheet, plist_png = tools.GetImageFromPlistPaletted(plist, plist_json)
+	pli, pln := tools.GetImageFromPlistPaletted(plist, plist_json)
+	plist_sheet = pli
+	plist_png = ebiten.NewImageFromImage(pln)
 	//加载玩家素材第二部分
 	plist, _ = p.image.ReadFile("resource/man/warrior/ba2_act.png")
 	plist_json, _ = p.image.ReadFile("resource/man/warrior/ba2_act.json")
-	plist_sheet_2, plist_png_2 = tools.GetImageFromPlistPaletted(plist, plist_json)
+	pli, pln = tools.GetImageFromPlistPaletted(plist, plist_json)
+	plist_sheet_2 = pli
+	plist_png_2 = ebiten.NewImageFromImage(pln)
 	p.SetPlayerState(0, 0)
 }
 
@@ -92,9 +95,9 @@ func (p *Player) GetAnimator(flg, name string, block uint8) (*ebiten.Image, int,
 	if flg == "man" {
 		//判断加载素材的第几部分
 		if block == 1 {
-			return ebiten.NewImageFromImage(plist_png.SubImage(plist_sheet.Sprites[name].Frame)), plist_sheet.Sprites[name].SpriteSourceSize.Min.X, plist_sheet.Sprites[name].SpriteSourceSize.Min.Y
+			return plist_png.SubImage(plist_sheet.Sprites[name+".png"].Frame).(*ebiten.Image), plist_sheet.Sprites[name+".png"].SpriteSourceSize.Min.X, plist_sheet.Sprites[name+".png"].SpriteSourceSize.Min.Y
 		} else {
-			return ebiten.NewImageFromImage(plist_png_2.SubImage(plist_sheet_2.Sprites[name].Frame)), plist_sheet_2.Sprites[name].SpriteSourceSize.Min.X, plist_sheet_2.Sprites[name].SpriteSourceSize.Min.Y
+			return plist_png_2.SubImage(plist_sheet_2.Sprites[name+".png"].Frame).(*ebiten.Image), plist_sheet_2.Sprites[name+".png"].SpriteSourceSize.Min.X, plist_sheet_2.Sprites[name+".png"].SpriteSourceSize.Min.Y
 		}
 	} else {
 		return nil, 0, 0
