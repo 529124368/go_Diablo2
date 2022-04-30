@@ -37,6 +37,13 @@ func (u *UI) LoadGameCharaSelectImages() {
 	}, false)
 	op.op.GeoM.Scale(0.5, 0.5)
 	u.AddComponent(op, tools.ISNORCOM)
+	if plist_png == nil {
+		plist, _ := u.image.ReadFile("resource/UI/logo.png")
+		plist_json, _ := u.image.ReadFile("resource/UI/logo.json")
+		pli, pic := tools.GetImageFromPlist(plist, plist_json)
+		plist_sheet = pli
+		plist_png = ebiten.NewImageFromImage(pic)
+	}
 
 	//加载野蛮人
 	plist, _ := u.image.ReadFile("resource/UI/selectRoles.png")

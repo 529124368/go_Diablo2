@@ -85,7 +85,7 @@ func (u *UI) DeleHP(num int) {
 	if DeletedHPSum < 95 {
 		DeletedHPSum += num
 		img, _, _ := u.GetAnimator("UI", u.Compents[1].imagesName)
-		HPImage = img.SubImage(image.Rectangle{image.Point{0, DeletedHPSum}, image.Point{80, 80}}).(*ebiten.Image)
+		HPImage = img.SubImage(image.Rectangle{image.Point{176, 1033 + DeletedHPSum}, image.Point{256, 1113}}).(*ebiten.Image)
 		HPop = new(ebiten.DrawImageOptions)
 		HPop.GeoM.Translate(28, float64(387+DeletedHPSum))
 	}
@@ -96,8 +96,8 @@ func (u *UI) DeleMP(num int) {
 	//u.Compents[1] hard code
 	if DeletedMPSum < 95 {
 		DeletedMPSum += num
-		img, _, _ := u.GetAnimator("UI", u.Compents[1].imagesName)
-		MPImage = img.SubImage(image.Rectangle{image.Point{0, DeletedMPSum}, image.Point{80, 80}}).(*ebiten.Image)
+		img, _, _ := u.GetAnimator("UI", u.Compents[9].imagesName)
+		MPImage = img.SubImage(image.Rectangle{image.Point{165, 1115 + DeletedMPSum}, image.Point{245, 1195}}).(*ebiten.Image)
 		MPop = new(ebiten.DrawImageOptions)
 		MPop.GeoM.Translate(684, float64(387+DeletedMPSum))
 	}

@@ -32,7 +32,7 @@ func (u *UI) LoadGameImages() {
 	u.AddComponent(QuickCreate(len, 480-float64(plist_sheet.Sprites[name+".png"].SourceSize.Y), name, plist_sheet, 0, nil), tools.ISNORCOM)
 
 	name = "HP"
-	u.AddComponent(QuickCreate(28, 480-float64(plist_sheet.Sprites[name+".png"].SourceSize.Y), name, plist_sheet, 0, nil), tools.ISNORCOM)
+	u.AddComponent(QuickCreate(28, 480-float64(plist_sheet.Sprites[name+".png"].SourceSize.Y+13), name, plist_sheet, 0, nil), tools.ISNORCOM)
 
 	len += 115
 
@@ -66,7 +66,7 @@ func (u *UI) LoadGameImages() {
 	u.AddComponent(QuickCreate(len, 480-float64(plist_sheet.Sprites[name+".png"].SourceSize.Y), name, plist_sheet, 0, nil), tools.ISNORCOM)
 
 	name = "MP"
-	u.AddComponent(QuickCreate(684, 480-float64(plist_sheet.Sprites[name+".png"].SourceSize.Y), name, plist_sheet, 1, nil), tools.ISNORCOM)
+	u.AddComponent(QuickCreate(684, 480-float64(plist_sheet.Sprites[name+".png"].SourceSize.Y+13), name, plist_sheet, 1, nil), tools.ISNORCOM)
 
 	name = "skill_btn"
 	u.AddComponent(QuickCreate(204, 441, name, plist_sheet, 0, func(i interfaces.SpriteInterface) {
