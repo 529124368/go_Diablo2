@@ -13,3 +13,8 @@
 ### 更新履历
   1. 第一次提交
   
+  
+  ios build
+  ebitenmobile bind -target ios -o Mobile.framework ./mobile
+
+
