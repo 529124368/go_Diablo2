@@ -16,5 +16,8 @@
   
   ios build
   ebitenmobile bind -target ios -o Mobile.framework ./mobile
+  
+  apk build
+  ebitenmobile bind -target android -javapkg golang.diablo2.mobile  -o mobile.aar .\mobile\
 
 
