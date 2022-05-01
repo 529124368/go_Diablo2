@@ -80,7 +80,7 @@ func (g *Game) changeScenceGameUpdate() {
 	dir := tools.CaluteDir(g.status.PLAYERCENTERX, g.status.PLAYERCENTERY, int64(g.player.MouseX), int64(g.player.MouseY))
 
 	//鼠标事件
-	if controller.MouseleftPress() {
+	if controller.MouseleftPress() || controller.IsTouch() {
 		//防止点击UI界面也移动
 		if mouseY < 436 {
 			g.status.Flg = true

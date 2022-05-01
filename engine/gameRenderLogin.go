@@ -62,7 +62,7 @@ func (g *Game) ChangeScenceLoginDraw(screen *ebiten.Image) {
 	screen.DrawImage(right, opRo)
 	if g.status.DisPlayDebugInfo {
 		//Draw Debug
-		ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nmouse position %d,%d",
+		ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nmouse position %d,%d\n",
 			int64(ebiten.CurrentFPS()), mouseX, mouseY))
 	}
 	//Change Frame

@@ -23,3 +23,8 @@ func Touch(minx, miny, maxx, maxy int) bool {
 func IsTouch() bool {
 	return len(ebiten.TouchIDs()) > 0
 }
+
+func GetTouchDefaultXY() (int, int) {
+	ids := ebiten.TouchIDs()
+	return ebiten.TouchPosition(ids[0])
+}

@@ -2,6 +2,7 @@ package engine
 
 import (
 	"embed"
+	"game/controller"
 	"game/fonts"
 	"game/interfaces"
 	"game/layout"
@@ -110,7 +111,13 @@ func (g *Game) StartEngine() {
 }
 
 func (g *Game) Update() error {
-	mouseX, mouseY = ebiten.CursorPosition()
+	//判断是否是点击屏幕
+	if !controller.IsTouch() {
+		mouseX, mouseY = ebiten.CursorPosition()
+	} else {
+		mouseX, mouseY = controller.GetTouchDefaultXY()
+	}
+
 	//切换场景逻辑
 	if !g.status.ChangeScenceFlg {
 		switch g.status.CurrentGameScence {
