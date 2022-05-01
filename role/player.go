@@ -2,6 +2,7 @@ package role
 
 import (
 	"embed"
+	"game/controller"
 	"game/interfaces"
 	"game/status"
 	"game/tools"
@@ -150,7 +151,7 @@ func (p *Player) PlayerMove(mouseX int, dir *uint8) {
 	//鼠标人物移动控制
 	if !p.status.OpenBag || p.status.OpenBag && mouseX <= tools.LAYOUTX/2 {
 		//判断人物方位
-		if p.OldDirection != p.Direction && !ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
+		if p.OldDirection != p.Direction && !controller.MouseRightPress() {
 			if !p.status.CalculateEnd {
 				newPath = tools.CalculateDirPath(p.OldDirection, p.Direction)
 				p.status.CalculateEnd = true

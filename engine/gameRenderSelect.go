@@ -2,20 +2,20 @@ package engine
 
 import (
 	"fmt"
+	"game/controller"
 	"game/tools"
 	"image/color"
 	"strconv"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 //Draw Select Update
 func (g *Game) ChangeScenceSelectUpdate() {
 	//鼠标点击监听
-	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) || g.IsTouch() {
-		if mouseX > 622 && mouseX < 702 && mouseY > 428 && mouseY < 456 || g.Touch(622, 428, 702, 456) {
+	if controller.MouseOnceLeftPress() || controller.IsTouch() {
+		if mouseX > 622 && mouseX < 702 && mouseY > 428 && mouseY < 456 || controller.Touch(622, 428, 702, 456) {
 			//获取按钮的回调函数
 			f := g.ui.Compents[0].CallFunc()
 			//按钮内注册了切换场景
@@ -46,12 +46,14 @@ func (g *Game) ChangeScenceSelectDraw(screen *ebiten.Image) {
 	//Draw Fire 场景火堆
 	name := "fire_" + strconv.Itoa(counts)
 	fire, _, _ := g.ui.GetAnimator(tools.PlistN, name)
-	opf := &ebiten.DrawImageOptions{}
-	opf.Filter = ebiten.FilterLinear
-	opf.GeoM.Translate(350, 375)
-	opf.CompositeMode = ebiten.CompositeModeLighter
-	opf.GeoM.Scale(1, 0.7)
-	screen.DrawImage(fire, opf)
+	if fire != nil {
+		opf := &ebiten.DrawImageOptions{}
+		opf.Filter = ebiten.FilterLinear
+		opf.GeoM.Translate(350, 375)
+		opf.CompositeMode = ebiten.CompositeModeLighter
+		opf.GeoM.Scale(1, 0.7)
+		screen.DrawImage(fire, opf)
+	}
 
 	//Draw Role 野蛮人战士
 	name = "ba_" + strconv.Itoa(counts)

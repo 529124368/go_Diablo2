@@ -2,19 +2,19 @@ package engine
 
 import (
 	"fmt"
+	"game/controller"
 	"game/tools"
 	"strconv"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 //Draw Login Update
 func (g *Game) ChangeScenceLoginUpdate() {
 	//切换场景判定
-	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) || g.IsTouch() {
-		if mouseX > 286 && mouseX < 503 && mouseY > 150 && mouseY < 218 || g.Touch(286, 150, 503, 218) {
+	if controller.MouseOnceLeftPress() || controller.IsTouch() {
+		if mouseX > 286 && mouseX < 503 && mouseY > 150 && mouseY < 218 || controller.Touch(286, 150, 503, 218) {
 			g.status.ChangeScenceFlg = true
 			//切换场景
 			g.ChangeScene("select")

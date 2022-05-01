@@ -4,6 +4,7 @@ import (
 	"embed"
 	"errors"
 	"fmt"
+	"game/controller"
 	"game/fonts"
 	"game/interfaces"
 	"game/status"
@@ -243,7 +244,7 @@ func (u *UI) DrawUI(screen *ebiten.Image) {
 //事件轮询
 func (u *UI) EventLoop(mouseX, mouseY int) {
 
-	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
+	if controller.MouseleftPress() {
 		//普通UI事件轮询
 		for _, v := range u.Compents {
 			if v.hasEvent == 1 && v.isDisplay {

@@ -2,6 +2,7 @@ package engine
 
 import (
 	"fmt"
+	"game/controller"
 	"game/tools"
 	"math"
 	"runtime"
@@ -12,6 +13,8 @@ import (
 )
 
 var dropItemName = ""
+var newpositonX, newpositonY float64
+var newDir uint8
 
 //切换游戏场景
 func (g *Game) ChangeScene(name string) {
@@ -73,8 +76,11 @@ func (g *Game) changeScenceGameUpdate() {
 	}
 	g.player.MouseX = mouseX
 	g.player.MouseY = mouseY
+	//计算鼠标位置
+	dir := tools.CaluteDir(g.status.PLAYERCENTERX, g.status.PLAYERCENTERY, int64(g.player.MouseX), int64(g.player.MouseY))
+
 	//鼠标事件
-	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
+	if controller.MouseleftPress() {
 		//防止点击UI界面也移动
 		if mouseY < 436 {
 			g.status.Flg = true
@@ -107,6 +113,21 @@ func (g *Game) changeScenceGameUpdate() {
 				}
 			}
 		}
+		if g.status.Flg {
+			//计算新的位置
+			newDir = dir
+			newpositonX = g.player.X + float64(mouseX) - 395
+			newpositonY = g.player.Y + float64(mouseY) - 240
+		}
+	}
+
+	if newpositonX != 0 && newpositonY != 0 && (math.Abs(g.player.X-newpositonX) > 1 && math.Abs(g.player.Y-newpositonY) > 1) {
+		g.status.Flg = true
+		//鼠标人物移动控制
+		g.player.PlayerMove(mouseX, &newDir)
+	} else {
+		newpositonX = 0
+		newpositonY = 0
 	}
 
 	//鼠标滚轮控制
@@ -114,11 +135,8 @@ func (g *Game) changeScenceGameUpdate() {
 		g.status.MapZoom += int(x)
 	}
 
-	//计算鼠标位置
-	dir := tools.CaluteDir(g.status.PLAYERCENTERX, g.status.PLAYERCENTERY, int64(g.player.MouseX), int64(g.player.MouseY))
-
 	//普通攻击
-	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) && !g.status.IsTakeItem {
+	if controller.MouseRightPress() && !g.status.IsTakeItem {
 		if g.player.State != tools.ATTACK {
 			counts = 0
 		}
@@ -128,7 +146,7 @@ func (g *Game) changeScenceGameUpdate() {
 		}
 	}
 	//技能
-	if ebiten.IsKeyPressed(ebiten.KeyF1) && !g.status.IsTakeItem {
+	if controller.MousePressF1() && !g.status.IsTakeItem {
 		//音乐
 		g.music.PlayMusic("File00002184.wav", tools.MUSICWAV)
 		//g.player.SkillName = "狂风"
@@ -142,8 +160,6 @@ func (g *Game) changeScenceGameUpdate() {
 	}
 	//事件循环监听 是否有按钮点击事件
 	g.ui.EventLoop(mouseX, mouseY)
-	//鼠标人物移动控制
-	g.player.PlayerMove(mouseX, &dir)
 
 	//根据状态改变帧数
 	if g.player.State == tools.IDLE {
@@ -160,7 +176,6 @@ func (g *Game) changeScenceGameUpdate() {
 		frameNums = 8
 		frameSpeed = 5
 	}
-
 }
 
 //Draw Game Scence
