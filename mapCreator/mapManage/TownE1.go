@@ -113,7 +113,7 @@ func (t *TownE1) RenderDropItems(screen *ebiten.Image, offsetX, offsetY float64,
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Translate(t.dropItemsList[i].pos.x+offsetX, t.dropItemsList[i].pos.y+offsetY)
 		screen.DrawImage(t.dropAnm[16], op)
-		if tools.Distance(int64(playX), int64(playY), int64(t.dropItemsList[i].pos.x), int64(t.dropItemsList[i].pos.y+130)) <= 35 {
+		if tools.Distance(int64(playX), int64(playY), int64(t.dropItemsList[i].pos.x), int64(t.dropItemsList[i].pos.y+130)) <= 30 {
 			if t.bag.InsertBag(t.dropItemsList[i].name) {
 				if i != len(t.dropItemsList)-1 {
 					t.dropItemsList = append(t.dropItemsList[:i], t.dropItemsList[i+1:]...)
