@@ -17,8 +17,8 @@ type StatusManage struct {
 	PLAYERCENTERY     int64
 	IsTakeItem        bool //是否拿起物品
 	Mouseoffset       int
-	MoveOffsetX       float64
-	MoveOffsetY       float64
+	CamerOffsetX      float64
+	CamerOffsetY      float64
 	ReadMapSizeWidth  int
 	ReadMapSizeHeight int
 	MapTitleX         int
@@ -50,8 +50,8 @@ func NewStatusManage() *StatusManage {
 		IsTakeItem:      false,
 		Mouseoffset:     -1800,
 		//玩家初始位置偏移设置
-		MoveOffsetX: -5280 + 395,
-		MoveOffsetY: -1880 + 240,
+		CamerOffsetX: -5280 + 395,
+		CamerOffsetY: -1880 + 240,
 		//读取地图的尺寸
 		ReadMapSizeWidth:  0,
 		ReadMapSizeHeight: 0,

@@ -57,16 +57,10 @@ func NewGame() *Game {
 	sta := status.NewStatusManage()
 	bag := storage.New()
 	//场景
-	// rand.Seed(time.Now().Unix()) // unix 时间戳，秒
-	// data := rand.Int31n(50)
-	//var m interfaces.MapInterface
-	//	if data%2 == 0 {
-	//		m = mapManage.NewN1(&asset, sta,bag)
-	//	} else {
 	m := mapManage.NewE1(&asset, sta, bag)
-	//}
 	//Player  设置初始状态和坐标
 	r := role.NewPlayer(5280, 1880, tools.IDLE, 0, 0, 0, &asset, m, sta)
+
 	//字体
 	f := fonts.NewFont(&asset)
 	//UI

@@ -121,8 +121,8 @@ func (p *Player) GetMouseController(dir uint8) {
 		//移动判断
 		moveX, moveY := tools.CalculateSpeed(dir, speed)
 		if p.CanWalk(moveX, moveY, dir) {
-			p.status.MoveOffsetX += -moveX
-			p.status.MoveOffsetY += -moveY
+			p.status.CamerOffsetX += -moveX
+			p.status.CamerOffsetY += -moveY
 			p.Y += moveY
 			p.X += moveX
 		}

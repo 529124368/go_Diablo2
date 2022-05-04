@@ -31,7 +31,7 @@ func (m *MapBase) LoadMap() {
 
 //改变地图坐标
 func (m *MapBase) ChangeMapTranslate(x, y float64) {
-	m.Status.MoveOffsetX += x
+	m.Status.CamerOffsetX += x
 }
 
 //渲染地图的地砖

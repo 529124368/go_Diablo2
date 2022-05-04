@@ -192,26 +192,25 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	g.status.MapTitleY = mapY
 	g.mapManage.SortLayer(mapX, mapY)
 	//Draw floor
-	g.mapManage.RenderFloor(screen, g.status.MoveOffsetX, g.status.MoveOffsetY)
+	g.mapManage.RenderFloor(screen, g.status.CamerOffsetX, g.status.CamerOffsetY)
 	//Draw drop items
-	g.mapManage.RenderDropItems(screen, g.status.MoveOffsetX, g.status.MoveOffsetY, g.player.X, g.player.Y)
+	g.mapManage.RenderDropItems(screen, g.status.CamerOffsetX, g.status.CamerOffsetY, g.player.X, g.player.Y)
 	//切换渲染顺序
 	if g.status.DisplaySort {
 		//Draw player
 		g.player.Render(screen, counts)
 		//Draw Wall
-		g.mapManage.RenderWall(screen, g.status.MoveOffsetX, g.status.MoveOffsetY)
+		g.mapManage.RenderWall(screen, g.status.CamerOffsetX, g.status.CamerOffsetY)
 		//Draw map Anmi
-		g.mapManage.Render(screen, countsFor20, countsFor8, g.status.MoveOffsetX, g.status.MoveOffsetY)
+		g.mapManage.Render(screen, countsFor20, countsFor8, g.status.CamerOffsetX, g.status.CamerOffsetY)
 
 	} else {
 		//Draw Wall
-		g.mapManage.RenderWall(screen, g.status.MoveOffsetX, g.status.MoveOffsetY)
+		g.mapManage.RenderWall(screen, g.status.CamerOffsetX, g.status.CamerOffsetY)
 		//Draw map Anmi
-		g.mapManage.Render(screen, countsFor20, countsFor8, g.status.MoveOffsetX, g.status.MoveOffsetY)
+		g.mapManage.Render(screen, countsFor20, countsFor8, g.status.CamerOffsetX, g.status.CamerOffsetY)
 		//Draw player
 		g.player.Render(screen, counts)
-
 	}
 	//Draw UI
 	g.ui.DrawUI(screen)
