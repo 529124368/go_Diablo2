@@ -54,15 +54,16 @@ var asset embed.FS
 
 //GameEngine
 func NewGame() *Game {
-	w := ws.NewNet()
-	w.Start()
 	//statueManage
 	sta := status.NewStatusManage()
+	//Net
+	w := ws.NewNet(sta)
+	w.Start()
 	bag := storage.New()
 	//场景
 	m := mapManage.NewE1(&asset, sta, bag)
 	//Player  设置初始状态和坐标
-	r := role.NewPlayer(5280, 1880, tools.IDLE, 0, 0, 0, &asset, m, sta, w)
+	r := role.NewPlayer(5280, 1880, tools.IDLE, 0, 0, 0, &asset, m, sta, nil)
 	r1 := role.NewPlayer(5280, 1880, tools.IDLE, 0, 0, 0, &asset, m, sta, nil)
 	r2 := role.NewPlayer(5039, 2031, tools.IDLE, 0, 0, 0, &asset, m, sta, nil)
 
@@ -91,6 +92,7 @@ func NewGame() *Game {
 
 //引擎启动
 func (g *Game) StartEngine() {
+	go g.handle()
 	//隐藏鼠标系统的ICON
 	ebiten.SetCursorMode(ebiten.CursorModeHidden)
 	w := sync.WaitGroup{}

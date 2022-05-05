@@ -1,7 +1,7 @@
 package ws
 
 import (
-	"fmt"
+	"game/status"
 	"log"
 	"time"
 
@@ -9,40 +9,49 @@ import (
 )
 
 type WsNetManage struct {
-	Con *websocket.Conn
+	Con    *websocket.Conn
+	status *status.StatusManage
 }
 
-func NewNet() *WsNetManage {
+func NewNet(s *status.StatusManage) *WsNetManage {
 	url := "ws://124.220.178.68:8081/game?ConToken=zimugeWO**@erfs45656DGKZNNSJD"
 	ws, _, err := websocket.DefaultDialer.Dial(url, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
 	w := &WsNetManage{
-		Con: ws,
+		Con:    ws,
+		status: s,
 	}
 	return w
 }
 
 func (w *WsNetManage) Start() {
-	w.Con.WriteMessage(1, []byte("@@InsertRoom|1"))
+	w.SendMessage("@@InsertRoom|1")
 	//心跳维持
 	go func() {
 		for {
-			w.Con.WriteMessage(1, []byte("@@ping"))
+			w.SendMessage("@@ping")
 			time.Sleep(time.Second * 500)
 		}
 	}()
 	//接收消息
 	go func() {
 		for {
-			_, mesg, _ := w.Con.ReadMessage()
-			fmt.Println(string(mesg))
+			s := w.reciveMessage()
+			//放入消息队列
+			w.status.Queue <- s
 		}
-
 	}()
 }
 
+//往客户端发送消息
 func (w *WsNetManage) SendMessage(msg string) {
 	w.Con.WriteMessage(1, []byte(msg))
+}
+
+//接受服务器端消息
+func (w *WsNetManage) reciveMessage() string {
+	_, mesg, _ := w.Con.ReadMessage()
+	return string(mesg)
 }
