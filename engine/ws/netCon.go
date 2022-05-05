@@ -26,13 +26,14 @@ func NewNet() *WsNetManage {
 
 func (w *WsNetManage) Start() {
 	w.Con.WriteMessage(1, []byte("@@InsertRoom|1"))
-	//心跳检测
+	//心跳维持
 	go func() {
 		for {
 			w.Con.WriteMessage(1, []byte("@@ping"))
 			time.Sleep(time.Second * 500)
 		}
 	}()
+	//接收消息
 	go func() {
 		for {
 			_, mesg, _ := w.Con.ReadMessage()

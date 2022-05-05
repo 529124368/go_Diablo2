@@ -214,6 +214,7 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	}
 	//Draw UI
 	g.ui.DrawUI(screen)
+
 	//Draw Drop items Anm
 	if g.status.IsPlayDropAnmi {
 		if g.mapManage.PlayDropItemAnm(screen, g.player.X, g.player.Y, dropItemName, countsFor17) {

@@ -272,15 +272,12 @@ func (t *TownE1) LoadMap() {
 	re, _ = t.image.ReadFile(tools.ObjectPath + "/mapSucai/outdoor/river.dt1")
 	ss7, err := dt1.LoadDT1(re)
 
-	//wall
 	ss2.Tiles = append(ss2.Tiles, ss1.Tiles...)
 	ss2.Tiles = append(ss2.Tiles, ss3.Tiles...)
 	ss2.Tiles = append(ss2.Tiles, ss4.Tiles...)
 	ss2.Tiles = append(ss2.Tiles, ss5.Tiles...)
 	ss2.Tiles = append(ss2.Tiles, ss6.Tiles...)
 	ss2.Tiles = append(ss2.Tiles, ss7.Tiles...)
-
-	//floor
 	ss.Tiles = append(ss.Tiles, ss2.Tiles...)
 
 	if err != nil {
@@ -317,10 +314,10 @@ func (t *TownE1) LoadMap() {
 		for j := 0; j < w; j++ {
 			ds1Tile := d.Walls[0].Tile(j, i)
 			if !ds1Tile.Hidden() && ds1Tile.Prop1 != 0 {
-				ds := maps.GetTiles(int(ds1Tile.Style), int(ds1Tile.Sequence), ds1Tile.Type, ss2.Tiles)
+				ds := maps.GetTiles(int(ds1Tile.Style), int(ds1Tile.Sequence), ds1Tile.Type, ss.Tiles)
 				if ds != nil {
 					if ds1Tile.Type == d2enum.TileRightPartOfNorthCornerWall {
-						dss := maps.GetTiles(int(ds1Tile.Style), int(ds1Tile.Sequence), d2enum.TileLeftPartOfNorthCornerWall, ss2.Tiles)
+						dss := maps.GetTiles(int(ds1Tile.Style), int(ds1Tile.Sequence), d2enum.TileLeftPartOfNorthCornerWall, ss.Tiles)
 						if dss != nil && dss[ds1Tile.RandomIndex].Height < ds[ds1Tile.RandomIndex].Height {
 							m, h := maps.GetWallTitleImage(dss[ds1Tile.RandomIndex], ds1Tile, ww)
 							t.Img2[i][j].Img = m

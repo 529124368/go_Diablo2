@@ -3,7 +3,6 @@ package engine
 import (
 	"embed"
 	"game/controller"
-	"game/engine/ws"
 	"game/fonts"
 	"game/interfaces"
 	"game/layout"
@@ -54,8 +53,8 @@ var asset embed.FS
 
 //GameEngine
 func NewGame() *Game {
-	w := ws.NewNet()
-	w.Start()
+	// w := ws.NewNet()
+	// w.Start()
 	//statueManage
 	sta := status.NewStatusManage()
 	bag := storage.New()
