@@ -12,7 +12,6 @@ type StatusManage struct {
 	CalculateEnd      bool
 	UIOFFSETX         int
 	ShadowOffsetX     int
-	ShadowOffsetY     int
 	PLAYERCENTERX     int64
 	PLAYERCENTERY     int64
 	IsTakeItem        bool //是否拿起物品
@@ -43,8 +42,7 @@ func NewStatusManage() *StatusManage {
 		IsWalk:          true,
 		CalculateEnd:    false,
 		UIOFFSETX:       0,
-		ShadowOffsetX:   -345,
-		ShadowOffsetY:   345,
+		ShadowOffsetX:   -70,
 		PLAYERCENTERX:   395, //LAYOUTX/2
 		PLAYERCENTERY:   240, //LAYOUTY/2
 		IsTakeItem:      false,

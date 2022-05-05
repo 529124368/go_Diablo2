@@ -29,7 +29,7 @@ const (
 
 type Game struct {
 	count, countForMap int
-	player             *role.Player              //玩家
+	player             [2]*role.Player           //玩家
 	mapManage          interfaces.MapInterface   //地图等管理
 	ui                 *layout.UI                //UI
 	music              interfaces.MusicInterface //音乐
@@ -62,6 +62,7 @@ func NewGame() *Game {
 	m := mapManage.NewE1(&asset, sta, bag)
 	//Player  设置初始状态和坐标
 	r := role.NewPlayer(5280, 1880, tools.IDLE, 0, 0, 0, &asset, m, sta)
+	r1 := role.NewPlayer(5280, 1880, tools.IDLE, 0, 0, 0, &asset, m, sta)
 
 	//字体
 	f := fonts.NewFont(&asset)
@@ -74,7 +75,7 @@ func NewGame() *Game {
 	gameEngine := &Game{
 		count:       0,
 		countForMap: 0,
-		player:      r,
+		player:      [2]*role.Player{r, r1},
 		ui:          u,
 		music:       bgm,
 		status:      sta,

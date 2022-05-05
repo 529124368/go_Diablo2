@@ -31,7 +31,8 @@ func (g *Game) ChangeScene(name string) {
 		w.Add(3)
 		//Palyer Init
 		go func() {
-			g.player.LoadImages()
+			g.player[0].LoadImages()
+			g.player[1].LoadImages()
 			runtime.GC()
 			w.Done()
 		}()
@@ -71,13 +72,13 @@ func (g *Game) changeScenceGameUpdate() {
 	// 		g.music.PlayBGMusic("town1.wav", tools.MUSICWAV)
 	// 	}()
 	// }
-	if g.player.State != tools.ATTACK && g.player.State != tools.SkILL {
-		g.player.State = tools.IDLE
+	if g.player[0].State != tools.ATTACK && g.player[0].State != tools.SkILL {
+		g.player[0].State = tools.IDLE
 	}
-	g.player.MouseX = mouseX
-	g.player.MouseY = mouseY
+	g.player[0].MouseX = mouseX
+	g.player[0].MouseY = mouseY
 	//计算鼠标位置
-	dir := tools.CaluteDir(g.status.PLAYERCENTERX, g.status.PLAYERCENTERY, int64(g.player.MouseX), int64(g.player.MouseY))
+	dir := tools.CaluteDir(g.status.PLAYERCENTERX, g.status.PLAYERCENTERY, int64(g.player[0].MouseX), int64(g.player[0].MouseY))
 
 	//鼠标事件
 	if controller.MouseleftPress() || controller.IsTouch() {
@@ -116,15 +117,15 @@ func (g *Game) changeScenceGameUpdate() {
 		if g.status.Flg {
 			//计算新的位置
 			newDir = dir
-			newpositonX = g.player.X + float64(mouseX) - 395
-			newpositonY = g.player.Y + float64(mouseY) - 240
+			newpositonX = g.player[0].X + float64(mouseX) - 395
+			newpositonY = g.player[0].Y + float64(mouseY) - 240
 		}
 	}
 
-	if newpositonX != 0 && newpositonY != 0 && (math.Abs(g.player.X-newpositonX) > 1 && math.Abs(g.player.Y-newpositonY) > 1) {
+	if newpositonX != 0 && newpositonY != 0 && (math.Abs(g.player[0].X-newpositonX) > 1 && math.Abs(g.player[0].Y-newpositonY) > 1) {
 		g.status.Flg = true
 		//鼠标人物移动控制
-		g.player.PlayerMove(mouseX, &newDir)
+		g.player[0].PlayerMove(mouseX, &newDir)
 	} else {
 		newpositonX = 0
 		newpositonY = 0
@@ -137,39 +138,39 @@ func (g *Game) changeScenceGameUpdate() {
 
 	//普通攻击
 	if controller.MouseRightPress() && !g.status.IsTakeItem {
-		if g.player.State != tools.ATTACK {
+		if g.player[0].State != tools.ATTACK {
 			counts = 0
 		}
 		g.status.Flg = false
-		if g.player.Direction != dir || g.player.State != tools.ATTACK {
-			g.player.SetPlayerState(tools.ATTACK, dir)
+		if g.player[0].Direction != dir || g.player[0].State != tools.ATTACK {
+			g.player[0].SetPlayerState(tools.ATTACK, dir)
 		}
 	}
 	//技能
 	if controller.MousePressF1() && !g.status.IsTakeItem {
 		//音乐
 		g.music.PlayMusic("File00002184.wav", tools.MUSICWAV)
-		//g.player.SkillName = "狂风"
-		if g.player.State != tools.SkILL {
+		//g.player[0].SkillName = "狂风"
+		if g.player[0].State != tools.SkILL {
 			counts = 0
 		}
 		g.status.Flg = false
-		if g.player.Direction != dir || g.player.State != tools.SkILL {
-			g.player.SetPlayerState(tools.SkILL, dir)
+		if g.player[0].Direction != dir || g.player[0].State != tools.SkILL {
+			g.player[0].SetPlayerState(tools.SkILL, dir)
 		}
 	}
 	//事件循环监听 是否有按钮点击事件
 	g.ui.EventLoop(mouseX, mouseY)
 
 	//根据状态改变帧数
-	if g.player.State == tools.IDLE {
+	if g.player[0].State == tools.IDLE {
 		frameNums = 16
 		frameSpeed = 5
 
-	} else if g.player.State == tools.ATTACK {
+	} else if g.player[0].State == tools.ATTACK {
 		frameNums = 16
 		frameSpeed = 1
-	} else if g.player.State == tools.SkILL {
+	} else if g.player[0].State == tools.SkILL {
 		frameNums = 14
 		frameSpeed = 1
 	} else {
@@ -186,7 +187,7 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 		}
 	}()
 	//获取玩家当前的地图块坐标
-	mapX, mapY := tools.GetFloorPositionAt(g.player.X, g.player.Y)
+	mapX, mapY := tools.GetFloorPositionAt(g.player[0].X, g.player[0].Y)
 	//玩家所在地图的逻辑坐标
 	g.status.MapTitleX = mapX
 	g.status.MapTitleY = mapY
@@ -194,11 +195,12 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	//Draw floor
 	g.mapManage.RenderFloor(screen, g.status.CamerOffsetX, g.status.CamerOffsetY)
 	//Draw drop items
-	g.mapManage.RenderDropItems(screen, g.status.CamerOffsetX, g.status.CamerOffsetY, g.player.X, g.player.Y)
+	g.mapManage.RenderDropItems(screen, g.status.CamerOffsetX, g.status.CamerOffsetY, g.player[0].X, g.player[0].Y)
 	//切换渲染顺序
 	if g.status.DisplaySort {
 		//Draw player
-		g.player.Render(screen, counts)
+		g.player[0].Render(screen, counts)
+		g.player[1].RenderCopy(screen, counts)
 		//Draw Wall
 		g.mapManage.RenderWall(screen, g.status.CamerOffsetX, g.status.CamerOffsetY)
 		//Draw map Anmi
@@ -210,14 +212,15 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 		//Draw map Anmi
 		g.mapManage.Render(screen, countsFor20, countsFor8, g.status.CamerOffsetX, g.status.CamerOffsetY)
 		//Draw player
-		g.player.Render(screen, counts)
+		g.player[0].Render(screen, counts)
+		g.player[1].RenderCopy(screen, counts)
 	}
 	//Draw UI
 	g.ui.DrawUI(screen)
 
 	//Draw Drop items Anm
 	if g.status.IsPlayDropAnmi {
-		if g.mapManage.PlayDropItemAnm(screen, g.player.X, g.player.Y, dropItemName, countsFor17) {
+		if g.mapManage.PlayDropItemAnm(screen, g.player[0].X, g.player[0].Y, dropItemName, countsFor17) {
 			countsFor17 = 0
 			g.status.IsPlayDropAnmi = false
 		}
@@ -227,7 +230,7 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 		len := tools.Distance(g.status.PLAYERCENTERX, g.status.PLAYERCENTERY, int64(mouseX), int64(mouseY))
 		re := tools.Angle(math.Abs(float64(int64(mouseY)-g.status.PLAYERCENTERY)), len)
 		ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nplayer world position %d,%d\nmouse position %d,%d\ndir %d\nAngle %f\nCell XY %d,%d",
-			int64(ebiten.CurrentFPS()), int64(g.player.X), int64(g.player.Y), g.player.MouseX, g.player.MouseY, tools.CaluteDir(g.status.PLAYERCENTERX, g.status.PLAYERCENTERY, int64(g.player.MouseX), int64(g.player.MouseY)), re, mapX, mapY))
+			int64(ebiten.CurrentFPS()), int64(g.player[0].X), int64(g.player[0].Y), g.player[0].MouseX, g.player[0].MouseY, tools.CaluteDir(g.status.PLAYERCENTERX, g.status.PLAYERCENTERY, int64(g.player[0].MouseX), int64(g.player[0].MouseY)), re, mapX, mapY))
 	}
 	//Change player Frame
 	if g.count > frameSpeed {

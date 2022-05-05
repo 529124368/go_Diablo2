@@ -16,7 +16,29 @@ const (
 	OFFSETY int = -50
 )
 
-var (
+// var (
+// 	plist_sheet   *texturepacker.SpriteSheet
+// 	plist_sheet_2 *texturepacker.SpriteSheet
+// 	plist_png     *ebiten.Image
+// 	plist_png_2   *ebiten.Image
+// 	opS           *ebiten.DrawImageOptions
+// 	op            *ebiten.DrawImageOptions
+// 	newPath       []uint8
+// 	turnLoop      uint8 = 0
+// )
+
+type Player struct {
+	X             float64                 //玩家世界坐标X
+	Y             float64                 //玩家世界坐标Y
+	State         uint8                   //玩家状态
+	Direction     uint8                   //玩家当前方向
+	OldDirection  uint8                   //玩家旧的方向
+	MouseX        int                     //鼠标X坐标
+	MouseY        int                     //鼠标Y坐标
+	SkillName     string                  //技能名称
+	image         *embed.FS               //静态资源获取
+	map_c         interfaces.MapInterface //地图
+	status        *status.StatusManage    //状态
 	plist_sheet   *texturepacker.SpriteSheet
 	plist_sheet_2 *texturepacker.SpriteSheet
 	plist_png     *ebiten.Image
@@ -24,27 +46,12 @@ var (
 	opS           *ebiten.DrawImageOptions
 	op            *ebiten.DrawImageOptions
 	newPath       []uint8
-	turnLoop      uint8 = 0
-)
-
-type Player struct {
-	X            float64                 //玩家世界坐标X
-	Y            float64                 //玩家世界坐标Y
-	State        uint8                   //玩家状态
-	Direction    uint8                   //玩家当前方向
-	OldDirection uint8                   //玩家旧的方向
-	MouseX       int                     //鼠标X坐标
-	MouseY       int                     //鼠标Y坐标
-	SkillName    string                  //技能名称
-	image        *embed.FS               //静态资源获取
-	map_c        interfaces.MapInterface //地图
-	status       *status.StatusManage    //状态
+	turnLoop      uint8
 }
 
 //创建玩家
 func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m interfaces.MapInterface, s *status.StatusManage) *Player {
-	opS = &ebiten.DrawImageOptions{}
-	op = &ebiten.DrawImageOptions{}
+
 	play := &Player{
 		X:            x, //地图坐标X
 		Y:            y, //地图坐标Y
@@ -57,6 +64,9 @@ func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m i
 		image:        images,
 		map_c:        m,
 		status:       s,
+		turnLoop:     0,
+		opS:          &ebiten.DrawImageOptions{},
+		op:           &ebiten.DrawImageOptions{},
 	}
 	return play
 }
@@ -67,14 +77,14 @@ func (p *Player) LoadImages() {
 	plist, _ := p.image.ReadFile("resource/man/warrior/ba2.png")
 	plist_json, _ := p.image.ReadFile("resource/man/warrior/ba2.json")
 	pli, pln := tools.GetImageFromPlistPaletted(plist, plist_json)
-	plist_sheet = pli
-	plist_png = ebiten.NewImageFromImage(pln)
+	p.plist_sheet = pli
+	p.plist_png = ebiten.NewImageFromImage(pln)
 	//加载玩家素材第二部分
 	plist, _ = p.image.ReadFile("resource/man/warrior/ba2_act.png")
 	plist_json, _ = p.image.ReadFile("resource/man/warrior/ba2_act.json")
 	pli, pln = tools.GetImageFromPlistPaletted(plist, plist_json)
-	plist_sheet_2 = pli
-	plist_png_2 = ebiten.NewImageFromImage(pln)
+	p.plist_sheet_2 = pli
+	p.plist_png_2 = ebiten.NewImageFromImage(pln)
 	p.SetPlayerState(0, 0)
 }
 
@@ -96,9 +106,9 @@ func (p *Player) GetAnimator(flg, name string, block uint8) (*ebiten.Image, int,
 	if flg == "man" {
 		//判断加载素材的第几部分
 		if block == 1 {
-			return plist_png.SubImage(plist_sheet.Sprites[name+".png"].Frame).(*ebiten.Image), plist_sheet.Sprites[name+".png"].SpriteSourceSize.Min.X, plist_sheet.Sprites[name+".png"].SpriteSourceSize.Min.Y
+			return p.plist_png.SubImage(p.plist_sheet.Sprites[name+".png"].Frame).(*ebiten.Image), p.plist_sheet.Sprites[name+".png"].SpriteSourceSize.Min.X, p.plist_sheet.Sprites[name+".png"].SpriteSourceSize.Min.Y
 		} else {
-			return plist_png_2.SubImage(plist_sheet_2.Sprites[name+".png"].Frame).(*ebiten.Image), plist_sheet_2.Sprites[name+".png"].SpriteSourceSize.Min.X, plist_sheet_2.Sprites[name+".png"].SpriteSourceSize.Min.Y
+			return p.plist_png_2.SubImage(p.plist_sheet_2.Sprites[name+".png"].Frame).(*ebiten.Image), p.plist_sheet_2.Sprites[name+".png"].SpriteSourceSize.Min.X, p.plist_sheet_2.Sprites[name+".png"].SpriteSourceSize.Min.Y
 		}
 	} else {
 		return nil, 0, 0
@@ -153,29 +163,29 @@ func (p *Player) PlayerMove(mouseX int, dir *uint8) {
 		//判断人物方位
 		if p.OldDirection != p.Direction && !controller.MouseRightPress() {
 			if !p.status.CalculateEnd {
-				newPath = tools.CalculateDirPath(p.OldDirection, p.Direction)
+				p.newPath = tools.CalculateDirPath(p.OldDirection, p.Direction)
 				p.status.CalculateEnd = true
 			}
-			if len(newPath) >= 3 {
-				if turnLoop >= uint8(len(newPath)) {
-					turnLoop = uint8(len(newPath) - 1)
-					*dir = newPath[turnLoop]
+			if len(p.newPath) >= 3 {
+				if p.turnLoop >= uint8(len(p.newPath)) {
+					p.turnLoop = uint8(len(p.newPath) - 1)
+					*dir = p.newPath[p.turnLoop]
 					p.UpdateOldPlayerDir(p.Direction)
 				} else {
-					*dir = newPath[turnLoop]
+					*dir = p.newPath[p.turnLoop]
 				}
-				turnLoop++
+				p.turnLoop++
 				p.SetPlayerState(tools.IDLE, *dir)
 			} else {
 				//直接切换方向
 				p.status.CalculateEnd = false
-				turnLoop = 0
+				p.turnLoop = 0
 				p.UpdateOldPlayerDir(p.Direction)
 				p.GetMouseController(p.Direction)
 			}
 		} else {
 			p.status.CalculateEnd = false
-			turnLoop = 0
+			p.turnLoop = 0
 			p.GetMouseController(*dir)
 		}
 	}

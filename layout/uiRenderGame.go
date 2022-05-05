@@ -178,8 +178,7 @@ func (u *UI) LoadGameImages() {
 				//恢复因打开包裹导致的人物偏移
 				u.status.UIOFFSETX = 0
 				//恢复影子偏移
-				u.status.ShadowOffsetX = -345
-				u.status.ShadowOffsetY = 345
+				u.status.ShadowOffsetX = -70
 				//恢复玩家中心位置
 				u.status.PLAYERCENTERX = 388
 				//恢复地图偏移
@@ -304,8 +303,7 @@ func (u *UI) LoadGameImages() {
 							//修改玩家中心位置
 							u.status.PLAYERCENTERX -= 200
 							//修改人物影子偏移
-							u.status.ShadowOffsetX = u.status.ShadowOffsetX + 24
-							u.status.ShadowOffsetY = u.status.ShadowOffsetY - 84
+							u.status.ShadowOffsetX = u.status.ShadowOffsetX - 5
 							for _, v := range u.MiniPanelCompents {
 								v.SetPosition(-100, 0)
 								if v.clickMaxX != 0 {
