@@ -31,8 +31,9 @@ func (g *Game) ChangeScene(name string) {
 		w.Add(3)
 		//Palyer Init
 		go func() {
-			g.player[0].LoadImages()
-			g.player[1].LoadImages()
+			g.player[0].LoadImages("ba2", 2)
+			g.player[1].LoadImages("ba", 1)
+			g.player[2].LoadImages("ba1", 1)
 			runtime.GC()
 			w.Done()
 		}()
@@ -138,6 +139,7 @@ func (g *Game) changeScenceGameUpdate() {
 
 	//普通攻击
 	if controller.MouseRightPress() && !g.status.IsTakeItem {
+		//g.player[0].WsCon.SendMessage("attack#######")
 		if g.player[0].State != tools.ATTACK {
 			counts = 0
 		}
@@ -201,6 +203,7 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 		//Draw player
 		g.player[0].Render(screen, counts)
 		g.player[1].RenderCopy(screen, counts)
+		g.player[2].RenderCopy(screen, counts)
 		//Draw Wall
 		g.mapManage.RenderWall(screen, g.status.CamerOffsetX, g.status.CamerOffsetY)
 		//Draw map Anmi
@@ -214,6 +217,7 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 		//Draw player
 		g.player[0].Render(screen, counts)
 		g.player[1].RenderCopy(screen, counts)
+		g.player[2].RenderCopy(screen, counts)
 	}
 	//Draw UI
 	g.ui.DrawUI(screen)

@@ -200,11 +200,11 @@ func (p *Player) RenderCopy(screen *ebiten.Image, counts int) {
 	p.opS.GeoM.Rotate(-0.5)
 	p.opS.GeoM.Scale(1, 0.5)
 	p.opS.ColorM.Scale(0, 0, 0, 1)
-	p.opS.GeoM.Translate(float64(5280+x-50)+p.status.CamerOffsetX, float64(1880+y+50)+p.status.CamerOffsetY)
+	p.opS.GeoM.Translate(float64(int(p.X)+x-32)+p.status.CamerOffsetX, float64(int(p.Y)+y+35)+p.status.CamerOffsetY)
 	screen.DrawImage(imagess, p.opS)
 	//Draw Player
 	p.op.GeoM.Reset()
-	p.op.GeoM.Translate(float64(5280+x)+p.status.CamerOffsetX, float64(1880+y)+p.status.CamerOffsetY)
+	p.op.GeoM.Translate(float64(int(p.X)+x)+p.status.CamerOffsetX, float64(int(p.Y)+y)+p.status.CamerOffsetY)
 	p.op.Filter = ebiten.FilterLinear
 	screen.DrawImage(imagess, p.op)
 }

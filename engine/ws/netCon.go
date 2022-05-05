@@ -42,3 +42,7 @@ func (w *WsNetManage) Start() {
 
 	}()
 }
+
+func (w *WsNetManage) SendMessage(msg string) {
+	w.Con.WriteMessage(1, []byte(msg))
+}

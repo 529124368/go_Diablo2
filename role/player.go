@@ -3,6 +3,7 @@ package role
 import (
 	"embed"
 	"game/controller"
+	"game/engine/ws"
 	"game/interfaces"
 	"game/status"
 	"game/tools"
@@ -15,17 +16,6 @@ const (
 	OFFSETX int = -30
 	OFFSETY int = -50
 )
-
-// var (
-// 	plist_sheet   *texturepacker.SpriteSheet
-// 	plist_sheet_2 *texturepacker.SpriteSheet
-// 	plist_png     *ebiten.Image
-// 	plist_png_2   *ebiten.Image
-// 	opS           *ebiten.DrawImageOptions
-// 	op            *ebiten.DrawImageOptions
-// 	newPath       []uint8
-// 	turnLoop      uint8 = 0
-// )
 
 type Player struct {
 	X             float64                 //玩家世界坐标X
@@ -47,10 +37,11 @@ type Player struct {
 	op            *ebiten.DrawImageOptions
 	newPath       []uint8
 	turnLoop      uint8
+	WsCon         *ws.WsNetManage //net
 }
 
 //创建玩家
-func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m interfaces.MapInterface, s *status.StatusManage) *Player {
+func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m interfaces.MapInterface, s *status.StatusManage, con *ws.WsNetManage) *Player {
 
 	play := &Player{
 		X:            x, //地图坐标X
@@ -67,24 +58,35 @@ func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m i
 		turnLoop:     0,
 		opS:          &ebiten.DrawImageOptions{},
 		op:           &ebiten.DrawImageOptions{},
+		WsCon:        con,
 	}
 	return play
 }
 
 //Load Images
-func (p *Player) LoadImages() {
-	//加载玩家素材第一部分
-	plist, _ := p.image.ReadFile("resource/man/warrior/ba2.png")
-	plist_json, _ := p.image.ReadFile("resource/man/warrior/ba2.json")
-	pli, pln := tools.GetImageFromPlistPaletted(plist, plist_json)
-	p.plist_sheet = pli
-	p.plist_png = ebiten.NewImageFromImage(pln)
-	//加载玩家素材第二部分
-	plist, _ = p.image.ReadFile("resource/man/warrior/ba2_act.png")
-	plist_json, _ = p.image.ReadFile("resource/man/warrior/ba2_act.json")
-	pli, pln = tools.GetImageFromPlistPaletted(plist, plist_json)
-	p.plist_sheet_2 = pli
-	p.plist_png_2 = ebiten.NewImageFromImage(pln)
+func (p *Player) LoadImages(name string, num uint8) {
+	if num == 2 {
+		//加载玩家素材第一部分
+		plist, _ := p.image.ReadFile("resource/man/warrior/" + name + ".png")
+		plist_json, _ := p.image.ReadFile("resource/man/warrior/" + name + ".json")
+		pli, pln := tools.GetImageFromPlistPaletted(plist, plist_json)
+		p.plist_sheet = pli
+		p.plist_png = ebiten.NewImageFromImage(pln)
+		//加载玩家素材第二部分
+		plist, _ = p.image.ReadFile("resource/man/warrior/" + name + "_act.png")
+		plist_json, _ = p.image.ReadFile("resource/man/warrior/" + name + "_act.json")
+		pli, pln = tools.GetImageFromPlistPaletted(plist, plist_json)
+		p.plist_sheet_2 = pli
+		p.plist_png_2 = ebiten.NewImageFromImage(pln)
+	} else {
+		//加载玩家素材第一部分
+		plist, _ := p.image.ReadFile("resource/man/warrior/" + name + ".png")
+		plist_json, _ := p.image.ReadFile("resource/man/warrior/" + name + ".json")
+		pli, pln := tools.GetImageFromPlistPaletted(plist, plist_json)
+		p.plist_sheet = pli
+		p.plist_png = ebiten.NewImageFromImage(pln)
+	}
+
 	p.SetPlayerState(0, 0)
 }
 

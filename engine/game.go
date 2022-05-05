@@ -3,6 +3,7 @@ package engine
 import (
 	"embed"
 	"game/controller"
+	"game/engine/ws"
 	"game/fonts"
 	"game/interfaces"
 	"game/layout"
@@ -29,7 +30,7 @@ const (
 
 type Game struct {
 	count, countForMap int
-	player             [2]*role.Player           //玩家
+	player             [3]*role.Player           //玩家
 	mapManage          interfaces.MapInterface   //地图等管理
 	ui                 *layout.UI                //UI
 	music              interfaces.MusicInterface //音乐
@@ -53,16 +54,17 @@ var asset embed.FS
 
 //GameEngine
 func NewGame() *Game {
-	// w := ws.NewNet()
-	// w.Start()
+	w := ws.NewNet()
+	w.Start()
 	//statueManage
 	sta := status.NewStatusManage()
 	bag := storage.New()
 	//场景
 	m := mapManage.NewE1(&asset, sta, bag)
 	//Player  设置初始状态和坐标
-	r := role.NewPlayer(5280, 1880, tools.IDLE, 0, 0, 0, &asset, m, sta)
-	r1 := role.NewPlayer(5280, 1880, tools.IDLE, 0, 0, 0, &asset, m, sta)
+	r := role.NewPlayer(5280, 1880, tools.IDLE, 0, 0, 0, &asset, m, sta, w)
+	r1 := role.NewPlayer(5280, 1880, tools.IDLE, 0, 0, 0, &asset, m, sta, nil)
+	r2 := role.NewPlayer(5039, 2031, tools.IDLE, 0, 0, 0, &asset, m, sta, nil)
 
 	//字体
 	f := fonts.NewFont(&asset)
@@ -75,7 +77,7 @@ func NewGame() *Game {
 	gameEngine := &Game{
 		count:       0,
 		countForMap: 0,
-		player:      [2]*role.Player{r, r1},
+		player:      [3]*role.Player{r, r1, r2},
 		ui:          u,
 		music:       bgm,
 		status:      sta,
