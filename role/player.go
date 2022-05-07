@@ -161,37 +161,34 @@ func (p *Player) CanWalk(xS, yS float64, dir uint8) bool {
 }
 
 //玩家移动
-func (p *Player) PlayerMove(mouseX int, dir *uint8) {
-	//鼠标人物移动控制
-	if !p.status.OpenBag || p.status.OpenBag && mouseX <= tools.LAYOUTX/2 {
-		//判断人物方位
-		if p.OldDirection != p.Direction && !controller.MouseRightPress() {
-			if !p.status.CalculateEnd {
-				p.newPath = tools.CalculateDirPath(p.OldDirection, p.Direction)
-				p.status.CalculateEnd = true
-			}
-			if len(p.newPath) >= 3 {
-				if p.turnLoop >= uint8(len(p.newPath)) {
-					p.turnLoop = uint8(len(p.newPath) - 1)
-					*dir = p.newPath[p.turnLoop]
-					p.UpdateOldPlayerDir(p.Direction)
-				} else {
-					*dir = p.newPath[p.turnLoop]
-				}
-				p.turnLoop++
-				p.SetPlayerState(tools.IDLE, *dir)
-			} else {
-				//直接切换方向
-				p.status.CalculateEnd = false
-				p.turnLoop = 0
+func (p *Player) PlayerMove(dir *uint8) {
+	//判断人物方位
+	if p.OldDirection != p.Direction && !controller.MouseRightPress() {
+		if !p.status.CalculateEnd {
+			p.newPath = tools.CalculateDirPath(p.OldDirection, p.Direction)
+			p.status.CalculateEnd = true
+		}
+		if len(p.newPath) >= 3 {
+			if p.turnLoop >= uint8(len(p.newPath)) {
+				p.turnLoop = uint8(len(p.newPath) - 1)
+				*dir = p.newPath[p.turnLoop]
 				p.UpdateOldPlayerDir(p.Direction)
-				p.GetMouseController(p.Direction)
+			} else {
+				*dir = p.newPath[p.turnLoop]
 			}
+			p.turnLoop++
+			p.SetPlayerState(tools.IDLE, *dir)
 		} else {
+			//直接切换方向
 			p.status.CalculateEnd = false
 			p.turnLoop = 0
-			p.GetMouseController(*dir)
+			p.UpdateOldPlayerDir(p.Direction)
+			p.GetMouseController(p.Direction)
 		}
+	} else {
+		p.status.CalculateEnd = false
+		p.turnLoop = 0
+		p.GetMouseController(*dir)
 	}
 }
 

@@ -128,7 +128,7 @@ func (g *Game) changeScenceGameUpdate() {
 	if newpositonX != 0 && newpositonY != 0 && (math.Abs(g.player[0].X-newpositonX) > 1 && math.Abs(g.player[0].Y-newpositonY) > 1) {
 		g.status.Flg = true
 		//鼠标人物移动控制
-		g.player[0].PlayerMove(mouseX, &newDir)
+		g.player[0].PlayerMove(&newDir)
 	} else {
 		newpositonX = 0
 		newpositonY = 0
