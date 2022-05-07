@@ -29,30 +29,35 @@ func NewNet(s *status.StatusManage) *WsNetManage {
 func (w *WsNetManage) Start() {
 	//发送消息
 	w.SendMessage("@@myName")
-	//心跳维持
-	go func() {
-		for {
-			w.SendMessage("@@ping")
-			time.Sleep(time.Second * 500)
-		}
-	}()
 	//接收消息
 	go func() {
 		for {
-			s := w.reciveMessage()
+			s, err := w.reciveMessage()
+			if err != nil {
+				return
+			}
 			//放入消息队列
 			w.status.Queue <- s
 		}
 	}()
+	//心跳维持
+	for {
+		time.Sleep(time.Second * 500)
+		err := w.SendMessage("@@ping")
+		if err != nil {
+			return
+		}
+	}
 }
 
 //往客户端发送消息
-func (w *WsNetManage) SendMessage(msg string) {
-	w.Con.WriteMessage(1, []byte(msg))
+func (w *WsNetManage) SendMessage(msg string) error {
+	err := w.Con.WriteMessage(1, []byte(msg))
+	return err
 }
 
 //接受服务器端消息
-func (w *WsNetManage) reciveMessage() []byte {
-	_, mesg, _ := w.Con.ReadMessage()
-	return mesg
+func (w *WsNetManage) reciveMessage() ([]byte, error) {
+	_, mesg, err := w.Con.ReadMessage()
+	return mesg, err
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-//渲染角色
+//渲染本机角色
 func (p *Player) Render(screen *ebiten.Image, counts int) {
 	var name string
 	block := 1
@@ -114,7 +114,7 @@ func (p *Player) Render(screen *ebiten.Image, counts int) {
 	// }
 }
 
-//渲染角色
+//渲染其他客户端角色
 func (p *Player) RenderCopy(screen *ebiten.Image, counts int) {
 	var name string
 	block := 1

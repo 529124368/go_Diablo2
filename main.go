@@ -17,6 +17,9 @@ func main() {
 	ebiten.SetWindowTitle("Golang_DibaloⅡ")
 	ebiten.SetMaxTPS(80)
 	gameStart := engine.NewGame()
+	defer func() {
+		gameStart.CloseCon()
+	}()
 	if err := ebiten.RunGame(gameStart); err != nil {
 		log.Fatal(err)
 	}

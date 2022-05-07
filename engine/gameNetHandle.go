@@ -20,7 +20,11 @@ type serviceMessage struct {
 //接受服务器端消息
 func (g *Game) ListenMessage() {
 	for {
-		msg := <-g.status.Queue
+		msg, ok := <-g.status.Queue
+		if !ok {
+			fmt.Println("afs")
+			return
+		}
 		//处理消息
 		g.Handle(msg)
 	}
@@ -72,6 +76,22 @@ func (g *Game) Handle(msg []byte) {
 			d2, _ := strconv.ParseFloat(d[2], 64)
 			g.CreatePlayer(d1, d2, d[3], "")
 			return
+		}
+	}
+	//角色移动
+	if len(sm.Data) > 7 && sm.Data[:7] == "@@Move|" {
+		d := strings.Split(sm.Data, "|")
+		if len(d) == 5 {
+			pm := d[1]
+			mx, _ := strconv.Atoi(d[2])
+			my, _ := strconv.Atoi(d[3])
+			md, _ := strconv.Atoi(d[4])
+			for _, v := range g.player {
+				if v.PlayerName == pm {
+					v.PlayerNextMovePositon(mx, my, uint8(md))
+					return
+				}
+			}
 		}
 	}
 	//玩家登陆

@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"game/controller"
 	"game/engine/ws"
+	"game/role"
 	"game/tools"
 	"math"
 	"runtime"
+	"strconv"
 	"sync"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -14,8 +16,6 @@ import (
 )
 
 var dropItemName = ""
-var newpositonX, newpositonY float64
-var newDir uint8
 
 //切换游戏场景
 func (g *Game) ChangeScene(name string) {
@@ -29,9 +29,16 @@ func (g *Game) ChangeScene(name string) {
 		//进入游戏场景
 		g.status.CurrentGameScence = tools.GAMESCENESTART
 		w := sync.WaitGroup{}
+		//网络链接
+		ww := ws.NewNet(g.status)
+		g.Ws = ww.Con
+		go ww.Start()
 		w.Add(3)
 		//Palyer Init
 		go func() {
+			//new Player  设置初始状态和坐标
+			r := role.NewPlayer(5280, 1880, tools.IDLE, 0, 0, 0, &asset, g.mapManage, g.status, ww)
+			g.player = append(g.player, r)
 			g.player[0].LoadImages("ba2", 2)
 			runtime.GC()
 			w.Done()
@@ -51,9 +58,6 @@ func (g *Game) ChangeScene(name string) {
 			w.Done()
 		}()
 		w.Wait()
-		//网络链接
-		ww := ws.NewNet(g.status)
-		ww.Start()
 		go func() {
 			runtime.GC()
 		}()
@@ -119,19 +123,19 @@ func (g *Game) changeScenceGameUpdate() {
 		}
 		if g.status.Flg {
 			//计算新的位置
-			newDir = dir
-			newpositonX = g.player[0].X + float64(mouseX) - 395
-			newpositonY = g.player[0].Y + float64(mouseY) - 240
+			g.player[0].WsCon.SendMessage("@@Move|" + g.player[0].PlayerName + "|" + strconv.Itoa(mouseX) + "|" + strconv.Itoa(mouseY) + "|" + strconv.Itoa(int(dir)))
+			g.player[0].PlayerNextMovePositon(mouseX, mouseY, dir)
 		}
 	}
 
-	if newpositonX != 0 && newpositonY != 0 && (math.Abs(g.player[0].X-newpositonX) > 1 && math.Abs(g.player[0].Y-newpositonY) > 1) {
-		g.status.Flg = true
-		//鼠标人物移动控制
-		g.player[0].PlayerMove(&newDir)
-	} else {
-		newpositonX = 0
-		newpositonY = 0
+	//人物移动控制
+	for k, v := range g.player {
+		if k == 0 {
+			v.PlayerMove()
+		} else {
+			v.PlayerMoveCopy()
+		}
+
 	}
 
 	//鼠标滚轮控制
@@ -141,7 +145,7 @@ func (g *Game) changeScenceGameUpdate() {
 
 	//普通攻击
 	if controller.MouseRightPress() && !g.status.IsTakeItem {
-		//g.player[0].WsCon.SendMessage("attack#######")
+		g.player[0].WsCon.SendMessage("attack#######")
 		if g.player[0].State != tools.ATTACK {
 			counts = 0
 		}

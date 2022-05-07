@@ -15,6 +15,7 @@ import (
 	"runtime"
 	"sync"
 
+	"github.com/gorilla/websocket"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
@@ -35,6 +36,7 @@ type Game struct {
 	music              interfaces.MusicInterface //音乐
 	status             *status.StatusManage      //状态管理器
 	font_style         *fonts.FontBase           //字体
+	Ws                 *websocket.Conn
 }
 
 var (
@@ -76,9 +78,6 @@ func NewGame() *Game {
 		mapManage:   m,
 		font_style:  f,
 	}
-	//new Player  设置初始状态和坐标
-	r := role.NewPlayer(5280, 1880, tools.IDLE, 0, 0, 0, &asset, m, sta, nil)
-	gameEngine.player = append(gameEngine.player, r)
 	//启动游戏
 	gameEngine.StartEngine()
 	return gameEngine
@@ -106,6 +105,11 @@ func (g *Game) StartEngine() {
 	}()
 }
 
+//关闭所有连接
+func (g *Game) CloseCon() {
+	g.Ws.Close()
+	close(g.status.Queue)
+}
 func (g *Game) Update() error {
 	//判断是否是点击屏幕
 	if !controller.IsTouch() {
