@@ -44,7 +44,6 @@ var (
 	countsFor20 int = 0
 	countsFor8  int = 0
 	countsFor17 int = 0
-	frameNums   int = 4
 	frameSpeed  int = 5
 	mouseX      int
 	mouseY      int

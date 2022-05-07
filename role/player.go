@@ -19,29 +19,30 @@ const (
 )
 
 type Player struct {
-	PlayerName               string                  //玩家名字
-	X                        float64                 //玩家世界坐标X
-	Y                        float64                 //玩家世界坐标Y
-	State                    uint8                   //玩家状态
-	Direction                uint8                   //玩家当前方向
-	OldDirection             uint8                   //玩家旧的方向
-	MouseX                   int                     //鼠标X坐标
-	MouseY                   int                     //鼠标Y坐标
-	SkillName                string                  //技能名称
-	image                    *embed.FS               //静态资源获取
-	map_c                    interfaces.MapInterface //地图
-	status                   *status.StatusManage    //状态
-	plist_sheet              *texturepacker.SpriteSheet
-	plist_sheet_2            *texturepacker.SpriteSheet
-	plist_png                *ebiten.Image
-	plist_png_2              *ebiten.Image
-	opS                      *ebiten.DrawImageOptions
-	op                       *ebiten.DrawImageOptions
-	newPath                  []uint8
-	turnLoop                 uint8
-	WsCon                    *ws.WsNetManage //net
-	newpositonX, newpositonY float64
-	newDir                   uint8
+	PlayerName                           string                  //玩家名字
+	X                                    float64                 //玩家世界坐标X
+	Y                                    float64                 //玩家世界坐标Y
+	State                                uint8                   //玩家状态
+	Direction                            uint8                   //玩家当前方向
+	OldDirection                         uint8                   //玩家旧的方向
+	MouseX                               int                     //鼠标X坐标
+	MouseY                               int                     //鼠标Y坐标
+	SkillName                            string                  //技能名称
+	image                                *embed.FS               //静态资源获取
+	map_c                                interfaces.MapInterface //地图
+	status                               *status.StatusManage    //状态
+	plist_sheet                          *texturepacker.SpriteSheet
+	plist_sheet_2                        *texturepacker.SpriteSheet
+	plist_png                            *ebiten.Image
+	plist_png_2                          *ebiten.Image
+	opS                                  *ebiten.DrawImageOptions
+	op                                   *ebiten.DrawImageOptions
+	newPath                              []uint8
+	turnLoop                             uint8
+	WsCon                                *ws.WsNetManage //net
+	newpositonX, newpositonY             float64
+	newDir                               uint8
+	FrameSpeed, FrameNums, Counts, count int
 }
 
 //创建玩家
@@ -152,14 +153,8 @@ func (p *Player) GetMouseControllerCopy(dir uint8) {
 	if p.status.Flg {
 		speed := 0.0
 		//判断是否走路
-		if p.status.IsWalk && (p.Direction != dir || p.State != tools.Walk) {
-			speed = tools.SPEED
-			p.SetPlayerState(tools.Walk, dir)
-		}
-		if !p.status.IsWalk && (p.Direction != dir || p.State != tools.RUN) {
-			speed = tools.SPEED_RUN
-			p.SetPlayerState(tools.RUN, dir)
-		}
+		speed = tools.SPEED
+		p.SetPlayerState(tools.Walk, dir)
 		//移动判断
 		moveX, moveY := tools.CalculateSpeed(dir, speed)
 		if p.CanWalk(moveX, moveY, dir) {
@@ -224,39 +219,15 @@ func (p *Player) PlayerMove() {
 	}
 }
 
-//非控制玩家移动
+//控制非玩家移动
 func (p *Player) PlayerMoveCopy() {
 	if p.newpositonX != 0 && p.newpositonY != 0 && (math.Abs(p.X-p.newpositonX) > 1 && math.Abs(p.Y-p.newpositonY) > 1) {
 		p.status.Flg = true
-		//判断人物方位
-		if p.OldDirection != p.Direction && !controller.MouseRightPress() {
-			if !p.status.CalculateEnd {
-				p.newPath = tools.CalculateDirPath(p.OldDirection, p.Direction)
-				p.status.CalculateEnd = true
-			}
-			if len(p.newPath) >= 3 {
-				if p.turnLoop >= uint8(len(p.newPath)) {
-					p.turnLoop = uint8(len(p.newPath) - 1)
-					p.newDir = p.newPath[p.turnLoop]
-					p.UpdateOldPlayerDir(p.Direction)
-				} else {
-					p.newDir = p.newPath[p.turnLoop]
-				}
-				p.turnLoop++
-				p.SetPlayerState(tools.IDLE, p.newDir)
-			} else {
-				//直接切换方向
-				p.status.CalculateEnd = false
-				p.turnLoop = 0
-				p.UpdateOldPlayerDir(p.Direction)
-				p.GetMouseControllerCopy(p.Direction)
-			}
-		} else {
-			p.status.CalculateEnd = false
-			p.turnLoop = 0
-			p.GetMouseControllerCopy(p.newDir)
-		}
+		//直接切换方向
+		p.UpdateOldPlayerDir(p.newDir)
+		p.GetMouseControllerCopy(p.newDir)
 	} else {
+		p.State = tools.IDLE
 		p.newpositonX = 0
 		p.newpositonY = 0
 	}

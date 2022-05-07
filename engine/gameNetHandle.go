@@ -66,8 +66,6 @@ func (g *Game) MovePlayer() {
 func (g *Game) Handle(msg []byte) {
 	//解包
 	g.unpack(msg)
-	//打印数据
-	fmt.Println(sm.Data)
 	//动态创建角色 测试用
 	if len(sm.Data) > 12 && sm.Data[:12] == "@@newplayer|" {
 		d := strings.Split(sm.Data, "|")
@@ -98,7 +96,7 @@ func (g *Game) Handle(msg []byte) {
 	if len(sm.Data) > 10 && sm.Data[:10] == "@@loginIn|" {
 		d := strings.Split(sm.Data, "|")
 		if len(d) == 2 {
-			g.CreatePlayer(5202, 1959, "ba", d[1])
+			g.CreatePlayer(5280, 1880, "ba", d[1])
 			return
 		}
 	}
@@ -113,6 +111,21 @@ func (g *Game) Handle(msg []byte) {
 				}
 			}
 		}
+	}
+	//除了我还有谁
+	if len(sm.Data) > 12 && sm.Data[:12] == "@@HasPlayer|" {
+		d := strings.Split(sm.Data, "|")
+		for _, na := range d[1:] {
+			for _, v := range g.player {
+				fmt.Println(na)
+				fmt.Println(v.PlayerName)
+				if v.PlayerName != na {
+					fmt.Println(v.PlayerName)
+					g.CreatePlayer(5280, 1880, "ba", na)
+				}
+			}
+		}
+		return
 	}
 	//获取名字
 	if len(sm.Data) > 7 && sm.Data[:7] == "@@Name|" {

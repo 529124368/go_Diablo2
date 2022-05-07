@@ -29,6 +29,8 @@ func NewNet(s *status.StatusManage) *WsNetManage {
 func (w *WsNetManage) Start() {
 	//发送消息
 	w.SendMessage("@@myName")
+	// time.Sleep(time.Second)
+	w.SendMessage("@@whoNotMe")
 	//接收消息
 	go func() {
 		for {

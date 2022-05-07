@@ -73,12 +73,6 @@ func (g *Game) changeScenceGameUpdate() {
 		g.status.MusicIsPlay = true
 		g.music.PlayMusic("Bar_act2_complete_tombs.wav", tools.MUSICWAV)
 	}
-	//背景音乐是否还在播放
-	// if !g.music.IsPlayingBGMusic() {
-	// 	go func() {
-	// 		g.music.PlayBGMusic("town1.wav", tools.MUSICWAV)
-	// 	}()
-	// }
 	if g.player[0].State != tools.ATTACK && g.player[0].State != tools.SkILL {
 		g.player[0].State = tools.IDLE
 	}
@@ -147,7 +141,7 @@ func (g *Game) changeScenceGameUpdate() {
 	if controller.MouseRightPress() && !g.status.IsTakeItem {
 		g.player[0].WsCon.SendMessage("attack#######")
 		if g.player[0].State != tools.ATTACK {
-			counts = 0
+			g.player[0].Counts = 0
 		}
 		g.status.Flg = false
 		if g.player[0].Direction != dir || g.player[0].State != tools.ATTACK {
@@ -160,7 +154,7 @@ func (g *Game) changeScenceGameUpdate() {
 		g.music.PlayMusic("File00002184.wav", tools.MUSICWAV)
 		//g.player[0].SkillName = "狂风"
 		if g.player[0].State != tools.SkILL {
-			counts = 0
+			g.player[0].Counts = 0
 		}
 		g.status.Flg = false
 		if g.player[0].Direction != dir || g.player[0].State != tools.SkILL {
@@ -171,20 +165,22 @@ func (g *Game) changeScenceGameUpdate() {
 	g.ui.EventLoop(mouseX, mouseY)
 
 	//根据状态改变帧数
-	if g.player[0].State == tools.IDLE {
-		frameNums = 16
-		frameSpeed = 5
-
-	} else if g.player[0].State == tools.ATTACK {
-		frameNums = 16
-		frameSpeed = 1
-	} else if g.player[0].State == tools.SkILL {
-		frameNums = 14
-		frameSpeed = 1
-	} else {
-		frameNums = 8
-		frameSpeed = 5
+	for _, v := range g.player {
+		if v.State == tools.IDLE {
+			v.FrameNums = 16
+			v.FrameSpeed = 5
+		} else if v.State == tools.ATTACK {
+			v.FrameNums = 16
+			v.FrameSpeed = 1
+		} else if v.State == tools.SkILL {
+			v.FrameNums = 14
+			v.FrameSpeed = 1
+		} else {
+			v.FrameNums = 8
+			v.FrameSpeed = 5
+		}
 	}
+
 }
 
 //Draw Game Scence
@@ -209,9 +205,9 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 		//Draw player
 		for k, v := range g.player {
 			if k == 0 {
-				v.Render(screen, counts)
+				v.Render(screen)
 			} else {
-				v.RenderCopy(screen, counts)
+				v.RenderCopy(screen)
 			}
 		}
 		//Draw Wall
@@ -227,9 +223,9 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 		//Draw player
 		for k, v := range g.player {
 			if k == 0 {
-				v.Render(screen, counts)
+				v.Render(screen)
 			} else {
-				v.RenderCopy(screen, counts)
+				v.RenderCopy(screen)
 			}
 		}
 	}
@@ -249,14 +245,6 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 		re := tools.Angle(math.Abs(float64(int64(mouseY)-g.status.PLAYERCENTERY)), len)
 		ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nplayer world position %d,%d\nmouse position %d,%d\ndir %d\nAngle %f\nCell XY %d,%d",
 			int64(ebiten.CurrentFPS()), int64(g.player[0].X), int64(g.player[0].Y), g.player[0].MouseX, g.player[0].MouseY, tools.CaluteDir(g.status.PLAYERCENTERX, g.status.PLAYERCENTERY, int64(g.player[0].MouseX), int64(g.player[0].MouseY)), re, mapX, mapY))
-	}
-	//Change player Frame
-	if g.count > frameSpeed {
-		counts++
-		g.count = 0
-		if counts >= frameNums {
-			counts = 0
-		}
 	}
 
 	//Change map Frame
