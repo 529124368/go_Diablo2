@@ -14,7 +14,7 @@ type WsNetManage struct {
 }
 
 func NewNet(s *status.StatusManage) *WsNetManage {
-	url := "ws://124.220.178.68:8081/game?ConToken=zimugeWO**@erfs45656DGKZNNSJD"
+	url := "ws://124.220.178.68:8082/game?ConToken=zimugeWO**@erfs45656DGKZNNSJD"
 	ws, _, err := websocket.DefaultDialer.Dial(url, nil)
 	if err != nil {
 		log.Fatal(err)
@@ -27,7 +27,8 @@ func NewNet(s *status.StatusManage) *WsNetManage {
 }
 
 func (w *WsNetManage) Start() {
-	w.SendMessage("@@InsertRoom|1")
+	//发送消息
+	w.SendMessage("@@myName")
 	//心跳维持
 	go func() {
 		for {
@@ -51,7 +52,7 @@ func (w *WsNetManage) SendMessage(msg string) {
 }
 
 //接受服务器端消息
-func (w *WsNetManage) reciveMessage() string {
+func (w *WsNetManage) reciveMessage() []byte {
 	_, mesg, _ := w.Con.ReadMessage()
-	return string(mesg)
+	return mesg
 }

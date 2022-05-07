@@ -28,7 +28,7 @@ type StatusManage struct {
 	IsPlayDropAnmi    bool //是否播放掉落物品动画
 	IsDropDeal        bool //是否掉落物品处理中
 	DisplaySort       bool //人物和物体渲染顺序
-	Queue             chan string
+	Queue             chan []byte
 }
 
 func NewStatusManage() *StatusManage {
@@ -64,7 +64,7 @@ func NewStatusManage() *StatusManage {
 		IsPlayDropAnmi:    false,
 		IsDropDeal:        false,
 		DisplaySort:       false,
-		Queue:             make(chan string),
+		Queue:             make(chan []byte),
 	}
 	return n
 }

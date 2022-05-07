@@ -3,6 +3,7 @@ package engine
 import (
 	"fmt"
 	"game/controller"
+	"game/engine/ws"
 	"game/tools"
 	"math"
 	"runtime"
@@ -32,8 +33,6 @@ func (g *Game) ChangeScene(name string) {
 		//Palyer Init
 		go func() {
 			g.player[0].LoadImages("ba2", 2)
-			g.player[1].LoadImages("ba", 1)
-			g.player[2].LoadImages("ba1", 1)
 			runtime.GC()
 			w.Done()
 		}()
@@ -52,6 +51,9 @@ func (g *Game) ChangeScene(name string) {
 			w.Done()
 		}()
 		w.Wait()
+		//网络链接
+		ww := ws.NewNet(g.status)
+		ww.Start()
 		go func() {
 			runtime.GC()
 		}()
@@ -201,9 +203,13 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	//切换渲染顺序
 	if g.status.DisplaySort {
 		//Draw player
-		g.player[0].Render(screen, counts)
-		g.player[1].RenderCopy(screen, counts)
-		g.player[2].RenderCopy(screen, counts)
+		for k, v := range g.player {
+			if k == 0 {
+				v.Render(screen, counts)
+			} else {
+				v.RenderCopy(screen, counts)
+			}
+		}
 		//Draw Wall
 		g.mapManage.RenderWall(screen, g.status.CamerOffsetX, g.status.CamerOffsetY)
 		//Draw map Anmi
@@ -215,9 +221,13 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 		//Draw map Anmi
 		g.mapManage.Render(screen, countsFor20, countsFor8, g.status.CamerOffsetX, g.status.CamerOffsetY)
 		//Draw player
-		g.player[0].Render(screen, counts)
-		g.player[1].RenderCopy(screen, counts)
-		g.player[2].RenderCopy(screen, counts)
+		for k, v := range g.player {
+			if k == 0 {
+				v.Render(screen, counts)
+			} else {
+				v.RenderCopy(screen, counts)
+			}
+		}
 	}
 	//Draw UI
 	g.ui.DrawUI(screen)

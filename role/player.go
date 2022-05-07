@@ -18,6 +18,7 @@ const (
 )
 
 type Player struct {
+	PlayerName    string                  //玩家名字
 	X             float64                 //玩家世界坐标X
 	Y             float64                 //玩家世界坐标Y
 	State         uint8                   //玩家状态
@@ -44,6 +45,7 @@ type Player struct {
 func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m interfaces.MapInterface, s *status.StatusManage, con *ws.WsNetManage) *Player {
 
 	play := &Player{
+		PlayerName:   "",
 		X:            x, //地图坐标X
 		Y:            y, //地图坐标Y
 		State:        state,
@@ -191,4 +193,12 @@ func (p *Player) PlayerMove(mouseX int, dir *uint8) {
 			p.GetMouseController(*dir)
 		}
 	}
+}
+
+//GC
+func (p *Player) GC() {
+	p.plist_sheet = nil
+	p.plist_sheet_2 = nil
+	p.plist_png = nil
+	p.plist_png_2 = nil
 }

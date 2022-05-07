@@ -3,7 +3,6 @@ package engine
 import (
 	"embed"
 	"game/controller"
-	"game/engine/ws"
 	"game/fonts"
 	"game/interfaces"
 	"game/layout"
@@ -30,7 +29,7 @@ const (
 
 type Game struct {
 	count, countForMap int
-	player             [3]*role.Player           //玩家
+	player             []*role.Player            //玩家
 	mapManage          interfaces.MapInterface   //地图等管理
 	ui                 *layout.UI                //UI
 	music              interfaces.MusicInterface //音乐
@@ -56,16 +55,9 @@ var asset embed.FS
 func NewGame() *Game {
 	//statueManage
 	sta := status.NewStatusManage()
-	//Net
-	w := ws.NewNet(sta)
-	w.Start()
 	bag := storage.New()
 	//场景
 	m := mapManage.NewE1(&asset, sta, bag)
-	//Player  设置初始状态和坐标
-	r := role.NewPlayer(5280, 1880, tools.IDLE, 0, 0, 0, &asset, m, sta, nil)
-	r1 := role.NewPlayer(5280, 1880, tools.IDLE, 0, 0, 0, &asset, m, sta, nil)
-	r2 := role.NewPlayer(5039, 2031, tools.IDLE, 0, 0, 0, &asset, m, sta, nil)
 
 	//字体
 	f := fonts.NewFont(&asset)
@@ -78,13 +70,15 @@ func NewGame() *Game {
 	gameEngine := &Game{
 		count:       0,
 		countForMap: 0,
-		player:      [3]*role.Player{r, r1, r2},
 		ui:          u,
 		music:       bgm,
 		status:      sta,
 		mapManage:   m,
 		font_style:  f,
 	}
+	//new Player  设置初始状态和坐标
+	r := role.NewPlayer(5280, 1880, tools.IDLE, 0, 0, 0, &asset, m, sta, nil)
+	gameEngine.player = append(gameEngine.player, r)
 	//启动游戏
 	gameEngine.StartEngine()
 	return gameEngine
@@ -92,7 +86,8 @@ func NewGame() *Game {
 
 //引擎启动
 func (g *Game) StartEngine() {
-	go g.handle()
+	//网络监听消息
+	go g.ListenMessage()
 	//隐藏鼠标系统的ICON
 	ebiten.SetCursorMode(ebiten.CursorModeHidden)
 	w := sync.WaitGroup{}
