@@ -38,10 +38,9 @@ func (g *Game) ChangeScene(name string) {
 		w.Add(3)
 		//Palyer Init
 		go func() {
-			//new Player  设置初始状态和坐标
 			r := role.NewPlayer(5280, 1880, tools.IDLE, 0, 0, 0, &asset, g.mapManage, g.status, ww)
 			g.player = append(g.player, r)
-			g.player[0].LoadImages("ba2", 2)
+			g.player[0].LoadImages("ba1", 1)
 			runtime.GC()
 			w.Done()
 		}()
@@ -128,7 +127,7 @@ func (g *Game) changeScenceGameUpdate() {
 		if k == 0 {
 			v.PlayerMove()
 		} else {
-			v.PlayerMoveCopy()
+			v.PlayerMoveAI()
 		}
 
 	}

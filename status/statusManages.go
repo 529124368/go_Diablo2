@@ -30,6 +30,7 @@ type StatusManage struct {
 	DisplaySort       bool        //人物和物体渲染顺序
 	Queue             chan []byte //消息队列
 	IsNetPlay         bool        //是否网络游玩
+	IsRun             bool
 }
 
 func NewStatusManage() *StatusManage {
@@ -67,6 +68,7 @@ func NewStatusManage() *StatusManage {
 		DisplaySort:       false,
 		Queue:             make(chan []byte),
 		IsNetPlay:         true,
+		IsRun:             false,
 	}
 	return n
 }

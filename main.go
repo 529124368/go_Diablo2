@@ -3,6 +3,7 @@ package main
 import (
 	"game/engine"
 	"log"
+	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -13,6 +14,7 @@ const (
 )
 
 func main() {
+	os.Setenv("EBITEN_GRAPHICS_LIBRARY", "opengl")
 	ebiten.SetWindowSize(SCREENWIDTH*2, SCREENHEIGHT*2)
 	ebiten.SetWindowTitle("Golang_DibaloⅡ")
 	ebiten.SetMaxTPS(80)

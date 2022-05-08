@@ -26,18 +26,14 @@ type Player struct {
 	State                                uint8                   //玩家状态
 	Direction                            uint8                   //玩家当前方向
 	OldDirection                         uint8                   //玩家旧的方向
-	MouseX                               int                     //鼠标X坐标
-	MouseY                               int                     //鼠标Y坐标
+	MouseX, MouseY                       int                     //鼠标X坐标 鼠标Y坐标
 	SkillName                            string                  //技能名称
 	image                                *embed.FS               //静态资源获取
 	map_c                                interfaces.MapInterface //地图
 	status                               *status.StatusManage    //状态
-	plist_sheet                          *texturepacker.SpriteSheet
-	plist_sheet_2                        *texturepacker.SpriteSheet
-	plist_png                            *ebiten.Image
-	plist_png_2                          *ebiten.Image
-	opS                                  *ebiten.DrawImageOptions
-	op                                   *ebiten.DrawImageOptions
+	plist_sheet, plist_sheet_2           *texturepacker.SpriteSheet
+	plist_png, plist_png_2               *ebiten.Image
+	opS, op                              *ebiten.DrawImageOptions
 	newPath                              []uint8
 	turnLoop                             uint8
 	WsCon                                *ws.WsNetManage //net
@@ -93,7 +89,6 @@ func (p *Player) LoadImages(name string, num uint8) {
 		p.plist_sheet = pli
 		p.plist_png = ebiten.NewImageFromImage(pln)
 	}
-
 	p.SetPlayerState(0, 0)
 }
 
@@ -144,23 +139,10 @@ func (p *Player) GetMouseController(dir uint8) {
 			p.status.CamerOffsetY += -moveY
 			p.Y += moveY
 			p.X += moveX
-		}
-		p.status.Flg = false
-	}
-}
-
-//暗黑破坏神 16方位 移动 鼠标控制
-func (p *Player) GetMouseControllerCopy(dir uint8) {
-	if p.status.Flg {
-		speed := 0.0
-		//判断是否走路
-		speed = tools.SPEED
-		p.SetPlayerState(tools.Walk, dir)
-		//移动判断
-		moveX, moveY := tools.CalculateSpeed(dir, speed)
-		if p.CanWalk(moveX, moveY, dir) {
-			p.Y += moveY
-			p.X += moveX
+		} else {
+			p.newpositonX = 0
+			p.newpositonY = 0
+			p.status.CalculateEnd = false
 		}
 		p.status.Flg = false
 	}
@@ -185,6 +167,7 @@ func (p *Player) CanWalk(xS, yS float64, dir uint8) bool {
 //本机玩家移动
 func (p *Player) PlayerMove() {
 	if p.newpositonX != 0 && p.newpositonY != 0 && (math.Abs(p.X-p.newpositonX) > 1 && math.Abs(p.Y-p.newpositonY) > 1) {
+		p.status.IsRun = true
 		p.status.Flg = true
 		//判断人物方位
 		if p.OldDirection != p.Direction && !controller.MouseRightPress() {
@@ -218,27 +201,12 @@ func (p *Player) PlayerMove() {
 		p.newpositonX = 0
 		p.newpositonY = 0
 	}
-}
-
-//控制非玩家移动
-func (p *Player) PlayerMoveCopy() {
-	if p.newpositonX != 0 && p.newpositonY != 0 && (math.Abs(p.X-p.newpositonX) > 1 && math.Abs(p.Y-p.newpositonY) > 1) {
-		p.status.Flg = true
-		//直接切换方向
-		p.UpdateOldPlayerDir(p.newDir)
-		p.GetMouseControllerCopy(p.newDir)
-	} else {
-		p.State = tools.IDLE
-		p.newpositonX = 0
-		p.newpositonY = 0
+	//玩家停止
+	if p.State == tools.IDLE && p.status.IsRun {
+		p.status.IsRun = false
+		//网络
+		p.WsCon.SendMessage("@@MoveEnd|" + p.PlayerName + "|" + strconv.FormatFloat(p.X, 'f', 0, 64) + "|" + strconv.FormatFloat(p.Y, 'f', 0, 64))
 	}
-}
-
-//控制非玩家新位置的预算
-func (p *Player) UpdatePlayerNextMovePositon(newpositonX, newpositonY float64, dir uint8) {
-	p.newDir = dir
-	p.newpositonX = newpositonX
-	p.newpositonY = newpositonY
 }
 
 //玩家到新位置的预算
@@ -250,13 +218,4 @@ func (p *Player) PlayerNextMovePositon(mouseX, mouseY int, dir uint8) {
 		//网络
 		p.WsCon.SendMessage("@@Move|" + p.PlayerName + "|" + strconv.FormatFloat(p.newpositonX, 'f', 0, 64) + "|" + strconv.FormatFloat(p.newpositonY, 'f', 0, 64) + "|" + strconv.Itoa(int(p.newDir)))
 	}
-
-}
-
-//GC
-func (p *Player) GC() {
-	p.plist_sheet = nil
-	p.plist_sheet_2 = nil
-	p.plist_png = nil
-	p.plist_png_2 = nil
 }

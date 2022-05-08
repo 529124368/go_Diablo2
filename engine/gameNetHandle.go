@@ -87,7 +87,7 @@ func (g *Game) Handle(msg []byte) {
 			md, _ := strconv.Atoi(d[4])
 			for _, v := range g.player {
 				if v.PlayerName == pm {
-					v.UpdatePlayerNextMovePositon(mx, my, uint8(md))
+					v.UpdatePlayerNextMovePositonAI(mx, my, uint8(md))
 					return
 				}
 			}
@@ -108,6 +108,20 @@ func (g *Game) Handle(msg []byte) {
 			for k, v := range g.player {
 				if v.PlayerName == d[1] {
 					g.DeletePlayer(k)
+					return
+				}
+			}
+		}
+	}
+	//玩家停止移动
+	if len(sm.Data) > 10 && sm.Data[:10] == "@@MoveEnd|" {
+		d := strings.Split(sm.Data, "|")
+		if len(d) == 4 {
+			for _, v := range g.player {
+				if v.PlayerName == d[1] {
+					v.StopPlayerMoveAI()
+					v.X, _ = strconv.ParseFloat(d[2], 64)
+					v.Y, _ = strconv.ParseFloat(d[3], 64)
 					return
 				}
 			}

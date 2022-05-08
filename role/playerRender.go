@@ -52,11 +52,11 @@ func (p *Player) Render(screen *ebiten.Image) {
 		// x += -4
 		// y += -3
 		//ba2
-		// x += 4
-		// y += -18
+		x += 4
+		y += -18
 		//ba3
-		x += 3
-		y += -7
+		// x += 3
+		// y += -7
 	}
 	//Idel -> RUN Offset
 	if p.State == tools.RUN {
@@ -64,11 +64,11 @@ func (p *Player) Render(screen *ebiten.Image) {
 		// x += -4
 		// y += -3
 		//ba2
-		// x += 4
-		// y += -18
+		x += 4
+		y += -18
 		//ba3
-		x += 8
-		y += -10
+		// x += 8
+		// y += -10
 	}
 
 	//Idel -> Walk -> Attack Offset
@@ -77,11 +77,11 @@ func (p *Player) Render(screen *ebiten.Image) {
 		// x += -50
 		// y += -30
 		//ba2
-		// x += -55
-		// y += -35
-		//ba3
 		x += -55
-		y += -20
+		y += -35
+		//ba3
+		// x += -55
+		// y += -20
 	}
 
 	//Idel -> SKILL-> Offset
@@ -90,11 +90,11 @@ func (p *Player) Render(screen *ebiten.Image) {
 		// x += -50
 		// y += -30
 		//ba2
-		// x += -55
-		// y += -35
+		x += -55
+		y += -35
 		//ba3
-		x += -10
-		y += -15
+		// x += -10
+		// y += -15
 	}
 	//Draw Shadow
 	p.opS.GeoM.Reset()
@@ -123,7 +123,7 @@ func (p *Player) Render(screen *ebiten.Image) {
 	// }
 }
 
-//渲染其他客户端角色
+//渲染Ai角色
 func (p *Player) RenderCopy(screen *ebiten.Image) {
 	p.count++
 	//Change player Frame
