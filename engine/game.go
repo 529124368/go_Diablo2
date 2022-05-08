@@ -30,7 +30,8 @@ const (
 
 type Game struct {
 	count, countForMap int
-	player             []*role.Player            //玩家
+	player             *role.Player              //本机玩家
+	playerAI           []*role.Player            //AI玩家
 	mapManage          interfaces.MapInterface   //地图等管理
 	ui                 *layout.UI                //UI
 	music              interfaces.MusicInterface //音乐
@@ -101,9 +102,6 @@ func (g *Game) StartEngine() {
 		w.Done()
 	}()
 	w.Wait()
-	go func() {
-		runtime.GC()
-	}()
 }
 
 //关闭所有连接

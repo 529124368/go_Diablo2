@@ -40,6 +40,7 @@ type Player struct {
 	newpositonX, newpositonY             float64
 	newDir                               uint8
 	FrameSpeed, FrameNums, Counts, count int
+	imgOffset                            [4]tools.OffsetXY //动作图片偏移
 }
 
 //创建玩家
@@ -66,30 +67,24 @@ func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m i
 	return play
 }
 
-//Load Images
+//加載玩家素材
 func (p *Player) LoadImages(name string, num uint8) {
+	//加载玩家素材第一部分
+	plist, _ := p.image.ReadFile("resource/man/warrior/" + name + ".png")
+	plist_json, _ := p.image.ReadFile("resource/man/warrior/" + name + ".json")
+	pli, pln := tools.GetImageFromPlistPaletted(plist, plist_json)
+	p.plist_sheet = pli
+	p.plist_png = ebiten.NewImageFromImage(pln)
 	if num == 2 {
-		//加载玩家素材第一部分
-		plist, _ := p.image.ReadFile("resource/man/warrior/" + name + ".png")
-		plist_json, _ := p.image.ReadFile("resource/man/warrior/" + name + ".json")
-		pli, pln := tools.GetImageFromPlistPaletted(plist, plist_json)
-		p.plist_sheet = pli
-		p.plist_png = ebiten.NewImageFromImage(pln)
 		//加载玩家素材第二部分
 		plist, _ = p.image.ReadFile("resource/man/warrior/" + name + "_act.png")
 		plist_json, _ = p.image.ReadFile("resource/man/warrior/" + name + "_act.json")
 		pli, pln = tools.GetImageFromPlistPaletted(plist, plist_json)
 		p.plist_sheet_2 = pli
 		p.plist_png_2 = ebiten.NewImageFromImage(pln)
-	} else {
-		//加载玩家素材第一部分
-		plist, _ := p.image.ReadFile("resource/man/warrior/" + name + ".png")
-		plist_json, _ := p.image.ReadFile("resource/man/warrior/" + name + ".json")
-		pli, pln := tools.GetImageFromPlistPaletted(plist, plist_json)
-		p.plist_sheet = pli
-		p.plist_png = ebiten.NewImageFromImage(pln)
 	}
 	p.SetPlayerState(0, 0)
+	p.imgOffset = tools.GetOffetByAction(name)
 }
 
 //设置玩家状态
@@ -205,7 +200,9 @@ func (p *Player) PlayerMove() {
 	if p.State == tools.IDLE && p.status.IsRun {
 		p.status.IsRun = false
 		//网络
-		p.WsCon.SendMessage("@@MoveEnd|" + p.PlayerName + "|" + strconv.FormatFloat(p.X, 'f', 0, 64) + "|" + strconv.FormatFloat(p.Y, 'f', 0, 64))
+		if p.status.IsNetPlay {
+			p.WsCon.SendMessage("@@MoveEnd|" + p.PlayerName + "|" + strconv.FormatFloat(p.X, 'f', 0, 64) + "|" + strconv.FormatFloat(p.Y, 'f', 0, 64))
+		}
 	}
 }
 

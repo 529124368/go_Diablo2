@@ -45,7 +45,7 @@ func NewStatusManage() *StatusManage {
 		IsWalk:          true,
 		CalculateEnd:    false,
 		UIOFFSETX:       0,
-		ShadowOffsetX:   -70,
+		ShadowOffsetX:   -60,
 		PLAYERCENTERX:   395, //LAYOUTX/2
 		PLAYERCENTERY:   240, //LAYOUTY/2
 		IsTakeItem:      false,
@@ -67,7 +67,7 @@ func NewStatusManage() *StatusManage {
 		IsDropDeal:        false,
 		DisplaySort:       false,
 		Queue:             make(chan []byte),
-		IsNetPlay:         true,
+		IsNetPlay:         false,
 		IsRun:             false,
 	}
 	return n

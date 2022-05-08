@@ -178,7 +178,7 @@ func (u *UI) LoadGameImages() {
 				//恢复因打开包裹导致的人物偏移
 				u.status.UIOFFSETX = 0
 				//恢复影子偏移
-				u.status.ShadowOffsetX = -70
+				u.status.ShadowOffsetX = -60
 				//恢复玩家中心位置
 				u.status.PLAYERCENTERX = 388
 				//恢复地图偏移

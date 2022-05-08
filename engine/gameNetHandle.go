@@ -44,16 +44,16 @@ func (g *Game) CreatePlayer(x, y float64, name, playerName string) {
 	r := role.NewPlayer(x, y, tools.IDLE, 0, 0, 0, &asset, g.mapManage, g.status, nil)
 	r.PlayerName = playerName
 	r.LoadImages(name, 1)
-	g.player = append(g.player, r)
+	g.playerAI = append(g.playerAI, r)
 }
 
 //删除角色
 func (g *Game) DeletePlayer(id int) {
-	g.player[id].GC()
-	if id < len(g.player)-1 {
-		g.player = append(g.player[:id], g.player[id+1:]...)
+	g.playerAI[id].GC()
+	if id < len(g.playerAI)-1 {
+		g.playerAI = append(g.playerAI[:id], g.playerAI[id+1:]...)
 	} else {
-		g.player = g.player[:id]
+		g.playerAI = g.playerAI[:id]
 	}
 
 }
@@ -85,7 +85,7 @@ func (g *Game) Handle(msg []byte) {
 			mx, _ := strconv.ParseFloat(d[2], 64)
 			my, _ := strconv.ParseFloat(d[3], 64)
 			md, _ := strconv.Atoi(d[4])
-			for _, v := range g.player {
+			for _, v := range g.playerAI {
 				if v.PlayerName == pm {
 					v.UpdatePlayerNextMovePositonAI(mx, my, uint8(md))
 					return
@@ -105,7 +105,7 @@ func (g *Game) Handle(msg []byte) {
 	if len(sm.Data) > 11 && sm.Data[:11] == "@@loginOut|" {
 		d := strings.Split(sm.Data, "|")
 		if len(d) == 2 {
-			for k, v := range g.player {
+			for k, v := range g.playerAI {
 				if v.PlayerName == d[1] {
 					g.DeletePlayer(k)
 					return
@@ -117,7 +117,7 @@ func (g *Game) Handle(msg []byte) {
 	if len(sm.Data) > 10 && sm.Data[:10] == "@@MoveEnd|" {
 		d := strings.Split(sm.Data, "|")
 		if len(d) == 4 {
-			for _, v := range g.player {
+			for _, v := range g.playerAI {
 				if v.PlayerName == d[1] {
 					v.StopPlayerMoveAI()
 					v.X, _ = strconv.ParseFloat(d[2], 64)
@@ -145,7 +145,7 @@ func (g *Game) Handle(msg []byte) {
 	//获取名字
 	if len(sm.Data) > 7 && sm.Data[:7] == "@@Name|" {
 		d := strings.Split(sm.Data, "|")
-		g.player[0].PlayerName = d[1]
+		g.player.PlayerName = d[1]
 		return
 	}
 }
