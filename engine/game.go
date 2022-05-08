@@ -84,8 +84,10 @@ func NewGame() *Game {
 
 //引擎启动
 func (g *Game) StartEngine() {
-	//网络监听消息
-	go g.ListenMessage()
+	if g.status.IsNetPlay {
+		//网络监听消息
+		go g.ListenMessage()
+	}
 	//隐藏鼠标系统的ICON
 	ebiten.SetCursorMode(ebiten.CursorModeHidden)
 	w := sync.WaitGroup{}

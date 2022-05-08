@@ -8,7 +8,6 @@ import (
 	"game/tools"
 	"math"
 	"runtime"
-	"strconv"
 	"sync"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -29,10 +28,13 @@ func (g *Game) ChangeScene(name string) {
 		//进入游戏场景
 		g.status.CurrentGameScence = tools.GAMESCENESTART
 		w := sync.WaitGroup{}
-		//网络链接
-		ww := ws.NewNet(g.status)
-		g.Ws = ww.Con
-		go ww.Start()
+		var ww *ws.WsNetManage = nil
+		if g.status.IsNetPlay {
+			//网络链接
+			ww = ws.NewNet(g.status)
+			g.Ws = ww.Con
+			go ww.Start()
+		}
 		w.Add(3)
 		//Palyer Init
 		go func() {
@@ -117,7 +119,6 @@ func (g *Game) changeScenceGameUpdate() {
 		}
 		if g.status.Flg {
 			//计算新的位置
-			g.player[0].WsCon.SendMessage("@@Move|" + g.player[0].PlayerName + "|" + strconv.Itoa(mouseX) + "|" + strconv.Itoa(mouseY) + "|" + strconv.Itoa(int(dir)))
 			g.player[0].PlayerNextMovePositon(mouseX, mouseY, dir)
 		}
 	}
@@ -139,7 +140,6 @@ func (g *Game) changeScenceGameUpdate() {
 
 	//普通攻击
 	if controller.MouseRightPress() && !g.status.IsTakeItem {
-		g.player[0].WsCon.SendMessage("attack#######")
 		if g.player[0].State != tools.ATTACK {
 			g.player[0].Counts = 0
 		}

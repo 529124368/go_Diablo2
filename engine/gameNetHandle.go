@@ -34,6 +34,7 @@ func (g *Game) ListenMessage() {
 func (g *Game) unpack(msg []byte) {
 	err := json.Unmarshal(msg, &sm)
 	if err != nil {
+		fmt.Println("afss")
 		fmt.Println(err)
 	}
 }
@@ -81,12 +82,12 @@ func (g *Game) Handle(msg []byte) {
 		d := strings.Split(sm.Data, "|")
 		if len(d) == 5 {
 			pm := d[1]
-			mx, _ := strconv.Atoi(d[2])
-			my, _ := strconv.Atoi(d[3])
+			mx, _ := strconv.ParseFloat(d[2], 64)
+			my, _ := strconv.ParseFloat(d[3], 64)
 			md, _ := strconv.Atoi(d[4])
 			for _, v := range g.player {
 				if v.PlayerName == pm {
-					v.PlayerNextMovePositon(mx, my, uint8(md))
+					v.UpdatePlayerNextMovePositon(mx, my, uint8(md))
 					return
 				}
 			}
@@ -115,15 +116,15 @@ func (g *Game) Handle(msg []byte) {
 	//除了我还有谁
 	if len(sm.Data) > 12 && sm.Data[:12] == "@@HasPlayer|" {
 		d := strings.Split(sm.Data, "|")
+		var px float64 = 5280
+		var py float64 = 1880
 		for _, na := range d[1:] {
-			for _, v := range g.player {
-				fmt.Println(na)
-				fmt.Println(v.PlayerName)
-				if v.PlayerName != na {
-					fmt.Println(v.PlayerName)
-					g.CreatePlayer(5280, 1880, "ba", na)
-				}
+			w := strings.Split(na, "%")
+			if w[1] != "0" && w[2] != "0" {
+				px, _ = strconv.ParseFloat(w[1], 64)
+				py, _ = strconv.ParseFloat(w[2], 64)
 			}
+			g.CreatePlayer(px, py, "ba", w[0])
 		}
 		return
 	}
@@ -131,5 +132,6 @@ func (g *Game) Handle(msg []byte) {
 	if len(sm.Data) > 7 && sm.Data[:7] == "@@Name|" {
 		d := strings.Split(sm.Data, "|")
 		g.player[0].PlayerName = d[1]
+		return
 	}
 }

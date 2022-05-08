@@ -8,6 +8,7 @@ import (
 	"game/status"
 	"game/tools"
 	"math"
+	"strconv"
 
 	"github.com/fzipp/texturepacker"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -205,8 +206,8 @@ func (p *Player) PlayerMove() {
 				//直接切换方向
 				p.status.CalculateEnd = false
 				p.turnLoop = 0
-				p.UpdateOldPlayerDir(p.Direction)
-				p.GetMouseController(p.Direction)
+				p.UpdateOldPlayerDir(p.newDir)
+				p.GetMouseController(p.newDir)
 			}
 		} else {
 			p.status.CalculateEnd = false
@@ -233,11 +234,23 @@ func (p *Player) PlayerMoveCopy() {
 	}
 }
 
+//控制非玩家新位置的预算
+func (p *Player) UpdatePlayerNextMovePositon(newpositonX, newpositonY float64, dir uint8) {
+	p.newDir = dir
+	p.newpositonX = newpositonX
+	p.newpositonY = newpositonY
+}
+
 //玩家到新位置的预算
 func (p *Player) PlayerNextMovePositon(mouseX, mouseY int, dir uint8) {
 	p.newDir = dir
 	p.newpositonX = p.X + float64(mouseX) - 395
 	p.newpositonY = p.Y + float64(mouseY) - 240
+	if p.status.IsNetPlay {
+		//网络
+		p.WsCon.SendMessage("@@Move|" + p.PlayerName + "|" + strconv.FormatFloat(p.newpositonX, 'f', 0, 64) + "|" + strconv.FormatFloat(p.newpositonY, 'f', 0, 64) + "|" + strconv.Itoa(int(p.newDir)))
+	}
+
 }
 
 //GC

@@ -18,7 +18,9 @@ func main() {
 	ebiten.SetMaxTPS(80)
 	gameStart := engine.NewGame()
 	defer func() {
-		gameStart.CloseCon()
+		if gameStart.Ws != nil {
+			gameStart.CloseCon()
+		}
 	}()
 	if err := ebiten.RunGame(gameStart); err != nil {
 		log.Fatal(err)

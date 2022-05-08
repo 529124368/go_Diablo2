@@ -24,11 +24,12 @@ type StatusManage struct {
 	MapTitleY         int
 	MapZoom           int
 	CurrentGameScence int
-	DisPlayDebugInfo  bool //是否显示Debug信息
-	IsPlayDropAnmi    bool //是否播放掉落物品动画
-	IsDropDeal        bool //是否掉落物品处理中
-	DisplaySort       bool //人物和物体渲染顺序
-	Queue             chan []byte
+	DisPlayDebugInfo  bool        //是否显示Debug信息
+	IsPlayDropAnmi    bool        //是否播放掉落物品动画
+	IsDropDeal        bool        //是否掉落物品处理中
+	DisplaySort       bool        //人物和物体渲染顺序
+	Queue             chan []byte //消息队列
+	IsNetPlay         bool        //是否网络游玩
 }
 
 func NewStatusManage() *StatusManage {
@@ -65,6 +66,7 @@ func NewStatusManage() *StatusManage {
 		IsDropDeal:        false,
 		DisplaySort:       false,
 		Queue:             make(chan []byte),
+		IsNetPlay:         true,
 	}
 	return n
 }
