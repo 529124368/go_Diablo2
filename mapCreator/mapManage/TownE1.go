@@ -87,8 +87,7 @@ func (t *TownE1) LoadAnm() {
 		}
 	}
 	//
-	xx, yy, _ := t.GetCellXY(33, 16)
-	t.NPCAI[0] = npc.NewPlayerAI(xx, yy, 0, 0, t.Status, t.Image)
+	t.NPCAI[0] = npc.NewPlayerAI(4580, 2041, 0, 0, t.Status, t.Image)
 	t.NPCAI[0].LoadImages("DC", "/NPC/", 1)
 }
 

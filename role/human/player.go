@@ -85,7 +85,7 @@ func (p *Player) GetMouseController(dir uint8) {
 			p.NewpositonY = 0
 			p.Status.CalculateEnd = false
 		}
-		p.FlagCanAction = false
+
 	}
 }
 
@@ -139,6 +139,7 @@ func (p *Player) PlayerMove() {
 			p.GetMouseController(p.NewDir)
 		}
 	} else {
+		p.FlagCanAction = false
 		p.NewpositonX = 0
 		p.NewpositonY = 0
 	}

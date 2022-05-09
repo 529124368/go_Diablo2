@@ -53,7 +53,6 @@ func (p *PlayerAI) GetMouseControllerAI(dir uint8) {
 		moveX, moveY := tools.CalculateSpeed(dir, speed)
 		p.Y += moveY
 		p.X += moveX
-		p.FlagCanAction = false
 	}
 }
 
@@ -64,6 +63,7 @@ func (p *PlayerAI) PlayerMoveAI() {
 		//直接切换方向
 		p.GetMouseControllerAI(p.NewDir)
 	} else {
+		p.FlagCanAction = false
 		p.State = tools.IDLE
 		p.NewpositonX = 0
 		p.NewpositonY = 0

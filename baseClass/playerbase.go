@@ -108,6 +108,6 @@ func (p *PlayerBase) ChangeFrame() {
 		p.FrameSpeed = 1
 	} else {
 		p.FrameNums = 8
-		p.FrameSpeed = 5
+		p.FrameSpeed = 3
 	}
 }

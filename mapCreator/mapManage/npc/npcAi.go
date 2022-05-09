@@ -14,13 +14,15 @@ import (
 type NpcAI struct {
 	baseClass.PlayerBase        //继承
 	PlayerName           string //玩家名字
-	//imgOffset            [4]tools.OffsetXY //动作图片偏移
+	AIWait, AICount      int
 }
 
 //创建NPC
 func NewPlayerAI(x, y float64, state, dir uint8, s *status.StatusManage, images *embed.FS) *NpcAI {
 	play := &NpcAI{
 		PlayerName: "",
+		AIWait:     100,
+		AICount:    0,
 	}
 	play.X = x //地图坐标X
 	play.Y = y //地图坐标Y
@@ -38,13 +40,12 @@ func (p *NpcAI) GetMouseControllerAI(dir uint8) {
 	if p.FlagCanAction {
 		speed := 0.0
 		//判断是否走路
-		speed = tools.SPEED
+		speed = 0.5
 		p.SetPlayerState(tools.Walk, dir)
 		//移动判断
 		moveX, moveY := tools.CalculateSpeed(dir, speed)
 		p.Y += moveY
 		p.X += moveX
-		p.FlagCanAction = false
 	}
 }
 
@@ -55,9 +56,15 @@ func (p *NpcAI) PlayerMoveAI() {
 		//直接切换方向
 		p.GetMouseControllerAI(p.NewDir)
 	} else {
+		p.FlagCanAction = false
 		p.State = tools.IDLE
+		if p.NewpositonX != 0 && p.NewpositonY != 0 {
+			p.X = p.NewpositonX
+			p.Y = p.NewpositonY
+		}
 		p.NewpositonX = 0
 		p.NewpositonY = 0
+
 	}
 }
 
@@ -69,6 +76,7 @@ func (p *NpcAI) StopPlayerMoveAI() {
 
 //控制AI NPC新位置的预算
 func (p *NpcAI) UpdatePlayerNextMovePositonAI(NewpositonX, NewpositonY float64, dir uint8) {
+	p.AICount = 0
 	p.NewDir = dir
 	p.NewpositonX = NewpositonX
 	p.NewpositonY = NewpositonY
@@ -76,6 +84,8 @@ func (p *NpcAI) UpdatePlayerNextMovePositonAI(NewpositonX, NewpositonY float64, 
 
 //渲染NPC
 func (p *NpcAI) Render(screen *ebiten.Image) {
+	p.AICount++
+	p.PlayerMoveAI()
 	p.ChangeFrame()
 	p.PlayerBase.Render()
 	var name string
@@ -105,6 +115,17 @@ func (p *NpcAI) Render(screen *ebiten.Image) {
 	p.Op.GeoM.Translate(float64(int(p.X)+x-25)+p.Status.CamerOffsetX, float64(int(p.Y)+y-30)+p.Status.CamerOffsetY)
 	p.Op.Filter = ebiten.FilterLinear
 	screen.DrawImage(imagess, p.Op)
+	//
+	if !p.FlagCanAction && p.AICount >= p.AIWait {
+		if p.X == 4674 && p.Y == 1947 {
+			p.UpdatePlayerNextMovePositonAI(4780, 2053, 3)
+		} else if p.X == 4780 && p.Y == 2053 {
+			p.UpdatePlayerNextMovePositonAI(4580, 2041, 5)
+		} else {
+			p.UpdatePlayerNextMovePositonAI(4674, 1947, 2)
+		}
+	}
+
 }
 
 //改变帧数
@@ -115,6 +136,6 @@ func (p *NpcAI) ChangeFrame() {
 		p.FrameSpeed = 5
 	} else {
 		p.FrameNums = 8
-		p.FrameSpeed = 6
+		p.FrameSpeed = 7
 	}
 }
