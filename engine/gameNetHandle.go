@@ -41,7 +41,7 @@ func (g *Game) unpack(msg []byte) {
 
 //新建角色
 func (g *Game) CreatePlayer(x, y float64, name, playerName string) {
-	r := role.NewPlayer(x, y, tools.IDLE, 0, 0, 0, &asset, g.mapManage, g.status, nil)
+	r := role.NewPlayerAI(x, y, tools.IDLE, 0, g.status, &asset)
 	r.PlayerName = playerName
 	r.LoadImages(name, 1)
 	g.playerAI = append(g.playerAI, r)

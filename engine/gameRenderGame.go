@@ -214,10 +214,10 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	//切换渲染顺序
 	if g.status.DisplaySort {
 		//Draw player
-		g.player.Render(screen, 0)
+		g.player.Render(screen)
 		if g.status.IsNetPlay && len(g.playerAI) > 0 {
 			for _, v := range g.playerAI {
-				v.Render(screen, 1)
+				v.Render(screen)
 			}
 		}
 
@@ -232,10 +232,10 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 		//Draw map Anmi
 		g.mapManage.Render(screen, countsFor20, countsFor8, g.status.CamerOffsetX, g.status.CamerOffsetY)
 		//Draw player
-		g.player.Render(screen, 0)
+		g.player.Render(screen)
 		if g.status.IsNetPlay && len(g.playerAI) > 0 {
 			for _, v := range g.playerAI {
-				v.Render(screen, 1)
+				v.Render(screen)
 			}
 		}
 	}

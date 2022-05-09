@@ -31,7 +31,7 @@ const (
 type Game struct {
 	count, countForMap int
 	player             *role.Player              //本机玩家
-	playerAI           []*role.Player            //AI玩家
+	playerAI           []*role.PlayerAI          //AI玩家
 	mapManage          interfaces.MapInterface   //地图等管理
 	ui                 *layout.UI                //UI
 	music              interfaces.MusicInterface //音乐

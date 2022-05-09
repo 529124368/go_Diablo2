@@ -10,7 +10,6 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/fzipp/texturepacker"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -20,19 +19,11 @@ const (
 )
 
 type Player struct {
+	PlayerBase                                                   //继承
 	PlayerName                           string                  //玩家名字
-	X                                    float64                 //玩家世界坐标X
-	Y                                    float64                 //玩家世界坐标Y
-	State                                uint8                   //玩家状态
-	Direction                            uint8                   //玩家当前方向
-	OldDirection                         uint8                   //玩家旧的方向
 	MouseX, MouseY                       int                     //鼠标X坐标 鼠标Y坐标
 	SkillName                            string                  //技能名称
-	image                                *embed.FS               //静态资源获取
 	map_c                                interfaces.MapInterface //地图
-	status                               *status.StatusManage    //状态
-	plist_sheet, plist_sheet_2           *texturepacker.SpriteSheet
-	plist_png, plist_png_2               *ebiten.Image
 	opS, op                              *ebiten.DrawImageOptions
 	newPath                              []uint8
 	turnLoop                             uint8
@@ -47,71 +38,30 @@ type Player struct {
 func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m interfaces.MapInterface, s *status.StatusManage, con *ws.WsNetManage) *Player {
 
 	play := &Player{
-		PlayerName:   "",
-		X:            x, //地图坐标X
-		Y:            y, //地图坐标Y
-		State:        state,
-		Direction:    dir,
-		OldDirection: dir,
-		MouseX:       mx,
-		MouseY:       my,
-		SkillName:    "", //技能名字
-		image:        images,
-		map_c:        m,
-		status:       s,
-		turnLoop:     0,
-		opS:          &ebiten.DrawImageOptions{},
-		op:           &ebiten.DrawImageOptions{},
-		WsCon:        con,
+		PlayerName: "",
+		MouseX:     mx,
+		MouseY:     my,
+		SkillName:  "", //技能名字
+		map_c:      m,
+		turnLoop:   0,
+		opS:        &ebiten.DrawImageOptions{},
+		op:         &ebiten.DrawImageOptions{},
+		WsCon:      con,
 	}
+	play.X = x //地图坐标X
+	play.Y = y //地图坐标Y
+	play.State = state
+	play.Direction = dir
+	play.OldDirection = dir
+	play.image = images
+	play.status = s
 	return play
 }
 
 //加載玩家素材
 func (p *Player) LoadImages(name string, num uint8) {
-	//加载玩家素材第一部分
-	plist, _ := p.image.ReadFile("resource/man/warrior/" + name + ".png")
-	plist_json, _ := p.image.ReadFile("resource/man/warrior/" + name + ".json")
-	pli, pln := tools.GetImageFromPlistPaletted(plist, plist_json)
-	p.plist_sheet = pli
-	p.plist_png = ebiten.NewImageFromImage(pln)
-	if num == 2 {
-		//加载玩家素材第二部分
-		plist, _ = p.image.ReadFile("resource/man/warrior/" + name + "_act.png")
-		plist_json, _ = p.image.ReadFile("resource/man/warrior/" + name + "_act.json")
-		pli, pln = tools.GetImageFromPlistPaletted(plist, plist_json)
-		p.plist_sheet_2 = pli
-		p.plist_png_2 = ebiten.NewImageFromImage(pln)
-	}
-	p.SetPlayerState(0, 0)
+	p.PlayerBase.LoadImages(name, num)
 	p.imgOffset = tools.GetOffetByAction(name)
-}
-
-//设置玩家状态
-func (p *Player) SetPlayerState(s, d uint8) {
-	p.State = s
-	if p.status.Flg {
-		p.Direction = d
-	}
-}
-
-//更新玩家旧的方向
-func (p *Player) UpdateOldPlayerDir(d uint8) {
-	p.OldDirection = d
-}
-
-//获取图片
-func (p *Player) GetAnimator(flg, name string, block uint8) (*ebiten.Image, int, int) {
-	if flg == "man" {
-		//判断加载素材的第几部分
-		if block == 1 {
-			return p.plist_png.SubImage(p.plist_sheet.Sprites[name+".png"].Frame).(*ebiten.Image), p.plist_sheet.Sprites[name+".png"].SpriteSourceSize.Min.X, p.plist_sheet.Sprites[name+".png"].SpriteSourceSize.Min.Y
-		} else {
-			return p.plist_png_2.SubImage(p.plist_sheet_2.Sprites[name+".png"].Frame).(*ebiten.Image), p.plist_sheet_2.Sprites[name+".png"].SpriteSourceSize.Min.X, p.plist_sheet_2.Sprites[name+".png"].SpriteSourceSize.Min.Y
-		}
-	} else {
-		return nil, 0, 0
-	}
 }
 
 //暗黑破坏神 16方位 移动 鼠标控制
@@ -215,4 +165,93 @@ func (p *Player) PlayerNextMovePositon(mouseX, mouseY int, dir uint8) {
 		//网络
 		p.WsCon.SendMessage("@@Move|" + p.PlayerName + "|" + strconv.FormatFloat(p.newpositonX, 'f', 0, 64) + "|" + strconv.FormatFloat(p.newpositonY, 'f', 0, 64) + "|" + strconv.Itoa(int(p.newDir)))
 	}
+}
+
+//渲染本机角色
+func (p *Player) Render(screen *ebiten.Image) {
+	p.count++
+	//Change player Frame
+	if p.count > p.FrameSpeed {
+		p.Counts++
+		p.count = 0
+		if p.Counts >= p.FrameNums {
+			p.Counts = 0
+		}
+	}
+	var name string
+	block := 1
+	//nameSkill := ""
+	switch p.State {
+	case tools.ATTACK:
+		name = strconv.Itoa(int(p.Direction)) + "_attack_" + strconv.Itoa(p.Counts)
+	case tools.SkILL:
+		block = 2
+		if p.Counts >= 14 {
+			p.Counts = 0
+		}
+		name = strconv.Itoa(int(p.Direction)) + "_skill_" + strconv.Itoa(p.Counts)
+	case tools.IDLE:
+		name = strconv.Itoa(int(p.Direction)) + "_stand_" + strconv.Itoa(p.Counts)
+	case tools.Walk:
+		if p.Counts >= 8 {
+			p.Counts = 0
+		}
+		name = strconv.Itoa(int(p.Direction)) + "_run_" + strconv.Itoa(p.Counts)
+	case tools.RUN:
+		block = 2
+		if p.Counts >= 8 {
+			p.Counts = 0
+		}
+		name = strconv.Itoa(int(p.Direction)) + "_run2_" + strconv.Itoa(p.Counts)
+	}
+
+	imagess, x, y := p.GetAnimator("man", name, uint8(block))
+	//Idel -> Walk Offset
+	if p.State == tools.Walk {
+		x += p.imgOffset[0].X
+		y += p.imgOffset[0].Y
+	}
+	//Idel -> RUN Offset
+	if p.State == tools.RUN {
+		x += p.imgOffset[1].X
+		y += p.imgOffset[1].Y
+	}
+
+	//Idel -> Walk -> Attack Offset
+	if p.State == tools.ATTACK {
+		x += p.imgOffset[2].X
+		y += p.imgOffset[2].Y
+	}
+
+	//Idel -> SKILL-> Offset
+	if p.State == tools.SkILL {
+		x += p.imgOffset[3].X
+		y += p.imgOffset[3].Y
+	}
+
+	//Draw Shadow
+	p.opS.GeoM.Reset()
+	p.opS.Filter = ebiten.FilterLinear
+	p.opS.GeoM.Rotate(-0.5)
+	p.opS.GeoM.Scale(1, 0.5)
+	p.opS.ColorM.Scale(0, 0, 0, 1)
+	p.opS.GeoM.Translate(float64(tools.LAYOUTX/2+x+p.status.ShadowOffsetX+p.status.UIOFFSETX), float64(tools.LAYOUTY/2+y))
+	screen.DrawImage(imagess, p.opS)
+	//Draw Player
+	p.op.GeoM.Reset()
+	p.op.GeoM.Translate(float64(tools.LAYOUTX/2+OFFSETX+x+p.status.UIOFFSETX), float64(tools.LAYOUTY/2+OFFSETY+y))
+	p.op.Filter = ebiten.FilterLinear
+	screen.DrawImage(imagess, p.op)
+
+	//Draw Skill
+	// if g.player.State == ATTACK {
+	// 	imagey, x, y := g.player.GetAnimator("skill", nameSkill)
+	// 	//skill option
+	// 	opSkill = &ebiten.DrawImageOptions{}
+	// 	opSkill.GeoM.Translate(float64(SCREENWIDTH/2+x), float64(SCREENHEIGHT/2+y))
+	// 	opSkill.CompositeMode = ebiten.CompositeModeLighter
+	// 	opSkill.GeoM.Scale(1.5, 1.5)
+	// 	opSkill.Filter = ebiten.FilterLinear
+	// 	screen.DrawImage(imagey, opSkill)
+	// }
 }

@@ -40,7 +40,6 @@ type TownE1 struct {
 	dropItemsList []dropItem      //掉落物品一览
 	op            []*ebiten.DrawImageOptions
 	xyPos         [23]postion
-	image         *embed.FS //静态资源获取
 	bag           *storage.Bag
 }
 
@@ -53,7 +52,6 @@ func NewE1(images *embed.FS, sta *status.StatusManage, b *storage.Bag) *TownE1 {
 		dropAnm:       make([]*ebiten.Image, 0),
 		dropItemsList: make([]dropItem, 0),
 		op:            make([]*ebiten.DrawImageOptions, 0),
-		image:         images,
 		bag:           b,
 	}
 	a.Image = images
@@ -65,23 +63,23 @@ func NewE1(images *embed.FS, sta *status.StatusManage, b *storage.Bag) *TownE1 {
 func (t *TownE1) LoadAnm() {
 	t.LoadXyList()
 	for i := 0; i < 20; i++ {
-		o, _ := t.image.ReadFile(tools.ObjectPath + "/fire/frame_" + strconv.Itoa(i) + ".png")
+		o, _ := t.Image.ReadFile(tools.ObjectPath + "/fire/frame_" + strconv.Itoa(i) + ".png")
 		t.anmiList = append(t.anmiList, tools.GetEbitenImage(o))
-		o, _ = t.image.ReadFile(tools.ObjectPath + "/huodui/frame_" + strconv.Itoa(i) + ".png")
+		o, _ = t.Image.ReadFile(tools.ObjectPath + "/huodui/frame_" + strconv.Itoa(i) + ".png")
 		t.huodui = append(t.huodui, tools.GetEbitenImage(o))
 	}
 	for i := 0; i < 15; i++ {
-		o, _ := t.image.ReadFile(tools.ObjectPath + "/waypoint/frame_" + strconv.Itoa(i) + ".png")
+		o, _ := t.Image.ReadFile(tools.ObjectPath + "/waypoint/frame_" + strconv.Itoa(i) + ".png")
 		t.wayList = append(t.wayList, tools.GetEbitenImage(o))
 
 	}
 	for i := 0; i < 17; i++ {
-		o, _ := t.image.ReadFile("resource/itemsdrop/c_" + strconv.Itoa(i) + ".png")
+		o, _ := t.Image.ReadFile("resource/itemsdrop/c_" + strconv.Itoa(i) + ".png")
 		t.dropAnm = append(t.dropAnm, tools.GetEbitenImage(o))
 	}
 	for j := 1; j <= 6; j++ {
 		for i := 0; i < 8; i++ {
-			o, _ := t.image.ReadFile("resource/NPC/npc" + strconv.Itoa(j) + "_" + strconv.Itoa(i) + ".png")
+			o, _ := t.Image.ReadFile("resource/NPC/npc" + strconv.Itoa(j) + "_" + strconv.Itoa(i) + ".png")
 			t.NPC = append(t.NPC, tools.GetEbitenImage(o))
 		}
 	}
@@ -247,29 +245,29 @@ func (t *TownE1) InsertOnLoadItesm(name string, x, y float64) {
 func (t *TownE1) LoadMap() {
 	//加载动态地图
 	//加载调色板
-	r, _ := t.image.ReadFile(tools.ObjectPath + "/mapSucai/pal.dat")
+	r, _ := t.Image.ReadFile(tools.ObjectPath + "/mapSucai/pal.dat")
 	ww, _ := dat.Load(r)
 	//加载地块dt1素材
-	re, _ := t.image.ReadFile(tools.ObjectPath + "/mapSucai/floor.dt1")
+	re, _ := t.Image.ReadFile(tools.ObjectPath + "/mapSucai/floor.dt1")
 	ss, _ := dt1.LoadDT1(re)
-	re, _ = t.image.ReadFile(tools.ObjectPath + "/mapSucai/objects.dt1")
+	re, _ = t.Image.ReadFile(tools.ObjectPath + "/mapSucai/objects.dt1")
 	ss1, _ := dt1.LoadDT1(re)
 
-	re, _ = t.image.ReadFile(tools.ObjectPath + "/mapSucai/outdoor/objects.dt1")
+	re, _ = t.Image.ReadFile(tools.ObjectPath + "/mapSucai/outdoor/objects.dt1")
 	ss2, _ := dt1.LoadDT1(re)
-	re, _ = t.image.ReadFile(tools.ObjectPath + "/mapSucai/outdoor/treegroups.dt1")
+	re, _ = t.Image.ReadFile(tools.ObjectPath + "/mapSucai/outdoor/treegroups.dt1")
 	ss3, _ := dt1.LoadDT1(re)
 
-	re, _ = t.image.ReadFile(tools.ObjectPath + "/mapSucai/fence.dt1")
+	re, _ = t.Image.ReadFile(tools.ObjectPath + "/mapSucai/fence.dt1")
 	ss4, _ := dt1.LoadDT1(re)
 
-	re, _ = t.image.ReadFile(tools.ObjectPath + "/mapSucai/outdoor/bridge.dt1")
+	re, _ = t.Image.ReadFile(tools.ObjectPath + "/mapSucai/outdoor/bridge.dt1")
 	ss5, _ := dt1.LoadDT1(re)
 
-	re, _ = t.image.ReadFile(tools.ObjectPath + "/mapSucai/outdoor/stonewall.dt1")
+	re, _ = t.Image.ReadFile(tools.ObjectPath + "/mapSucai/outdoor/stonewall.dt1")
 	ss6, _ := dt1.LoadDT1(re)
 
-	re, _ = t.image.ReadFile(tools.ObjectPath + "/mapSucai/outdoor/river.dt1")
+	re, _ = t.Image.ReadFile(tools.ObjectPath + "/mapSucai/outdoor/river.dt1")
 	ss7, err := dt1.LoadDT1(re)
 
 	ss2.Tiles = append(ss2.Tiles, ss1.Tiles...)
@@ -284,7 +282,7 @@ func (t *TownE1) LoadMap() {
 		fmt.Println(err)
 	}
 	//读取DS1文件
-	dd, _ := t.image.ReadFile(tools.ObjectPath + "/mapSucai/townE1.ds1")
+	dd, _ := t.Image.ReadFile(tools.ObjectPath + "/mapSucai/townE1.ds1")
 	d, _ := ds1.Unmarshal(dd)
 
 	w, h := d.Floors[0].Size()
