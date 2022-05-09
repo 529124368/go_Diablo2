@@ -122,14 +122,6 @@ func (g *Game) changeScenceGameUpdate() {
 		}
 	}
 
-	//人物移动控制
-	g.player.PlayerMove()
-	if g.status.IsNetPlay && len(g.playerAI) > 0 {
-		for _, v := range g.playerAI {
-			v.PlayerMoveAI()
-		}
-	}
-
 	//鼠标滚轮控制
 	if _, x := ebiten.Wheel(); x != 0 {
 		g.status.MapZoom += int(x)

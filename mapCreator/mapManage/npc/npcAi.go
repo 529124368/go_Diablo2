@@ -80,7 +80,6 @@ func (p *NpcAI) Render(screen *ebiten.Image) {
 	p.PlayerBase.Render()
 	var name string
 	block := 1
-	//nameSkill := ""
 	switch p.State {
 	case tools.IDLE:
 		name = strconv.Itoa(int(p.Direction)) + "_stand_" + strconv.Itoa(p.Counts)

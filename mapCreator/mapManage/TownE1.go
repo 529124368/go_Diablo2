@@ -80,7 +80,7 @@ func (t *TownE1) LoadAnm() {
 		o, _ := t.Image.ReadFile("resource/itemsdrop/c_" + strconv.Itoa(i) + ".png")
 		t.dropAnm = append(t.dropAnm, tools.GetEbitenImage(o))
 	}
-	for j := 1; j <= 6; j++ {
+	for j := 1; j <= 5; j++ {
 		for i := 0; i < 8; i++ {
 			o, _ := t.Image.ReadFile("resource/NPC/npc" + strconv.Itoa(j) + "_" + strconv.Itoa(i) + ".png")
 			t.NPC = append(t.NPC, tools.GetEbitenImage(o))

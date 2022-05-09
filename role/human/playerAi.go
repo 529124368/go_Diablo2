@@ -85,6 +85,7 @@ func (p *PlayerAI) UpdatePlayerNextMovePositonAI(NewpositonX, NewpositonY float6
 
 //渲染角色
 func (p *PlayerAI) Render(screen *ebiten.Image) {
+	p.PlayerMoveAI()
 	p.ChangeFrame()
 	p.PlayerBase.Render()
 	var name string

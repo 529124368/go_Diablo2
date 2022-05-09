@@ -165,6 +165,7 @@ func (p *Player) PlayerNextMovePositon(mouseX, mouseY int, dir uint8) {
 
 //渲染角色
 func (p *Player) Render(screen *ebiten.Image) {
+	p.PlayerMove()
 	p.ChangeFrame()
 	p.PlayerBase.Render()
 	var name string
