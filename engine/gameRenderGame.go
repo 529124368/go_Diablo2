@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"game/controller"
 	"game/engine/ws"
-	"game/role"
+	"game/role/human"
+
 	"game/tools"
 	"math"
 	"runtime"
@@ -38,7 +39,7 @@ func (g *Game) ChangeScene(name string) {
 		w.Add(3)
 		//Palyer Init
 		go func() {
-			g.player = role.NewPlayer(5280, 1880, tools.IDLE, 0, 0, 0, &asset, g.mapManage, g.status, ww)
+			g.player = human.NewPlayer(5280, 1880, tools.IDLE, 0, 0, 0, &asset, g.mapManage, g.status, ww)
 			g.player.LoadImages("ba", 1)
 			runtime.GC()
 			w.Done()

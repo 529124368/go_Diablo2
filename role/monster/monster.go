@@ -1,4 +1,4 @@
-package role
+package monster
 
 type Monster struct {
 	X         float64

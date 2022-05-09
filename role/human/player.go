@@ -1,4 +1,4 @@
-package role
+package human
 
 import (
 	"embed"

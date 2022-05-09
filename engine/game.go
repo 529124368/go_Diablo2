@@ -8,7 +8,7 @@ import (
 	"game/layout"
 	"game/mapCreator/mapManage"
 	"game/music"
-	"game/role"
+	"game/role/human"
 	"game/status"
 	"game/storage"
 	"game/tools"
@@ -30,8 +30,8 @@ const (
 
 type Game struct {
 	count, countForMap int
-	player             *role.Player              //本机玩家
-	playerAI           []*role.PlayerAI          //AI玩家
+	player             *human.Player             //本机玩家
+	playerAI           []*human.PlayerAI         //AI玩家
 	mapManage          interfaces.MapInterface   //地图等管理
 	ui                 *layout.UI                //UI
 	music              interfaces.MusicInterface //音乐
