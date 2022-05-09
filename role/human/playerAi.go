@@ -37,8 +37,8 @@ func NewPlayerAI(x, y float64, state, dir uint8, s *status.StatusManage, images 
 }
 
 //加載玩家素材
-func (p *PlayerAI) LoadImages(name string, num uint8) {
-	p.PlayerBase.LoadImages(name, num)
+func (p *PlayerAI) LoadImages(name, path string, num uint8) {
+	p.PlayerBase.LoadImages(name, path, num)
 	p.imgOffset = tools.GetOffetByAction(name)
 }
 
@@ -85,6 +85,7 @@ func (p *PlayerAI) UpdatePlayerNextMovePositonAI(NewpositonX, NewpositonY float6
 
 //渲染角色
 func (p *PlayerAI) Render(screen *ebiten.Image) {
+	p.ChangeFrame()
 	p.PlayerBase.Render()
 	var name string
 	block := 1

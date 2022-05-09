@@ -44,7 +44,7 @@ func (g *Game) unpack(msg []byte) {
 func (g *Game) CreatePlayer(x, y float64, name, playerName string) {
 	r := human.NewPlayerAI(x, y, tools.IDLE, 0, g.status, &asset)
 	r.PlayerName = playerName
-	r.LoadImages(name, 1)
+	r.LoadImages(name, "/man/warrior/", 1)
 	g.playerAI = append(g.playerAI, r)
 }
 

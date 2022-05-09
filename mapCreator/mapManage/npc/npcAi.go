@@ -19,7 +19,6 @@ type NpcAI struct {
 
 //创建NPC
 func NewPlayerAI(x, y float64, state, dir uint8, s *status.StatusManage, images *embed.FS) *NpcAI {
-
 	play := &NpcAI{
 		PlayerName: "",
 	}
@@ -28,16 +27,10 @@ func NewPlayerAI(x, y float64, state, dir uint8, s *status.StatusManage, images 
 	play.State = state
 	play.Status = s
 	play.Direction = dir
-	play.OldDirection = dir
 	play.Asset = images
 	play.OpS = &ebiten.DrawImageOptions{}
 	play.Op = &ebiten.DrawImageOptions{}
 	return play
-}
-
-//加載NPC素材
-func (p *NpcAI) LoadImages(name string, num uint8) {
-	p.PlayerBase.LoadImages(name, num)
 }
 
 //暗黑破坏神 16方位 移动 AI
@@ -60,7 +53,6 @@ func (p *NpcAI) PlayerMoveAI() {
 	if p.NewpositonX != 0 && p.NewpositonY != 0 && (math.Abs(p.X-p.NewpositonX) > 1 && math.Abs(p.Y-p.NewpositonY) > 1) {
 		p.FlagCanAction = true
 		//直接切换方向
-		p.UpdateOldPlayerDir(p.NewDir)
 		p.GetMouseControllerAI(p.NewDir)
 	} else {
 		p.State = tools.IDLE
@@ -84,32 +76,19 @@ func (p *NpcAI) UpdatePlayerNextMovePositonAI(NewpositonX, NewpositonY float64, 
 
 //渲染NPC
 func (p *NpcAI) Render(screen *ebiten.Image) {
+	p.ChangeFrame()
 	p.PlayerBase.Render()
 	var name string
 	block := 1
 	//nameSkill := ""
 	switch p.State {
-	case tools.ATTACK:
-		name = strconv.Itoa(int(p.Direction)) + "_attack_" + strconv.Itoa(p.Counts)
-	case tools.SkILL:
-		block = 2
-		if p.Counts >= 14 {
-			p.Counts = 0
-		}
-		name = strconv.Itoa(int(p.Direction)) + "_skill_" + strconv.Itoa(p.Counts)
 	case tools.IDLE:
 		name = strconv.Itoa(int(p.Direction)) + "_stand_" + strconv.Itoa(p.Counts)
 	case tools.Walk:
 		if p.Counts >= 8 {
 			p.Counts = 0
 		}
-		name = strconv.Itoa(int(p.Direction)) + "_run_" + strconv.Itoa(p.Counts)
-	case tools.RUN:
-		block = 2
-		if p.Counts >= 8 {
-			p.Counts = 0
-		}
-		name = strconv.Itoa(int(p.Direction)) + "_run2_" + strconv.Itoa(p.Counts)
+		name = strconv.Itoa(int(p.Direction)) + "_walk_" + strconv.Itoa(p.Counts)
 	}
 
 	imagess, x, y := p.GetAnimator("man", name, uint8(block))
@@ -127,4 +106,16 @@ func (p *NpcAI) Render(screen *ebiten.Image) {
 	p.Op.GeoM.Translate(float64(int(p.X)+x-25)+p.Status.CamerOffsetX, float64(int(p.Y)+y-30)+p.Status.CamerOffsetY)
 	p.Op.Filter = ebiten.FilterLinear
 	screen.DrawImage(imagess, p.Op)
+}
+
+//改变帧数
+func (p *NpcAI) ChangeFrame() {
+	//根据状态改变帧数
+	if p.State == tools.IDLE {
+		p.FrameNums = 8
+		p.FrameSpeed = 5
+	} else {
+		p.FrameNums = 8
+		p.FrameSpeed = 6
+	}
 }

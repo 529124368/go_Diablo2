@@ -55,8 +55,8 @@ func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m i
 }
 
 //加載玩家素材
-func (p *Player) LoadImages(name string, num uint8) {
-	p.PlayerBase.LoadImages(name, num)
+func (p *Player) LoadImages(name, path string, num uint8) {
+	p.PlayerBase.LoadImages(name, path, num)
 	p.imgOffset = tools.GetOffetByAction(name)
 }
 
@@ -165,6 +165,7 @@ func (p *Player) PlayerNextMovePositon(mouseX, mouseY int, dir uint8) {
 
 //渲染角色
 func (p *Player) Render(screen *ebiten.Image) {
+	p.ChangeFrame()
 	p.PlayerBase.Render()
 	var name string
 	block := 1

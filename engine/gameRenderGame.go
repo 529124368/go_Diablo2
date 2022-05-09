@@ -40,7 +40,7 @@ func (g *Game) ChangeScene(name string) {
 		//Palyer Init
 		go func() {
 			g.player = human.NewPlayer(5280, 1880, tools.IDLE, 0, 0, 0, &asset, g.mapManage, g.status, ww)
-			g.player.LoadImages("ba", 1)
+			g.player.LoadImages("ba", "/man/warrior/", 1)
 			runtime.GC()
 			w.Done()
 		}()
@@ -160,39 +160,6 @@ func (g *Game) changeScenceGameUpdate() {
 	}
 	//事件循环监听 是否有按钮点击事件
 	g.ui.EventLoop(mouseX, mouseY)
-
-	//根据状态改变帧数
-	if g.player.State == tools.IDLE {
-		g.player.FrameNums = 16
-		g.player.FrameSpeed = 5
-	} else if g.player.State == tools.ATTACK {
-		g.player.FrameNums = 16
-		g.player.FrameSpeed = 1
-	} else if g.player.State == tools.SkILL {
-		g.player.FrameNums = 14
-		g.player.FrameSpeed = 1
-	} else {
-		g.player.FrameNums = 8
-		g.player.FrameSpeed = 5
-	}
-	//Ai
-	if g.status.IsNetPlay && len(g.playerAI) > 0 {
-		for _, v := range g.playerAI {
-			if v.State == tools.IDLE {
-				v.FrameNums = 16
-				v.FrameSpeed = 5
-			} else if v.State == tools.ATTACK {
-				v.FrameNums = 16
-				v.FrameSpeed = 1
-			} else if v.State == tools.SkILL {
-				v.FrameNums = 14
-				v.FrameSpeed = 1
-			} else {
-				v.FrameNums = 8
-				v.FrameSpeed = 5
-			}
-		}
-	}
 }
 
 //Draw Game Scence

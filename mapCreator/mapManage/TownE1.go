@@ -41,7 +41,7 @@ type TownE1 struct {
 	dropAnm           []*ebiten.Image //掉落动画图集
 	dropItemsList     []dropItem      //掉落物品一览
 	op                []*ebiten.DrawImageOptions
-	xyPos             [23]postion
+	xyPos             [22]postion
 	bag               *storage.Bag
 	NPCAI             [1]*npc.NpcAI //AI NPC
 }
@@ -87,15 +87,15 @@ func (t *TownE1) LoadAnm() {
 		}
 	}
 	//
-	xx, yy, _ := t.GetCellXY(33, 18)
-	t.NPCAI[0] = npc.NewPlayerAI(xx, yy, 0, 0, nil, t.Image)
-
+	xx, yy, _ := t.GetCellXY(33, 16)
+	t.NPCAI[0] = npc.NewPlayerAI(xx, yy, 0, 0, t.Status, t.Image)
+	t.NPCAI[0].LoadImages("DC", "/NPC/", 1)
 }
 
 //加载动画坐标
 func (t *TownE1) LoadXyList() {
-	syList := [23]string{
-		"21,23", "23,21", "22,16", "21,11", "24,9", "27,13", "33,11", "34,7", "38,8", "41,9", "44,7", "41,12", "46,17", "46,14", "43,25", "35,10", "31,16", "42,9", "23,23", "29,14", "22,11", "34,13", "33,16",
+	syList := [22]string{
+		"21,23", "23,21", "22,16", "21,11", "24,9", "27,13", "33,11", "34,7", "38,8", "41,9", "44,7", "41,12", "46,17", "46,14", "43,25", "35,10", "31,16", "42,9", "23,23", "29,14", "22,11", "34,13",
 	}
 	for i, k := range syList {
 		re := strings.Split(k, ",")
@@ -179,7 +179,7 @@ func (t *TownE1) Render(screen *ebiten.Image, frameIndexFor20, frameIndexFor12 i
 	screen.DrawImage(t.huodui[frameIndexFor20], t.op[16])
 
 	//NPC
-	for i := 0; i < 6; i++ {
+	for i := 0; i < 5; i++ {
 		//shadow
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Rotate(-0.5)
@@ -194,6 +194,8 @@ func (t *TownE1) Render(screen *ebiten.Image, frameIndexFor20, frameIndexFor12 i
 		t.op[i+17].GeoM.Scale(Scale, Scale)
 		screen.DrawImage(t.NPC[frameIndexFor12+i*8], t.op[i+17])
 	}
+	//AI NPC
+	t.NPCAI[0].Render(screen)
 
 }
 

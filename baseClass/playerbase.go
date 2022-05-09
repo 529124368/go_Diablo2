@@ -28,17 +28,17 @@ type PlayerBase struct {
 }
 
 //加載素材
-func (p *PlayerBase) LoadImages(name string, num uint8) {
+func (p *PlayerBase) LoadImages(name, path string, num uint8) {
 	//加载玩家素材第一部分
-	plist, _ := p.Asset.ReadFile("resource/man/warrior/" + name + ".png")
-	plist_json, _ := p.Asset.ReadFile("resource/man/warrior/" + name + ".json")
+	plist, _ := p.Asset.ReadFile("resource" + path + name + ".png")
+	plist_json, _ := p.Asset.ReadFile("resource" + path + name + ".json")
 	pli, pln := tools.GetImageFromPlistPaletted(plist, plist_json)
 	p.Plist_sheet = pli
 	p.Plist_png = ebiten.NewImageFromImage(pln)
 	if num == 2 {
 		//加载玩家素材第二部分
-		plist, _ = p.Asset.ReadFile("resource/man/warrior/" + name + "_act.png")
-		plist_json, _ = p.Asset.ReadFile("resource/man/warrior/" + name + "_act.json")
+		plist, _ = p.Asset.ReadFile("resource" + path + name + "_act.png")
+		plist_json, _ = p.Asset.ReadFile("resource" + path + name + "_act.json")
 		pli, pln = tools.GetImageFromPlistPaletted(plist, plist_json)
 		p.Plist_sheet_2 = pli
 		p.Plist_png_2 = ebiten.NewImageFromImage(pln)
@@ -92,4 +92,22 @@ func (p *PlayerBase) GC() {
 	p.Plist_sheet_2 = nil
 	p.Plist_png = nil
 	p.Plist_png_2 = nil
+}
+
+//改变帧数
+func (p *PlayerBase) ChangeFrame() {
+	//根据状态改变帧数
+	if p.State == tools.IDLE {
+		p.FrameNums = 16
+		p.FrameSpeed = 5
+	} else if p.State == tools.ATTACK {
+		p.FrameNums = 16
+		p.FrameSpeed = 1
+	} else if p.State == tools.SkILL {
+		p.FrameNums = 14
+		p.FrameSpeed = 1
+	} else {
+		p.FrameNums = 8
+		p.FrameSpeed = 5
+	}
 }
