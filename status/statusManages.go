@@ -1,7 +1,7 @@
 package status
 
 type StatusManage struct {
-	Flg               bool //是否可以移动标志
+	//Flg               bool //是否可以移动标志
 	ChangeScenceFlg   bool
 	DoorCountFlg      bool
 	LoadingFlg        bool
@@ -35,7 +35,7 @@ type StatusManage struct {
 
 func NewStatusManage() *StatusManage {
 	n := &StatusManage{
-		Flg:             false,
+		//Flg:             false,
 		ChangeScenceFlg: false,
 		DoorCountFlg:    false,
 		LoadingFlg:      false,

@@ -11,6 +11,7 @@ import (
 
 //基础类
 type PlayerBase struct {
+	FlagCanAction                        bool                 //是否可以移动标志
 	X                                    float64              //玩家世界坐标X
 	Y                                    float64              //玩家世界坐标Y
 	State                                uint8                //玩家状态
@@ -48,7 +49,7 @@ func (p *PlayerBase) LoadImages(name string, num uint8) {
 //设置玩家状态
 func (p *PlayerBase) SetPlayerState(s, d uint8) {
 	p.State = s
-	if p.Status.Flg {
+	if p.FlagCanAction {
 		p.Direction = d
 	}
 }

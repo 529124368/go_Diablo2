@@ -1,4 +1,4 @@
-package human
+package npc
 
 import (
 	"embed"
@@ -11,39 +11,37 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-type PlayerAI struct {
-	baseClass.PlayerBase                   //继承
-	PlayerName           string            //玩家名字
-	SkillName            string            //技能名称
-	imgOffset            [4]tools.OffsetXY //动作图片偏移
+type NpcAI struct {
+	baseClass.PlayerBase        //继承
+	PlayerName           string //玩家名字
+	//imgOffset            [4]tools.OffsetXY //动作图片偏移
 }
 
-//创建玩家
-func NewPlayerAI(x, y float64, state, dir uint8, s *status.StatusManage, images *embed.FS) *PlayerAI {
+//创建NPC
+func NewPlayerAI(x, y float64, state, dir uint8, s *status.StatusManage, images *embed.FS) *NpcAI {
 
-	play := &PlayerAI{
+	play := &NpcAI{
 		PlayerName: "",
-		SkillName:  "", //技能名字
 	}
 	play.X = x //地图坐标X
 	play.Y = y //地图坐标Y
 	play.State = state
 	play.Status = s
 	play.Direction = dir
+	play.OldDirection = dir
 	play.Asset = images
 	play.OpS = &ebiten.DrawImageOptions{}
 	play.Op = &ebiten.DrawImageOptions{}
 	return play
 }
 
-//加載玩家素材
-func (p *PlayerAI) LoadImages(name string, num uint8) {
+//加載NPC素材
+func (p *NpcAI) LoadImages(name string, num uint8) {
 	p.PlayerBase.LoadImages(name, num)
-	p.imgOffset = tools.GetOffetByAction(name)
 }
 
-//暗黑破坏神 16方位 移动 鼠标控制 AI
-func (p *PlayerAI) GetMouseControllerAI(dir uint8) {
+//暗黑破坏神 16方位 移动 AI
+func (p *NpcAI) GetMouseControllerAI(dir uint8) {
 	if p.FlagCanAction {
 		speed := 0.0
 		//判断是否走路
@@ -57,11 +55,12 @@ func (p *PlayerAI) GetMouseControllerAI(dir uint8) {
 	}
 }
 
-//控制AI玩家移动
-func (p *PlayerAI) PlayerMoveAI() {
+//控制AI NPC移动
+func (p *NpcAI) PlayerMoveAI() {
 	if p.NewpositonX != 0 && p.NewpositonY != 0 && (math.Abs(p.X-p.NewpositonX) > 1 && math.Abs(p.Y-p.NewpositonY) > 1) {
 		p.FlagCanAction = true
 		//直接切换方向
+		p.UpdateOldPlayerDir(p.NewDir)
 		p.GetMouseControllerAI(p.NewDir)
 	} else {
 		p.State = tools.IDLE
@@ -70,21 +69,21 @@ func (p *PlayerAI) PlayerMoveAI() {
 	}
 }
 
-//停止AI玩家移动
-func (p *PlayerAI) StopPlayerMoveAI() {
+//停止AI NPC移动
+func (p *NpcAI) StopPlayerMoveAI() {
 	p.NewpositonX = 0
 	p.NewpositonY = 0
 }
 
-//控制AI玩家新位置的预算
-func (p *PlayerAI) UpdatePlayerNextMovePositonAI(NewpositonX, NewpositonY float64, dir uint8) {
+//控制AI NPC新位置的预算
+func (p *NpcAI) UpdatePlayerNextMovePositonAI(NewpositonX, NewpositonY float64, dir uint8) {
 	p.NewDir = dir
 	p.NewpositonX = NewpositonX
 	p.NewpositonY = NewpositonY
 }
 
-//渲染角色
-func (p *PlayerAI) Render(screen *ebiten.Image) {
+//渲染NPC
+func (p *NpcAI) Render(screen *ebiten.Image) {
 	p.PlayerBase.Render()
 	var name string
 	block := 1
@@ -114,28 +113,6 @@ func (p *PlayerAI) Render(screen *ebiten.Image) {
 	}
 
 	imagess, x, y := p.GetAnimator("man", name, uint8(block))
-	//Idel -> Walk Offset
-	if p.State == tools.Walk {
-		x += p.imgOffset[0].X
-		y += p.imgOffset[0].Y
-	}
-	//Idel -> RUN Offset
-	if p.State == tools.RUN {
-		x += p.imgOffset[1].X
-		y += p.imgOffset[1].Y
-	}
-
-	//Idel -> Walk -> Attack Offset
-	if p.State == tools.ATTACK {
-		x += p.imgOffset[2].X
-		y += p.imgOffset[2].Y
-	}
-
-	//Idel -> SKILL-> Offset
-	if p.State == tools.SkILL {
-		x += p.imgOffset[3].X
-		y += p.imgOffset[3].Y
-	}
 
 	//Draw Shadow
 	p.OpS.GeoM.Reset()

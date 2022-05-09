@@ -33,7 +33,6 @@ type Player struct {
 
 //创建玩家
 func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m interfaces.MapInterface, s *status.StatusManage, con *ws.WsNetManage) *Player {
-
 	play := &Player{
 		PlayerName: "",
 		MouseX:     mx,
@@ -63,7 +62,7 @@ func (p *Player) LoadImages(name string, num uint8) {
 
 //暗黑破坏神 16方位 移动 鼠标控制
 func (p *Player) GetMouseController(dir uint8) {
-	if p.Status.Flg {
+	if p.FlagCanAction {
 		speed := 0.0
 		//判断是否走路
 		if p.Status.IsWalk && (p.Direction != dir || p.State != tools.Walk) {
@@ -86,7 +85,7 @@ func (p *Player) GetMouseController(dir uint8) {
 			p.NewpositonY = 0
 			p.Status.CalculateEnd = false
 		}
-		p.Status.Flg = false
+		p.FlagCanAction = false
 	}
 }
 
@@ -110,7 +109,7 @@ func (p *Player) CanWalk(xS, yS float64, dir uint8) bool {
 func (p *Player) PlayerMove() {
 	if p.NewpositonX != 0 && p.NewpositonY != 0 && (math.Abs(p.X-p.NewpositonX) > 1 && math.Abs(p.Y-p.NewpositonY) > 1) {
 		p.Status.IsRun = true
-		p.Status.Flg = true
+		p.FlagCanAction = true
 		//判断人物方位
 		if p.OldDirection != p.Direction && !controller.MouseRightPress() {
 			if !p.Status.CalculateEnd {

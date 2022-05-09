@@ -8,6 +8,7 @@ import (
 	"game/mapCreator/dat"
 	"game/mapCreator/ds1"
 	"game/mapCreator/dt1"
+	"game/mapCreator/mapManage/npc"
 	"game/maps"
 	"game/status"
 	"game/storage"
@@ -42,6 +43,7 @@ type TownE1 struct {
 	op                []*ebiten.DrawImageOptions
 	xyPos             [23]postion
 	bag               *storage.Bag
+	NPCAI             [1]*npc.NpcAI //AI NPC
 }
 
 func NewE1(images *embed.FS, sta *status.StatusManage, b *storage.Bag) *TownE1 {
@@ -84,6 +86,10 @@ func (t *TownE1) LoadAnm() {
 			t.NPC = append(t.NPC, tools.GetEbitenImage(o))
 		}
 	}
+	//
+	xx, yy, _ := t.GetCellXY(33, 18)
+	t.NPCAI[0] = npc.NewPlayerAI(xx, yy, 0, 0, nil, t.Image)
+
 }
 
 //加载动画坐标

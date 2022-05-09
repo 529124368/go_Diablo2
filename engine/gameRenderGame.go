@@ -86,23 +86,23 @@ func (g *Game) changeScenceGameUpdate() {
 	if controller.MouseleftPress() || controller.IsTouch() {
 		//防止点击UI界面也移动
 		if mouseY < 436 {
-			g.status.Flg = true
+			g.player.FlagCanAction = true
 		}
 		//如果打开包裹，包裹已右位置不能点击移动
 		if g.status.OpenBag && mouseX >= tools.LAYOUTX/2 {
-			g.status.Flg = false
+			g.player.FlagCanAction = false
 		}
 		//如果打开MINi板子，并且没有打开包裹 以下坐标不可以点击移动
 		if g.status.OpenMiniPanel && !g.status.OpenBag && mouseX >= 305 && mouseX <= 475 && mouseY > 407 {
-			g.status.Flg = false
+			g.player.FlagCanAction = false
 		}
 		//如果打开MINi板子，并且打开包裹 以下坐标不可以点击移动
 		if g.status.OpenMiniPanel && g.status.OpenBag && mouseX >= 205 && mouseX <= 377 && mouseY > 407 {
-			g.status.Flg = false
+			g.player.FlagCanAction = false
 		}
 		//如果拿起物品也不可以移动
 		if g.status.IsTakeItem {
-			g.status.Flg = false
+			g.player.FlagCanAction = false
 			//这个范围内就是丢弃物品
 			if mouseY < 436 && mouseX < 390 {
 				if !g.status.IsDropDeal {
@@ -116,7 +116,7 @@ func (g *Game) changeScenceGameUpdate() {
 				}
 			}
 		}
-		if g.status.Flg {
+		if g.player.FlagCanAction {
 			//计算新的位置
 			g.player.PlayerNextMovePositon(mouseX, mouseY, dir)
 		}
@@ -140,7 +140,7 @@ func (g *Game) changeScenceGameUpdate() {
 		if g.player.State != tools.ATTACK {
 			g.player.Counts = 0
 		}
-		g.status.Flg = false
+		g.player.FlagCanAction = false
 		if g.player.Direction != dir || g.player.State != tools.ATTACK {
 			g.player.SetPlayerState(tools.ATTACK, dir)
 		}
@@ -153,7 +153,7 @@ func (g *Game) changeScenceGameUpdate() {
 		if g.player.State != tools.SkILL {
 			g.player.Counts = 0
 		}
-		g.status.Flg = false
+		g.player.FlagCanAction = false
 		if g.player.Direction != dir || g.player.State != tools.SkILL {
 			g.player.SetPlayerState(tools.SkILL, dir)
 		}
