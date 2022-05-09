@@ -1,4 +1,4 @@
-package maps
+package baseClass
 
 import (
 	"embed"

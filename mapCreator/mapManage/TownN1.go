@@ -4,6 +4,7 @@ import (
 	"embed"
 	"errors"
 	"fmt"
+	"game/baseClass"
 	"game/mapCreator/dat"
 	"game/mapCreator/ds1"
 	"game/mapCreator/dt1"
@@ -17,14 +18,14 @@ import (
 )
 
 type TownN1 struct {
-	maps.MapBase                  //继承
-	anmiList      []*ebiten.Image //火把动画图集
-	wayList       []*ebiten.Image //瞬间移动动画图集
-	huodui        []*ebiten.Image //火堆动画图集
-	NPC           []*ebiten.Image //NPC图集
-	dropAnm       []*ebiten.Image //掉落动画图集
-	dropItemsList []dropItem      //掉落物品一栏
-	op            []*ebiten.DrawImageOptions
+	baseClass.MapBase                 //继承
+	anmiList          []*ebiten.Image //火把动画图集
+	wayList           []*ebiten.Image //瞬间移动动画图集
+	huodui            []*ebiten.Image //火堆动画图集
+	NPC               []*ebiten.Image //NPC图集
+	dropAnm           []*ebiten.Image //掉落动画图集
+	dropItemsList     []dropItem      //掉落物品一栏
+	op                []*ebiten.DrawImageOptions
 	//xyPos         [17]postion
 	image *embed.FS //静态资源获取
 }
@@ -209,9 +210,9 @@ func (t *TownN1) LoadMap() {
 	}
 
 	//wall
-	t.Img2 = make([][]maps.ImgWall, h)
+	t.Img2 = make([][]baseClass.ImgWall, h)
 	for i := 0; i < h; i++ {
-		t.Img2[i] = make([]maps.ImgWall, w)
+		t.Img2[i] = make([]baseClass.ImgWall, w)
 		for j := 0; j < w; j++ {
 			ds1Tile := d.Walls[0].Tile(j, i)
 			if !ds1Tile.Hidden() && ds1Tile.Prop1 != 0 {

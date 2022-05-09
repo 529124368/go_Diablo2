@@ -18,7 +18,7 @@ type scenceMusic struct {
 	name string
 }
 type MusicBGM struct {
-	image                *embed.FS
+	asset                *embed.FS
 	AudioMusicScencePool []scenceMusic //场景音乐池
 	AudioContBGM         *audio.Player
 	BgmMusicName         string
@@ -27,7 +27,7 @@ type MusicBGM struct {
 func NewMusicBGM(images *embed.FS) *MusicBGM {
 	cont = audio.NewContext(musicRate)
 	m := &MusicBGM{
-		image:                images,
+		asset:                images,
 		AudioMusicScencePool: make([]scenceMusic, 0),
 		AudioContBGM:         nil,
 		BgmMusicName:         "",
@@ -125,14 +125,14 @@ func (m *MusicBGM) checkIsScenceMusicAtPlay(name string) bool {
 
 //MP3
 func (m *MusicBGM) LoadMp3(name string) *mp3.Stream {
-	bgm, _ := m.image.ReadFile("resource/BGM/" + name)
+	bgm, _ := m.asset.ReadFile("resource/BGM/" + name)
 	ss, _ := mp3.DecodeWithSampleRate(musicRate, bytes.NewReader(bgm))
 	return ss
 }
 
 //Wav
 func (m *MusicBGM) LoadWav(name string) *wav.Stream {
-	bgm, _ := m.image.ReadFile("resource/BGM/" + name)
+	bgm, _ := m.asset.ReadFile("resource/BGM/" + name)
 	ss, _ := wav.DecodeWithSampleRate(musicRate, bytes.NewReader(bgm))
 	return ss
 }

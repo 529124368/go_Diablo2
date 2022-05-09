@@ -2,6 +2,7 @@ package role
 
 import (
 	"embed"
+	"game/baseClass"
 	"game/controller"
 	"game/engine/ws"
 	"game/interfaces"
@@ -19,19 +20,15 @@ const (
 )
 
 type Player struct {
-	PlayerBase                                                   //继承
-	PlayerName                           string                  //玩家名字
-	MouseX, MouseY                       int                     //鼠标X坐标 鼠标Y坐标
-	SkillName                            string                  //技能名称
-	map_c                                interfaces.MapInterface //地图
-	opS, op                              *ebiten.DrawImageOptions
-	newPath                              []uint8
-	turnLoop                             uint8
-	WsCon                                *ws.WsNetManage //net
-	newpositonX, newpositonY             float64
-	newDir                               uint8
-	FrameSpeed, FrameNums, Counts, count int
-	imgOffset                            [4]tools.OffsetXY //动作图片偏移
+	baseClass.PlayerBase                         //继承
+	PlayerName           string                  //玩家名字
+	MouseX, MouseY       int                     //鼠标X坐标 鼠标Y坐标
+	SkillName            string                  //技能名称
+	map_c                interfaces.MapInterface //地图
+	newPath              []uint8
+	turnLoOp             uint8
+	WsCon                *ws.WsNetManage   //net
+	imgOffset            [4]tools.OffsetXY //动作图片偏移
 }
 
 //创建玩家
@@ -43,9 +40,7 @@ func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m i
 		MouseY:     my,
 		SkillName:  "", //技能名字
 		map_c:      m,
-		turnLoop:   0,
-		opS:        &ebiten.DrawImageOptions{},
-		op:         &ebiten.DrawImageOptions{},
+		turnLoOp:   0,
 		WsCon:      con,
 	}
 	play.X = x //地图坐标X
@@ -53,8 +48,10 @@ func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m i
 	play.State = state
 	play.Direction = dir
 	play.OldDirection = dir
-	play.image = images
-	play.status = s
+	play.Asset = images
+	play.Status = s
+	play.OpS = &ebiten.DrawImageOptions{}
+	play.Op = &ebiten.DrawImageOptions{}
 	return play
 }
 
@@ -66,37 +63,37 @@ func (p *Player) LoadImages(name string, num uint8) {
 
 //暗黑破坏神 16方位 移动 鼠标控制
 func (p *Player) GetMouseController(dir uint8) {
-	if p.status.Flg {
+	if p.Status.Flg {
 		speed := 0.0
 		//判断是否走路
-		if p.status.IsWalk && (p.Direction != dir || p.State != tools.Walk) {
+		if p.Status.IsWalk && (p.Direction != dir || p.State != tools.Walk) {
 			speed = tools.SPEED
 			p.SetPlayerState(tools.Walk, dir)
 		}
-		if !p.status.IsWalk && (p.Direction != dir || p.State != tools.RUN) {
+		if !p.Status.IsWalk && (p.Direction != dir || p.State != tools.RUN) {
 			speed = tools.SPEED_RUN
 			p.SetPlayerState(tools.RUN, dir)
 		}
 		//移动判断
 		moveX, moveY := tools.CalculateSpeed(dir, speed)
 		if p.CanWalk(moveX, moveY, dir) {
-			p.status.CamerOffsetX += -moveX
-			p.status.CamerOffsetY += -moveY
+			p.Status.CamerOffsetX += -moveX
+			p.Status.CamerOffsetY += -moveY
 			p.Y += moveY
 			p.X += moveX
 		} else {
-			p.newpositonX = 0
-			p.newpositonY = 0
-			p.status.CalculateEnd = false
+			p.NewpositonX = 0
+			p.NewpositonY = 0
+			p.Status.CalculateEnd = false
 		}
-		p.status.Flg = false
+		p.Status.Flg = false
 	}
 }
 
 //判断是否可以行走
 func (p *Player) CanWalk(xS, yS float64, dir uint8) bool {
 	x, y := tools.GetFloorPositionAt(p.X+xS-110, p.Y+yS+70)
-	if x >= p.status.ReadMapSizeWidth || y >= p.status.ReadMapSizeHeight || x < 0 || y < 0 {
+	if x >= p.Status.ReadMapSizeWidth || y >= p.Status.ReadMapSizeHeight || x < 0 || y < 0 {
 		p.SetPlayerState(tools.IDLE, dir)
 		return false
 	}
@@ -111,46 +108,46 @@ func (p *Player) CanWalk(xS, yS float64, dir uint8) bool {
 
 //本机玩家移动
 func (p *Player) PlayerMove() {
-	if p.newpositonX != 0 && p.newpositonY != 0 && (math.Abs(p.X-p.newpositonX) > 1 && math.Abs(p.Y-p.newpositonY) > 1) {
-		p.status.IsRun = true
-		p.status.Flg = true
+	if p.NewpositonX != 0 && p.NewpositonY != 0 && (math.Abs(p.X-p.NewpositonX) > 1 && math.Abs(p.Y-p.NewpositonY) > 1) {
+		p.Status.IsRun = true
+		p.Status.Flg = true
 		//判断人物方位
 		if p.OldDirection != p.Direction && !controller.MouseRightPress() {
-			if !p.status.CalculateEnd {
+			if !p.Status.CalculateEnd {
 				p.newPath = tools.CalculateDirPath(p.OldDirection, p.Direction)
-				p.status.CalculateEnd = true
+				p.Status.CalculateEnd = true
 			}
 			if len(p.newPath) >= 3 {
-				if p.turnLoop >= uint8(len(p.newPath)) {
-					p.turnLoop = uint8(len(p.newPath) - 1)
-					p.newDir = p.newPath[p.turnLoop]
+				if p.turnLoOp >= uint8(len(p.newPath)) {
+					p.turnLoOp = uint8(len(p.newPath) - 1)
+					p.NewDir = p.newPath[p.turnLoOp]
 					p.UpdateOldPlayerDir(p.Direction)
 				} else {
-					p.newDir = p.newPath[p.turnLoop]
+					p.NewDir = p.newPath[p.turnLoOp]
 				}
-				p.turnLoop++
-				p.SetPlayerState(tools.IDLE, p.newDir)
+				p.turnLoOp++
+				p.SetPlayerState(tools.IDLE, p.NewDir)
 			} else {
 				//直接切换方向
-				p.status.CalculateEnd = false
-				p.turnLoop = 0
-				p.UpdateOldPlayerDir(p.newDir)
-				p.GetMouseController(p.newDir)
+				p.Status.CalculateEnd = false
+				p.turnLoOp = 0
+				p.UpdateOldPlayerDir(p.NewDir)
+				p.GetMouseController(p.NewDir)
 			}
 		} else {
-			p.status.CalculateEnd = false
-			p.turnLoop = 0
-			p.GetMouseController(p.newDir)
+			p.Status.CalculateEnd = false
+			p.turnLoOp = 0
+			p.GetMouseController(p.NewDir)
 		}
 	} else {
-		p.newpositonX = 0
-		p.newpositonY = 0
+		p.NewpositonX = 0
+		p.NewpositonY = 0
 	}
 	//玩家停止
-	if p.State == tools.IDLE && p.status.IsRun {
-		p.status.IsRun = false
+	if p.State == tools.IDLE && p.Status.IsRun {
+		p.Status.IsRun = false
 		//网络
-		if p.status.IsNetPlay {
+		if p.Status.IsNetPlay {
 			p.WsCon.SendMessage("@@MoveEnd|" + p.PlayerName + "|" + strconv.FormatFloat(p.X, 'f', 0, 64) + "|" + strconv.FormatFloat(p.Y, 'f', 0, 64))
 		}
 	}
@@ -158,26 +155,18 @@ func (p *Player) PlayerMove() {
 
 //玩家到新位置的预算
 func (p *Player) PlayerNextMovePositon(mouseX, mouseY int, dir uint8) {
-	p.newDir = dir
-	p.newpositonX = p.X + float64(mouseX) - 395
-	p.newpositonY = p.Y + float64(mouseY) - 240
-	if p.status.IsNetPlay {
+	p.NewDir = dir
+	p.NewpositonX = p.X + float64(mouseX) - 395
+	p.NewpositonY = p.Y + float64(mouseY) - 240
+	if p.Status.IsNetPlay {
 		//网络
-		p.WsCon.SendMessage("@@Move|" + p.PlayerName + "|" + strconv.FormatFloat(p.newpositonX, 'f', 0, 64) + "|" + strconv.FormatFloat(p.newpositonY, 'f', 0, 64) + "|" + strconv.Itoa(int(p.newDir)))
+		p.WsCon.SendMessage("@@Move|" + p.PlayerName + "|" + strconv.FormatFloat(p.NewpositonX, 'f', 0, 64) + "|" + strconv.FormatFloat(p.NewpositonY, 'f', 0, 64) + "|" + strconv.Itoa(int(p.NewDir)))
 	}
 }
 
-//渲染本机角色
+//渲染角色
 func (p *Player) Render(screen *ebiten.Image) {
-	p.count++
-	//Change player Frame
-	if p.count > p.FrameSpeed {
-		p.Counts++
-		p.count = 0
-		if p.Counts >= p.FrameNums {
-			p.Counts = 0
-		}
-	}
+	p.PlayerBase.Render()
 	var name string
 	block := 1
 	//nameSkill := ""
@@ -230,28 +219,28 @@ func (p *Player) Render(screen *ebiten.Image) {
 	}
 
 	//Draw Shadow
-	p.opS.GeoM.Reset()
-	p.opS.Filter = ebiten.FilterLinear
-	p.opS.GeoM.Rotate(-0.5)
-	p.opS.GeoM.Scale(1, 0.5)
-	p.opS.ColorM.Scale(0, 0, 0, 1)
-	p.opS.GeoM.Translate(float64(tools.LAYOUTX/2+x+p.status.ShadowOffsetX+p.status.UIOFFSETX), float64(tools.LAYOUTY/2+y))
-	screen.DrawImage(imagess, p.opS)
+	p.OpS.GeoM.Reset()
+	p.OpS.Filter = ebiten.FilterLinear
+	p.OpS.GeoM.Rotate(-0.5)
+	p.OpS.GeoM.Scale(1, 0.5)
+	p.OpS.ColorM.Scale(0, 0, 0, 1)
+	p.OpS.GeoM.Translate(float64(tools.LAYOUTX/2+x+p.Status.ShadowOffsetX+p.Status.UIOFFSETX), float64(tools.LAYOUTY/2+y))
+	screen.DrawImage(imagess, p.OpS)
 	//Draw Player
-	p.op.GeoM.Reset()
-	p.op.GeoM.Translate(float64(tools.LAYOUTX/2+OFFSETX+x+p.status.UIOFFSETX), float64(tools.LAYOUTY/2+OFFSETY+y))
-	p.op.Filter = ebiten.FilterLinear
-	screen.DrawImage(imagess, p.op)
+	p.Op.GeoM.Reset()
+	p.Op.GeoM.Translate(float64(tools.LAYOUTX/2+OFFSETX+x+p.Status.UIOFFSETX), float64(tools.LAYOUTY/2+OFFSETY+y))
+	p.Op.Filter = ebiten.FilterLinear
+	screen.DrawImage(imagess, p.Op)
 
 	//Draw Skill
 	// if g.player.State == ATTACK {
 	// 	imagey, x, y := g.player.GetAnimator("skill", nameSkill)
-	// 	//skill option
-	// 	opSkill = &ebiten.DrawImageOptions{}
-	// 	opSkill.GeoM.Translate(float64(SCREENWIDTH/2+x), float64(SCREENHEIGHT/2+y))
-	// 	opSkill.CompositeMode = ebiten.CompositeModeLighter
-	// 	opSkill.GeoM.Scale(1.5, 1.5)
-	// 	opSkill.Filter = ebiten.FilterLinear
-	// 	screen.DrawImage(imagey, opSkill)
+	// 	//skill Option
+	// 	OpSkill = &ebiten.DrawImageOptions{}
+	// 	OpSkill.GeoM.Translate(float64(SCREENWIDTH/2+x), float64(SCREENHEIGHT/2+y))
+	// 	OpSkill.CompositeMode = ebiten.CompositeModeLighter
+	// 	OpSkill.GeoM.Scale(1.5, 1.5)
+	// 	OpSkill.Filter = ebiten.FilterLinear
+	// 	screen.DrawImage(imagey, OpSkill)
 	// }
 }

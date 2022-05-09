@@ -220,7 +220,6 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 				v.Render(screen)
 			}
 		}
-
 		//Draw Wall
 		g.mapManage.RenderWall(screen, g.status.CamerOffsetX, g.status.CamerOffsetY)
 		//Draw map Anmi

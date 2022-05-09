@@ -2,6 +2,7 @@ package role
 
 import (
 	"embed"
+	"game/baseClass"
 	"game/status"
 	"game/tools"
 	"math"
@@ -11,14 +12,10 @@ import (
 )
 
 type PlayerAI struct {
-	PlayerBase                                  //继承
-	PlayerName                           string //玩家名字
-	SkillName                            string //技能名称
-	opS, op                              *ebiten.DrawImageOptions
-	newpositonX, newpositonY             float64
-	newDir                               uint8
-	FrameSpeed, FrameNums, Counts, count int
-	imgOffset                            [4]tools.OffsetXY //动作图片偏移
+	baseClass.PlayerBase                   //继承
+	PlayerName           string            //玩家名字
+	SkillName            string            //技能名称
+	imgOffset            [4]tools.OffsetXY //动作图片偏移
 }
 
 //创建玩家
@@ -27,22 +24,28 @@ func NewPlayerAI(x, y float64, state, dir uint8, s *status.StatusManage, images 
 	play := &PlayerAI{
 		PlayerName: "",
 		SkillName:  "", //技能名字
-		opS:        &ebiten.DrawImageOptions{},
-		op:         &ebiten.DrawImageOptions{},
 	}
 	play.X = x //地图坐标X
 	play.Y = y //地图坐标Y
 	play.State = state
-	play.status = s
+	play.Status = s
 	play.Direction = dir
 	play.OldDirection = dir
-	play.image = images
+	play.Asset = images
+	play.OpS = &ebiten.DrawImageOptions{}
+	play.Op = &ebiten.DrawImageOptions{}
 	return play
+}
+
+//加載玩家素材
+func (p *PlayerAI) LoadImages(name string, num uint8) {
+	p.PlayerBase.LoadImages(name, num)
+	p.imgOffset = tools.GetOffetByAction(name)
 }
 
 //暗黑破坏神 16方位 移动 鼠标控制 AI
 func (p *PlayerAI) GetMouseControllerAI(dir uint8) {
-	if p.status.Flg {
+	if p.Status.Flg {
 		speed := 0.0
 		//判断是否走路
 		speed = tools.SPEED
@@ -51,48 +54,40 @@ func (p *PlayerAI) GetMouseControllerAI(dir uint8) {
 		moveX, moveY := tools.CalculateSpeed(dir, speed)
 		p.Y += moveY
 		p.X += moveX
-		p.status.Flg = false
+		p.Status.Flg = false
 	}
 }
 
 //控制AI玩家移动
 func (p *PlayerAI) PlayerMoveAI() {
-	if p.newpositonX != 0 && p.newpositonY != 0 && (math.Abs(p.X-p.newpositonX) > 1 && math.Abs(p.Y-p.newpositonY) > 1) {
-		p.status.Flg = true
+	if p.NewpositonX != 0 && p.NewpositonY != 0 && (math.Abs(p.X-p.NewpositonX) > 1 && math.Abs(p.Y-p.NewpositonY) > 1) {
+		p.Status.Flg = true
 		//直接切换方向
-		p.UpdateOldPlayerDir(p.newDir)
-		p.GetMouseControllerAI(p.newDir)
+		p.UpdateOldPlayerDir(p.NewDir)
+		p.GetMouseControllerAI(p.NewDir)
 	} else {
 		p.State = tools.IDLE
-		p.newpositonX = 0
-		p.newpositonY = 0
+		p.NewpositonX = 0
+		p.NewpositonY = 0
 	}
 }
 
 //停止AI玩家移动
 func (p *PlayerAI) StopPlayerMoveAI() {
-	p.newpositonX = 0
-	p.newpositonY = 0
+	p.NewpositonX = 0
+	p.NewpositonY = 0
 }
 
 //控制AI玩家新位置的预算
-func (p *PlayerAI) UpdatePlayerNextMovePositonAI(newpositonX, newpositonY float64, dir uint8) {
-	p.newDir = dir
-	p.newpositonX = newpositonX
-	p.newpositonY = newpositonY
+func (p *PlayerAI) UpdatePlayerNextMovePositonAI(NewpositonX, NewpositonY float64, dir uint8) {
+	p.NewDir = dir
+	p.NewpositonX = NewpositonX
+	p.NewpositonY = NewpositonY
 }
 
-//渲染本机角色
+//渲染角色
 func (p *PlayerAI) Render(screen *ebiten.Image) {
-	p.count++
-	//Change player Frame
-	if p.count > p.FrameSpeed {
-		p.Counts++
-		p.count = 0
-		if p.Counts >= p.FrameNums {
-			p.Counts = 0
-		}
-	}
+	p.PlayerBase.Render()
 	var name string
 	block := 1
 	//nameSkill := ""
@@ -144,30 +139,17 @@ func (p *PlayerAI) Render(screen *ebiten.Image) {
 		y += p.imgOffset[3].Y
 	}
 
-	//渲染Ai角色
 	//Draw Shadow
-	p.opS.GeoM.Reset()
-	p.opS.Filter = ebiten.FilterLinear
-	p.opS.GeoM.Rotate(-0.5)
-	p.opS.GeoM.Scale(1, 0.5)
-	p.opS.ColorM.Scale(0, 0, 0, 1)
-	p.opS.GeoM.Translate(float64(int(p.X)+x-32-25)+p.status.CamerOffsetX, float64(int(p.Y)+y+35-30)+p.status.CamerOffsetY)
-	screen.DrawImage(imagess, p.opS)
+	p.OpS.GeoM.Reset()
+	p.OpS.Filter = ebiten.FilterLinear
+	p.OpS.GeoM.Rotate(-0.5)
+	p.OpS.GeoM.Scale(1, 0.5)
+	p.OpS.ColorM.Scale(0, 0, 0, 1)
+	p.OpS.GeoM.Translate(float64(int(p.X)+x-32-25)+p.Status.CamerOffsetX, float64(int(p.Y)+y+35-30)+p.Status.CamerOffsetY)
+	screen.DrawImage(imagess, p.OpS)
 	//Draw Player
-	p.op.GeoM.Reset()
-	p.op.GeoM.Translate(float64(int(p.X)+x-25)+p.status.CamerOffsetX, float64(int(p.Y)+y-30)+p.status.CamerOffsetY)
-	p.op.Filter = ebiten.FilterLinear
-	screen.DrawImage(imagess, p.op)
-
-	//Draw Skill
-	// if g.player.State == ATTACK {
-	// 	imagey, x, y := g.player.GetAnimator("skill", nameSkill)
-	// 	//skill option
-	// 	opSkill = &ebiten.DrawImageOptions{}
-	// 	opSkill.GeoM.Translate(float64(SCREENWIDTH/2+x), float64(SCREENHEIGHT/2+y))
-	// 	opSkill.CompositeMode = ebiten.CompositeModeLighter
-	// 	opSkill.GeoM.Scale(1.5, 1.5)
-	// 	opSkill.Filter = ebiten.FilterLinear
-	// 	screen.DrawImage(imagey, opSkill)
-	// }
+	p.Op.GeoM.Reset()
+	p.Op.GeoM.Translate(float64(int(p.X)+x-25)+p.Status.CamerOffsetX, float64(int(p.Y)+y-30)+p.Status.CamerOffsetY)
+	p.Op.Filter = ebiten.FilterLinear
+	screen.DrawImage(imagess, p.Op)
 }
