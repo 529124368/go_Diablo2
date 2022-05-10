@@ -86,9 +86,14 @@ func (t *TownE1) LoadAnm() {
 			t.NPC = append(t.NPC, tools.GetEbitenImage(o))
 		}
 	}
-	//
+	//设置NPC DC
 	t.NPCAI[0] = npc.NewPlayerAI(4580, 2041, 0, 0, t.Status, t.Image)
 	t.NPCAI[0].LoadImages("DC", "/NPC/", 1)
+	aiPath := make([]npc.AIEndPoint, 3)
+	aiPath = append(aiPath, npc.AIEndPoint{X: 4674, Y: 1947, Dir: 2})
+	aiPath = append(aiPath, npc.AIEndPoint{X: 4780, Y: 2053, Dir: 3})
+	aiPath = append(aiPath, npc.AIEndPoint{X: 4580, Y: 2041, Dir: 5})
+	t.NPCAI[0].SetAIPath(aiPath, 100)
 }
 
 //加载动画坐标
