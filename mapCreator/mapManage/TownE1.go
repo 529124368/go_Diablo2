@@ -41,9 +41,9 @@ type TownE1 struct {
 	dropAnm           []*ebiten.Image //掉落动画图集
 	dropItemsList     []dropItem      //掉落物品一览
 	op                []*ebiten.DrawImageOptions
-	xyPos             [22]postion
+	xyPos             [17]postion
 	bag               *storage.Bag
-	NPCAI             [1]*npc.NpcAI //AI NPC
+	NPCAI             [3]*npc.NpcAI //AI NPC
 }
 
 func NewE1(images *embed.FS, sta *status.StatusManage, b *storage.Bag) *TownE1 {
@@ -80,26 +80,37 @@ func (t *TownE1) LoadAnm() {
 		o, _ := t.Image.ReadFile("resource/itemsdrop/c_" + strconv.Itoa(i) + ".png")
 		t.dropAnm = append(t.dropAnm, tools.GetEbitenImage(o))
 	}
-	for j := 1; j <= 5; j++ {
-		for i := 0; i < 8; i++ {
-			o, _ := t.Image.ReadFile("resource/NPC/npc" + strconv.Itoa(j) + "_" + strconv.Itoa(i) + ".png")
-			t.NPC = append(t.NPC, tools.GetEbitenImage(o))
-		}
-	}
 	//设置NPC DC
 	t.NPCAI[0] = npc.NewPlayerAI(4580, 2041, 0, 0, t.Status, t.Image)
 	t.NPCAI[0].LoadImages("DC", "/NPC/", 1)
 	aiPath := make([]npc.AIEndPoint, 3)
 	aiPath = append(aiPath, npc.AIEndPoint{X: 4674, Y: 1947, Dir: 2})
 	aiPath = append(aiPath, npc.AIEndPoint{X: 4780, Y: 2053, Dir: 3})
-	aiPath = append(aiPath, npc.AIEndPoint{X: 4580, Y: 2041, Dir: 5})
+	aiPath = append(aiPath, npc.AIEndPoint{X: 4580, Y: 2053, Dir: 5})
 	t.NPCAI[0].SetAIPath(aiPath, 100)
+
+	//设置NPC PS
+	t.NPCAI[1] = npc.NewPlayerAI(6003, 2048, 0, 4, t.Status, t.Image)
+	t.NPCAI[1].LoadImages("PS", "/NPC/", 1)
+	aiPath = make([]npc.AIEndPoint, 2)
+	aiPath = append(aiPath, npc.AIEndPoint{X: 6200, Y: 2048, Dir: 7})
+	aiPath = append(aiPath, npc.AIEndPoint{X: 6003, Y: 2048, Dir: 5})
+	t.NPCAI[1].SetAIPath(aiPath, 100)
+
+	//设置NPC PS
+	t.NPCAI[2] = npc.NewPlayerAI(4823, 1691, 0, 4, t.Status, t.Image)
+	t.NPCAI[2].LoadImages("RC", "/NPC/", 1)
+	aiPath = make([]npc.AIEndPoint, 2)
+	aiPath = append(aiPath, npc.AIEndPoint{X: 4823, Y: 1855, Dir: 4})
+	aiPath = append(aiPath, npc.AIEndPoint{X: 4918, Y: 1759, Dir: 2})
+	aiPath = append(aiPath, npc.AIEndPoint{X: 4823, Y: 1691, Dir: 1})
+	t.NPCAI[2].SetAIPath(aiPath, 100)
 }
 
 //加载动画坐标
 func (t *TownE1) LoadXyList() {
-	syList := [22]string{
-		"21,23", "23,21", "22,16", "21,11", "24,9", "27,13", "33,11", "34,7", "38,8", "41,9", "44,7", "41,12", "46,17", "46,14", "43,25", "35,10", "31,16", "42,9", "23,23", "29,14", "22,11", "34,13",
+	syList := [17]string{
+		"21,23", "23,21", "22,16", "21,11", "24,9", "27,13", "33,11", "34,7", "38,8", "41,9", "44,7", "41,12", "46,17", "46,14", "43,25", "35,10", "31,16",
 	}
 	for i, k := range syList {
 		re := strings.Split(k, ",")
@@ -182,25 +193,10 @@ func (t *TownE1) Render(screen *ebiten.Image, frameIndexFor20, frameIndexFor12 i
 	t.op[16].GeoM.Scale(Scale, Scale)
 	screen.DrawImage(t.huodui[frameIndexFor20], t.op[16])
 
-	//NPC
-	for i := 0; i < 5; i++ {
-		//shadow
-		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Rotate(-0.5)
-		op.GeoM.Scale(1, 0.5)
-		op.ColorM.Scale(0, 0, 0, 1)
-		op.GeoM.Translate(float64(t.xyPos[i+17].x)+offsetX-30, float64(t.xyPos[i+17].y)+offsetY+40)
-		screen.DrawImage(t.NPC[frameIndexFor12+i*8], op)
-		//
-		t.op[i+17].GeoM.Reset()
-		t.op[i+17].GeoM.Translate(float64(t.xyPos[i+17].x)+offsetX, float64(t.xyPos[i+17].y)+offsetY)
-		t.op[i+17].Filter = ebiten.FilterLinear
-		t.op[i+17].GeoM.Scale(Scale, Scale)
-		screen.DrawImage(t.NPC[frameIndexFor12+i*8], t.op[i+17])
-	}
 	//AI NPC
-	t.NPCAI[0].Render(screen)
-
+	for _, v := range t.NPCAI {
+		v.Render(screen)
+	}
 }
 
 //暗黑新手村专用 根据逻辑坐标 求具体坐标

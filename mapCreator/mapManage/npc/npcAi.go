@@ -107,20 +107,38 @@ func (p *NpcAI) Render(screen *ebiten.Image) {
 func (p *NpcAI) PlayerMoveAI() {
 	//AI 移动判断
 	p.AIMove()
-	//移动
-	if p.NewpositonX != 0 && p.NewpositonY != 0 && (math.Abs(p.X-p.NewpositonX) > 1 && math.Abs(p.Y-p.NewpositonY) > 1) {
-		p.FlagCanAction = true
-		//直接切换方向
-		p.GetMouseControllerAI(p.NewDir)
-	} else {
-		p.FlagCanAction = false
-		p.State = tools.IDLE
-		if p.NewpositonX != 0 && p.NewpositonY != 0 {
-			p.X = p.NewpositonX
-			p.Y = p.NewpositonY
+	if p.NewDir == 5 || p.NewDir == 6 || p.NewDir == 7 || p.NewDir == 4 {
+		//移动
+		if p.NewpositonX != 0 && p.NewpositonY != 0 && (math.Abs(p.X-p.NewpositonX) > 0 || math.Abs(p.Y-p.NewpositonY) > 0) {
+			p.FlagCanAction = true
+			//直接切换方向
+			p.GetMouseControllerAI(p.NewDir)
+		} else {
+			p.FlagCanAction = false
+			p.State = tools.IDLE
+			if p.NewpositonX != 0 && p.NewpositonY != 0 {
+				p.X = p.NewpositonX
+				p.Y = p.NewpositonY
+			}
+			p.NewpositonX = 0
+			p.NewpositonY = 0
 		}
-		p.NewpositonX = 0
-		p.NewpositonY = 0
+	} else {
+		//移动
+		if p.NewpositonX != 0 && p.NewpositonY != 0 && (math.Abs(p.X-p.NewpositonX) > 0 && math.Abs(p.Y-p.NewpositonY) > 0) {
+			p.FlagCanAction = true
+			//直接切换方向
+			p.GetMouseControllerAI(p.NewDir)
+		} else {
+			p.FlagCanAction = false
+			p.State = tools.IDLE
+			if p.NewpositonX != 0 && p.NewpositonY != 0 {
+				p.X = p.NewpositonX
+				p.Y = p.NewpositonY
+			}
+			p.NewpositonX = 0
+			p.NewpositonY = 0
+		}
 	}
 }
 
