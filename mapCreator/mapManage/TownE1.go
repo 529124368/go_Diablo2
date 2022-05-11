@@ -37,7 +37,6 @@ type TownE1 struct {
 	anmiList          []*ebiten.Image //火把动画图集
 	wayList           []*ebiten.Image //瞬间移动动画图集
 	huodui            []*ebiten.Image //火堆动画图集
-	NPC               []*ebiten.Image //NPC图集
 	dropAnm           []*ebiten.Image //掉落动画图集
 	dropItemsList     []dropItem      //掉落物品一览
 	op                []*ebiten.DrawImageOptions
@@ -51,7 +50,6 @@ func NewE1(images *embed.FS, sta *status.StatusManage, b *storage.Bag) *TownE1 {
 		anmiList:      make([]*ebiten.Image, 0),
 		wayList:       make([]*ebiten.Image, 0),
 		huodui:        make([]*ebiten.Image, 0),
-		NPC:           make([]*ebiten.Image, 0),
 		dropAnm:       make([]*ebiten.Image, 0),
 		dropItemsList: make([]dropItem, 0),
 		op:            make([]*ebiten.DrawImageOptions, 0),
@@ -77,7 +75,7 @@ func (t *TownE1) LoadAnm() {
 
 	}
 	for i := 0; i < 17; i++ {
-		o, _ := t.Image.ReadFile("resource/itemsdrop/c_" + strconv.Itoa(i) + ".png")
+		o, _ := t.Image.ReadFile("resource/itemsdrop/box_" + strconv.Itoa(i) + ".png")
 		t.dropAnm = append(t.dropAnm, tools.GetEbitenImage(o))
 	}
 	//设置NPC DC
@@ -314,7 +312,7 @@ func (t *TownE1) LoadMap() {
 	t.Img_Floor = make([][]*ebiten.Image, h)
 	for i := 0; i < h; i++ {
 		t.Img_Floor[i] = make([]*ebiten.Image, w)
-		for j := 0; j < w; j++ {
+		for j := 15; j < w; j++ {
 			ds1Tile := d.Floors[0].Tile(j, i)
 			if !ds1Tile.Hidden() && ds1Tile.Prop1 != 0 {
 				ds := maps.GetTiles(int(ds1Tile.Style), int(ds1Tile.Sequence), 0, ss.Tiles)
