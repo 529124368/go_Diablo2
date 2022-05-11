@@ -145,9 +145,7 @@ func (p *NpcAI) PlayerMoveAI() {
 //AI 移动判断
 func (p *NpcAI) AIMove() {
 	p.AICount++
-	if p.AIf >= p.AIPathCount {
-		p.AIf = 0
-	}
+	p.AIf %= p.AIPathCount
 	if !p.FlagCanAction && p.AICount >= p.AIWait {
 		p.UpdatePlayerNextMovePositonAI(p.AIpath[p.AIf].X, p.AIpath[p.AIf].Y, p.AIpath[p.AIf].Dir)
 	}

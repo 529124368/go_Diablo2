@@ -312,7 +312,7 @@ func (t *TownE1) LoadMap() {
 	t.Img_Floor = make([][]*ebiten.Image, h)
 	for i := 0; i < h; i++ {
 		t.Img_Floor[i] = make([]*ebiten.Image, w)
-		for j := 15; j < w; j++ {
+		for j := 0; j < w; j++ {
 			ds1Tile := d.Floors[0].Tile(j, i)
 			if !ds1Tile.Hidden() && ds1Tile.Prop1 != 0 {
 				ds := maps.GetTiles(int(ds1Tile.Style), int(ds1Tile.Sequence), 0, ss.Tiles)

@@ -21,7 +21,6 @@ type PlayerAI struct {
 
 //创建玩家
 func NewPlayerAI(x, y float64, state, dir uint8, s *status.StatusManage, images *embed.FS) *PlayerAI {
-
 	play := &PlayerAI{
 		PlayerName: "",
 		SkillName:  "", //技能名字
@@ -61,15 +60,28 @@ func (p *PlayerAI) GetMouseControllerAI(dir uint8) {
 
 //控制AI玩家移动
 func (p *PlayerAI) PlayerMoveAI() {
-	if p.NewpositonX != 0 && p.NewpositonY != 0 && (math.Abs(p.X-p.NewpositonX) > 1 && math.Abs(p.Y-p.NewpositonY) > 1) {
-		p.FlagCanAction = true
-		//直接切换方向
-		p.GetMouseControllerAI(p.NewDir)
+	if p.NewDir == 5 || p.NewDir == 6 || p.NewDir == 7 || p.NewDir == 4 {
+		if p.NewpositonX != 0 && p.NewpositonY != 0 && (math.Abs(p.X-p.NewpositonX) > 1 || math.Abs(p.Y-p.NewpositonY) > 1) {
+			p.FlagCanAction = true
+			//直接切换方向
+			p.GetMouseControllerAI(p.NewDir)
+		} else {
+			p.FlagCanAction = false
+			p.State = tools.IDLE
+			p.NewpositonX = 0
+			p.NewpositonY = 0
+		}
 	} else {
-		p.FlagCanAction = false
-		p.State = tools.IDLE
-		p.NewpositonX = 0
-		p.NewpositonY = 0
+		if p.NewpositonX != 0 && p.NewpositonY != 0 && (math.Abs(p.X-p.NewpositonX) > 1 && math.Abs(p.Y-p.NewpositonY) > 1) {
+			p.FlagCanAction = true
+			//直接切换方向
+			p.GetMouseControllerAI(p.NewDir)
+		} else {
+			p.FlagCanAction = false
+			p.State = tools.IDLE
+			p.NewpositonX = 0
+			p.NewpositonY = 0
+		}
 	}
 }
 
@@ -95,7 +107,9 @@ func (p *PlayerAI) UpdatePlayerNextMovePositonAI(NewpositonX, NewpositonY float6
 //渲染角色
 func (p *PlayerAI) Render(screen *ebiten.Image) {
 	p.PlayerMoveAI()
+	//改变帧数
 	p.ChangeFrame()
+	//渲染角色
 	p.PlayerBase.Render()
 	var name string
 	block := 1

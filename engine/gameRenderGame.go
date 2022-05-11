@@ -150,6 +150,8 @@ func (g *Game) changeScenceGameUpdate() {
 			g.player.SetPlayerState(tools.SkILL, dir)
 		}
 	}
+	//主机玩家移动
+	g.player.PlayerMove()
 	//事件循环监听 是否有按钮点击事件
 	g.ui.EventLoop(mouseX, mouseY)
 }

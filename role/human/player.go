@@ -107,41 +107,80 @@ func (p *Player) CanWalk(xS, yS float64, dir uint8) bool {
 
 //本机玩家移动
 func (p *Player) PlayerMove() {
-	if p.NewpositonX != 0 && p.NewpositonY != 0 && (math.Abs(p.X-p.NewpositonX) > 1 && math.Abs(p.Y-p.NewpositonY) > 1) {
-		p.Status.IsRun = true
-		p.FlagCanAction = true
-		//判断人物方位
-		if p.OldDirection != p.Direction && !controller.MouseRightPress() {
-			if !p.Status.CalculateEnd {
-				p.newPath = tools.CalculateDirPath(p.OldDirection, p.Direction)
-				p.Status.CalculateEnd = true
-			}
-			if len(p.newPath) >= 3 {
-				if p.turnLoOp >= uint8(len(p.newPath)) {
-					p.turnLoOp = uint8(len(p.newPath) - 1)
-					p.NewDir = p.newPath[p.turnLoOp]
-					p.UpdateOldPlayerDir(p.Direction)
-				} else {
-					p.NewDir = p.newPath[p.turnLoOp]
+	if p.NewDir == 5 || p.NewDir == 6 || p.NewDir == 7 || p.NewDir == 4 {
+		if p.NewpositonX != 0 && p.NewpositonY != 0 && (math.Abs(p.X-p.NewpositonX) > 1 || math.Abs(p.Y-p.NewpositonY) > 1) {
+			p.Status.IsRun = true
+			p.FlagCanAction = true
+			//判断人物方位
+			if p.OldDirection != p.Direction && !controller.MouseRightPress() {
+				if !p.Status.CalculateEnd {
+					p.newPath = tools.CalculateDirPath(p.OldDirection, p.Direction)
+					p.Status.CalculateEnd = true
 				}
-				p.turnLoOp++
-				p.SetPlayerState(tools.IDLE, p.NewDir)
+				if len(p.newPath) >= 3 {
+					if p.turnLoOp >= uint8(len(p.newPath)) {
+						p.turnLoOp = uint8(len(p.newPath) - 1)
+						p.NewDir = p.newPath[p.turnLoOp]
+						p.UpdateOldPlayerDir(p.Direction)
+					} else {
+						p.NewDir = p.newPath[p.turnLoOp]
+					}
+					p.turnLoOp++
+					p.SetPlayerState(tools.IDLE, p.NewDir)
+				} else {
+					//直接切换方向
+					p.Status.CalculateEnd = false
+					p.turnLoOp = 0
+					p.UpdateOldPlayerDir(p.NewDir)
+					p.GetMouseController(p.NewDir)
+				}
 			} else {
-				//直接切换方向
 				p.Status.CalculateEnd = false
 				p.turnLoOp = 0
-				p.UpdateOldPlayerDir(p.NewDir)
 				p.GetMouseController(p.NewDir)
 			}
 		} else {
-			p.Status.CalculateEnd = false
-			p.turnLoOp = 0
-			p.GetMouseController(p.NewDir)
+			p.FlagCanAction = false
+			p.NewpositonX = 0
+			p.NewpositonY = 0
 		}
 	} else {
-		p.FlagCanAction = false
-		p.NewpositonX = 0
-		p.NewpositonY = 0
+		if p.NewpositonX != 0 && p.NewpositonY != 0 && (math.Abs(p.X-p.NewpositonX) > 1 && math.Abs(p.Y-p.NewpositonY) > 1) {
+			p.Status.IsRun = true
+			p.FlagCanAction = true
+			//判断人物方位
+			if p.OldDirection != p.Direction && !controller.MouseRightPress() {
+				if !p.Status.CalculateEnd {
+					p.newPath = tools.CalculateDirPath(p.OldDirection, p.Direction)
+					p.Status.CalculateEnd = true
+				}
+				if len(p.newPath) >= 3 {
+					if p.turnLoOp >= uint8(len(p.newPath)) {
+						p.turnLoOp = uint8(len(p.newPath) - 1)
+						p.NewDir = p.newPath[p.turnLoOp]
+						p.UpdateOldPlayerDir(p.Direction)
+					} else {
+						p.NewDir = p.newPath[p.turnLoOp]
+					}
+					p.turnLoOp++
+					p.SetPlayerState(tools.IDLE, p.NewDir)
+				} else {
+					//直接切换方向
+					p.Status.CalculateEnd = false
+					p.turnLoOp = 0
+					p.UpdateOldPlayerDir(p.NewDir)
+					p.GetMouseController(p.NewDir)
+				}
+			} else {
+				p.Status.CalculateEnd = false
+				p.turnLoOp = 0
+				p.GetMouseController(p.NewDir)
+			}
+		} else {
+			p.FlagCanAction = false
+			p.NewpositonX = 0
+			p.NewpositonY = 0
+		}
 	}
 	//玩家停止
 	if p.State == tools.IDLE && p.Status.IsRun {
@@ -172,8 +211,9 @@ func (p *Player) PlayerNextMovePositon(mouseX, mouseY int, dir uint8) {
 
 //渲染角色
 func (p *Player) Render(screen *ebiten.Image) {
-	p.PlayerMove()
+	//改变帧数
 	p.ChangeFrame()
+	//渲染角色
 	p.PlayerBase.Render()
 	var name string
 	block := 1
