@@ -303,6 +303,11 @@ func (t *TownE1) LoadMap() {
 	dd, _ := t.Image.ReadFile(tools.ObjectPath + "/mapSucai/townE1.ds1")
 	d, _ := ds1.Unmarshal(dd)
 
+	//TODO
+	t.DS1 = d
+	t.DT1LIST = ss.Tiles
+	t.PA = ww
+
 	w, h := d.Floors[0].Size()
 	//保存地图大小
 	t.Status.ReadMapSizeWidth = w
@@ -313,12 +318,16 @@ func (t *TownE1) LoadMap() {
 	for i := 0; i < h; i++ {
 		t.Img_Floor[i] = make([]*ebiten.Image, w)
 		for j := 0; j < w; j++ {
-			ds1Tile := d.Floors[0].Tile(j, i)
-			if !ds1Tile.Hidden() && ds1Tile.Prop1 != 0 {
-				ds := maps.GetTiles(int(ds1Tile.Style), int(ds1Tile.Sequence), 0, ss.Tiles)
-				if ds != nil {
-					t.Img_Floor[i][j] = maps.GetTitleImage(ds[ds1Tile.RandomIndex], ww)
+			if i >= 6 && i <= 15 && j >= 32 && j <= 40 {
+				ds1Tile := d.Floors[0].Tile(j, i)
+				if !ds1Tile.Hidden() && ds1Tile.Prop1 != 0 {
+					ds := maps.GetTiles(int(ds1Tile.Style), int(ds1Tile.Sequence), 0, ss.Tiles)
+					if ds != nil {
+						t.Img_Floor[i][j] = maps.GetTitleImage(ds[ds1Tile.RandomIndex], ww)
+					}
 				}
+			} else {
+				t.Img_Floor[i][j] = nil
 			}
 		}
 	}
