@@ -67,7 +67,7 @@ func NewStatusManage() *StatusManage {
 		IsDropDeal:        false,
 		DisplaySort:       false,
 		Queue:             make(chan []byte),
-		IsNetPlay:         true,
+		IsNetPlay:         false,
 		IsRun:             false,
 	}
 	return n

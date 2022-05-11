@@ -43,7 +43,7 @@ type TownE1 struct {
 	op                []*ebiten.DrawImageOptions
 	xyPos             [17]postion
 	bag               *storage.Bag
-	NPCAI             [3]*npc.NpcAI //AI NPC
+	NPCAI             [4]*npc.NpcAI //AI NPC
 }
 
 func NewE1(images *embed.FS, sta *status.StatusManage, b *storage.Bag) *TownE1 {
@@ -103,8 +103,19 @@ func (t *TownE1) LoadAnm() {
 	aiPath = make([]npc.AIEndPoint, 2)
 	aiPath = append(aiPath, npc.AIEndPoint{X: 4823, Y: 1855, Dir: 4})
 	aiPath = append(aiPath, npc.AIEndPoint{X: 4918, Y: 1759, Dir: 2})
-	aiPath = append(aiPath, npc.AIEndPoint{X: 4823, Y: 1691, Dir: 1})
+	aiPath = append(aiPath, npc.AIEndPoint{X: 4823, Y: 1855, Dir: 0})
+	aiPath = append(aiPath, npc.AIEndPoint{X: 4823, Y: 1691, Dir: 6})
 	t.NPCAI[2].SetAIPath(aiPath, 100)
+
+	//设置NPC GH
+	t.NPCAI[3] = npc.NewPlayerAI(3230, 1905, 0, 3, t.Status, t.Image)
+	t.NPCAI[3].LoadImages("GH", "/NPC/", 1)
+	aiPath = make([]npc.AIEndPoint, 2)
+	aiPath = append(aiPath, npc.AIEndPoint{X: 3482, Y: 1905, Dir: 7})
+	aiPath = append(aiPath, npc.AIEndPoint{X: 3354, Y: 2005, Dir: 0})
+	aiPath = append(aiPath, npc.AIEndPoint{X: 3482, Y: 1905, Dir: 2})
+	aiPath = append(aiPath, npc.AIEndPoint{X: 3230, Y: 1905, Dir: 5})
+	t.NPCAI[3].SetAIPath(aiPath, 100)
 }
 
 //加载动画坐标
