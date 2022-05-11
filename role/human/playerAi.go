@@ -16,6 +16,7 @@ type PlayerAI struct {
 	PlayerName           string            //玩家名字
 	SkillName            string            //技能名称
 	imgOffset            [4]tools.OffsetXY //动作图片偏移
+	speed                float64           //移动速度
 }
 
 //创建玩家
@@ -45,12 +46,14 @@ func (p *PlayerAI) LoadImages(name, path string, num uint8) {
 //暗黑破坏神 16方位 移动 鼠标控制 AI
 func (p *PlayerAI) GetMouseControllerAI(dir uint8) {
 	if p.FlagCanAction {
-		speed := 0.0
 		//判断是否走路
-		speed = tools.SPEED
-		p.SetPlayerState(tools.Walk, dir)
+		if p.speed == tools.SPEED_RUN {
+			p.SetPlayerState(tools.RUN, dir)
+		} else {
+			p.SetPlayerState(tools.Walk, dir)
+		}
 		//移动判断
-		moveX, moveY := tools.CalculateSpeed(dir, speed)
+		moveX, moveY := tools.CalculateSpeed(dir, p.speed)
 		p.Y += moveY
 		p.X += moveX
 	}
@@ -77,10 +80,15 @@ func (p *PlayerAI) StopPlayerMoveAI() {
 }
 
 //控制AI玩家新位置的预算
-func (p *PlayerAI) UpdatePlayerNextMovePositonAI(NewpositonX, NewpositonY float64, dir uint8) {
+func (p *PlayerAI) UpdatePlayerNextMovePositonAI(NewpositonX, NewpositonY float64, dir uint8, types string) {
 	p.NewDir = dir
 	p.NewpositonX = NewpositonX
 	p.NewpositonY = NewpositonY
+	if types == "r" {
+		p.speed = tools.SPEED_RUN
+	} else if types == "w" {
+		p.speed = tools.SPEED
+	}
 }
 
 //渲染角色

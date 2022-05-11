@@ -160,7 +160,13 @@ func (p *Player) PlayerNextMovePositon(mouseX, mouseY int, dir uint8) {
 	p.NewpositonY = p.Y + float64(mouseY) - 240
 	if p.Status.IsNetPlay {
 		//网络
-		p.WsCon.SendMessage("@@Move|" + p.PlayerName + "|" + strconv.FormatFloat(p.NewpositonX, 'f', 0, 64) + "|" + strconv.FormatFloat(p.NewpositonY, 'f', 0, 64) + "|" + strconv.Itoa(int(p.NewDir)))
+		act := ""
+		if !p.Status.IsWalk {
+			act = "r"
+		} else {
+			act = "w"
+		}
+		p.WsCon.SendMessage("@@Move|" + p.PlayerName + "|" + strconv.FormatFloat(p.NewpositonX, 'f', 0, 64) + "|" + strconv.FormatFloat(p.NewpositonY, 'f', 0, 64) + "|" + strconv.Itoa(int(p.NewDir)) + "|" + act)
 	}
 }
 

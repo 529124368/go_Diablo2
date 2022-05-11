@@ -44,7 +44,7 @@ func (g *Game) unpack(msg []byte) {
 func (g *Game) CreatePlayer(x, y float64, name, playerName string) {
 	r := human.NewPlayerAI(x, y, tools.IDLE, 0, g.status, &asset)
 	r.PlayerName = playerName
-	r.LoadImages(name, "/man/warrior/", 1)
+	r.LoadImages(name, "/man/warrior/", 2)
 	g.playerAI = append(g.playerAI, r)
 }
 
@@ -81,14 +81,14 @@ func (g *Game) Handle(msg []byte) {
 	//角色移动
 	if len(sm.Data) > 7 && sm.Data[:7] == "@@Move|" {
 		d := strings.Split(sm.Data, "|")
-		if len(d) == 5 {
+		if len(d) == 6 {
 			pm := d[1]
 			mx, _ := strconv.ParseFloat(d[2], 64)
 			my, _ := strconv.ParseFloat(d[3], 64)
 			md, _ := strconv.Atoi(d[4])
 			for _, v := range g.playerAI {
 				if v.PlayerName == pm {
-					v.UpdatePlayerNextMovePositonAI(mx, my, uint8(md))
+					v.UpdatePlayerNextMovePositonAI(mx, my, uint8(md), d[5])
 					return
 				}
 			}
