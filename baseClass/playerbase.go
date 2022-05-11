@@ -79,10 +79,8 @@ func (p *PlayerBase) Render() {
 	//Change player Frame
 	if p.Count > p.FrameSpeed {
 		p.Counts++
+		p.Counts %= p.FrameNums
 		p.Count = 0
-		if p.Counts >= p.FrameNums {
-			p.Counts = 0
-		}
 	}
 }
 

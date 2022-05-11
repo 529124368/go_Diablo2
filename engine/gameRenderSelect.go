@@ -28,9 +28,7 @@ func (g *Game) ChangeScenceSelectUpdate() {
 	if g.count > 5 {
 		counts++
 		g.count = 0
-		if counts >= 25 {
-			counts = 0
-		}
+		counts %= 25
 	}
 }
 

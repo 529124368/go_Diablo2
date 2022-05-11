@@ -30,10 +30,8 @@ func (g *Game) ChangeScenceLoginUpdate() {
 	//Change Frame
 	if g.count > 2 {
 		counts++
+		counts %= 30
 		g.count = 0
-		if counts >= 30 {
-			counts = 0
-		}
 	}
 }
 
@@ -68,9 +66,7 @@ func (g *Game) ChangeScenceLoginDraw(screen *ebiten.Image) {
 	//Change Frame
 	if g.count > frameSpeed {
 		counts++
+		counts %= 30
 		g.count = 0
-		if counts >= 30 {
-			counts = 0
-		}
 	}
 }
