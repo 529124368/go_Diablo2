@@ -311,24 +311,24 @@ func (t *TownE1) LoadMap() {
 	t.Status.ReadMapSizeHeight = h
 
 	//floor
-	t.Img = make([][]*ebiten.Image, h)
+	t.Img_Floor = make([][]*ebiten.Image, h)
 	for i := 0; i < h; i++ {
-		t.Img[i] = make([]*ebiten.Image, w)
+		t.Img_Floor[i] = make([]*ebiten.Image, w)
 		for j := 0; j < w; j++ {
 			ds1Tile := d.Floors[0].Tile(j, i)
 			if !ds1Tile.Hidden() && ds1Tile.Prop1 != 0 {
 				ds := maps.GetTiles(int(ds1Tile.Style), int(ds1Tile.Sequence), 0, ss.Tiles)
 				if ds != nil {
-					t.Img[i][j] = maps.GetTitleImage(ds[ds1Tile.RandomIndex], ww)
+					t.Img_Floor[i][j] = maps.GetTitleImage(ds[ds1Tile.RandomIndex], ww)
 				}
 			}
 		}
 	}
 
 	//wall
-	t.Img2 = make([][]baseClass.ImgWall, h)
+	t.Img_Wall = make([][]baseClass.ImgWall, h)
 	for i := 0; i < h; i++ {
-		t.Img2[i] = make([]baseClass.ImgWall, w)
+		t.Img_Wall[i] = make([]baseClass.ImgWall, w)
 		for j := 0; j < w; j++ {
 			ds1Tile := d.Walls[0].Tile(j, i)
 			if !ds1Tile.Hidden() && ds1Tile.Prop1 != 0 {
@@ -338,17 +338,17 @@ func (t *TownE1) LoadMap() {
 						dss := maps.GetTiles(int(ds1Tile.Style), int(ds1Tile.Sequence), d2enum.TileLeftPartOfNorthCornerWall, ss.Tiles)
 						if dss != nil && dss[ds1Tile.RandomIndex].Height < ds[ds1Tile.RandomIndex].Height {
 							m, h := maps.GetWallTitleImage(dss[ds1Tile.RandomIndex], ds1Tile, ww)
-							t.Img2[i][j].Img = m
-							t.Img2[i][j].H = h
+							t.Img_Wall[i][j].Img = m
+							t.Img_Wall[i][j].H = h
 						} else {
 							m, h := maps.GetWallTitleImage(ds[ds1Tile.RandomIndex], ds1Tile, ww)
-							t.Img2[i][j].Img = m
-							t.Img2[i][j].H = h
+							t.Img_Wall[i][j].Img = m
+							t.Img_Wall[i][j].H = h
 						}
 					} else {
 						m, h := maps.GetWallTitleImage(ds[ds1Tile.RandomIndex], ds1Tile, ww)
-						t.Img2[i][j].Img = m
-						t.Img2[i][j].H = h
+						t.Img_Wall[i][j].Img = m
+						t.Img_Wall[i][j].H = h
 					}
 				}
 			}
@@ -356,58 +356,58 @@ func (t *TownE1) LoadMap() {
 	}
 
 	//地图显示补图  hardcode
-	t.Img3 = make([][]baseClass.ImgWall, h)
+	t.Img_Wall_Add = make([][]baseClass.ImgWall, h)
 	for i := 0; i < h; i++ {
-		t.Img3[i] = make([]baseClass.ImgWall, w)
+		t.Img_Wall_Add[i] = make([]baseClass.ImgWall, w)
 		for j := 0; j < w; j++ {
 			if j == 18 && i == 6 {
-				t.Img3[i][j].Img = maps.GetTitleImage(ss4.Tiles[7], ww)
-				t.Img3[i][j].H = -170
+				t.Img_Wall_Add[i][j].Img = maps.GetTitleImage(ss4.Tiles[7], ww)
+				t.Img_Wall_Add[i][j].H = -170
 			}
 			if j == 30 && i == 11 {
-				t.Img3[i][j].Img = maps.GetTitleImage(ss1.Tiles[22], ww)
-				t.Img3[i][j].H = -80
+				t.Img_Wall_Add[i][j].Img = maps.GetTitleImage(ss1.Tiles[22], ww)
+				t.Img_Wall_Add[i][j].H = -80
 			}
 			if j == 31 && i == 11 {
-				t.Img3[i][j].Img = maps.GetTitleImage(ss1.Tiles[23], ww)
-				t.Img3[i][j].H = -110
+				t.Img_Wall_Add[i][j].Img = maps.GetTitleImage(ss1.Tiles[23], ww)
+				t.Img_Wall_Add[i][j].H = -110
 			}
 
 			if j == 32 && i == 11 {
-				t.Img3[i][j].Img = maps.GetTitleImage(ss1.Tiles[24], ww)
-				t.Img3[i][j].H = -110
+				t.Img_Wall_Add[i][j].Img = maps.GetTitleImage(ss1.Tiles[24], ww)
+				t.Img_Wall_Add[i][j].H = -110
 			}
 			if j == 22 && i == 22 {
-				t.Img3[i][j].Img = maps.GetTitleImage(ss1.Tiles[24], ww)
-				t.Img3[i][j].H = -110
+				t.Img_Wall_Add[i][j].Img = maps.GetTitleImage(ss1.Tiles[24], ww)
+				t.Img_Wall_Add[i][j].H = -110
 			}
 			if j == 33 && i == 11 {
-				t.Img3[i][j].Img = maps.GetTitleImage(ss1.Tiles[21], ww)
-				t.Img3[i][j].H = -20
+				t.Img_Wall_Add[i][j].Img = maps.GetTitleImage(ss1.Tiles[21], ww)
+				t.Img_Wall_Add[i][j].H = -20
 			}
 			if j == 33 && i == 10 {
-				t.Img3[i][j].Img = maps.GetTitleImage(ss1.Tiles[25], ww)
-				t.Img3[i][j].H = -80
+				t.Img_Wall_Add[i][j].Img = maps.GetTitleImage(ss1.Tiles[25], ww)
+				t.Img_Wall_Add[i][j].H = -80
 			}
 			if j == 33 && i == 9 {
-				t.Img3[i][j].Img = maps.GetTitleImage(ss1.Tiles[26], ww)
-				t.Img3[i][j].H = -80
+				t.Img_Wall_Add[i][j].Img = maps.GetTitleImage(ss1.Tiles[26], ww)
+				t.Img_Wall_Add[i][j].H = -80
 			}
 			if j == 33 && i == 8 {
-				t.Img3[i][j].Img = maps.GetTitleImage(ss1.Tiles[27], ww)
-				t.Img3[i][j].H = -40
+				t.Img_Wall_Add[i][j].Img = maps.GetTitleImage(ss1.Tiles[27], ww)
+				t.Img_Wall_Add[i][j].H = -40
 			}
 			if j == 33 && i == 7 {
-				t.Img3[i][j].Img = maps.GetTitleImage(ss1.Tiles[28], ww)
-				t.Img3[i][j].H = -40
+				t.Img_Wall_Add[i][j].Img = maps.GetTitleImage(ss1.Tiles[28], ww)
+				t.Img_Wall_Add[i][j].H = -40
 			}
 			if j == 22 && i == 22 {
-				t.Img3[i][j].Img = maps.GetTitleImage(ss1.Tiles[19], ww)
-				t.Img3[i][j].H = -80
+				t.Img_Wall_Add[i][j].Img = maps.GetTitleImage(ss1.Tiles[19], ww)
+				t.Img_Wall_Add[i][j].H = -80
 			}
 			if j == 21 && i == 24 {
-				t.Img3[i][j].Img = maps.GetTitleImage(ss1.Tiles[16], ww)
-				t.Img3[i][j].H = -80
+				t.Img_Wall_Add[i][j].Img = maps.GetTitleImage(ss1.Tiles[16], ww)
+				t.Img_Wall_Add[i][j].H = -80
 			}
 
 		}
@@ -435,10 +435,10 @@ func (t *TownE1) RenderWall(screen *ebiten.Image, offsetX, offsetY float64) {
 			}
 			//视野剔除
 			if j > t.Status.MapTitleX-t.Status.MapZoom && j < t.Status.MapTitleX+t.Status.MapZoom && i > t.Status.MapTitleY-t.Status.MapZoom && i < t.Status.MapTitleY+t.Status.MapZoom {
-				s := t.Img3[i][j].Img
+				s := t.Img_Wall_Add[i][j].Img
 				if s != nil {
 					op := &ebiten.DrawImageOptions{}
-					op.GeoM.Translate(3280+float64(i)*(-80)+float64(sumX)+offsetX, float64(startY)+float64(j)*40+offsetY+float64(t.Img3[i][j].H))
+					op.GeoM.Translate(3280+float64(i)*(-80)+float64(sumX)+offsetX, float64(startY)+float64(j)*40+offsetY+float64(t.Img_Wall_Add[i][j].H))
 					op.GeoM.Scale(Scale, Scale)
 					screen.DrawImage(s, op)
 				}

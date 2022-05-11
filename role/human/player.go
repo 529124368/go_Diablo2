@@ -223,10 +223,10 @@ func (p *Player) Render(screen *ebiten.Image) {
 	//Draw Shadow
 	p.OpS.GeoM.Reset()
 	p.OpS.Filter = ebiten.FilterLinear
-	p.OpS.GeoM.Rotate(-0.5)
+	p.OpS.GeoM.Rotate(-0.45)
 	p.OpS.GeoM.Scale(1, 0.5)
 	p.OpS.ColorM.Scale(0, 0, 0, 1)
-	p.OpS.GeoM.Translate(float64(tools.LAYOUTX/2+x+p.Status.ShadowOffsetX+p.Status.UIOFFSETX), float64(tools.LAYOUTY/2+y))
+	p.OpS.GeoM.Translate(float64(tools.LAYOUTX/2+x+p.Status.ShadowOffsetX+p.Status.UIOFFSETX), float64(tools.LAYOUTY/2+y+p.Status.ShadowOffsetY))
 	screen.DrawImage(imagess, p.OpS)
 	//Draw Player
 	p.Op.GeoM.Reset()

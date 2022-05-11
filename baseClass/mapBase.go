@@ -17,12 +17,12 @@ type ImgWall struct {
 }
 
 type MapBase struct {
-	Image   *embed.FS
-	BgImage *ebiten.Image
-	Status  *status.StatusManage //状态
-	Img     [][]*ebiten.Image
-	Img2    [][]ImgWall
-	Img3    [][]ImgWall
+	Image        *embed.FS
+	BgImage      *ebiten.Image
+	Status       *status.StatusManage //状态
+	Img_Floor    [][]*ebiten.Image
+	Img_Wall     [][]ImgWall
+	Img_Wall_Add [][]ImgWall
 }
 
 //加载地图图片
@@ -50,7 +50,7 @@ func (m *MapBase) RenderFloor(screen *ebiten.Image, offsetX, offsetY float64) {
 			}
 			//视野剔除
 			if j > m.Status.MapTitleX-m.Status.MapZoom && j < m.Status.MapTitleX+m.Status.MapZoom && i > m.Status.MapTitleY-m.Status.MapZoom && i < m.Status.MapTitleY+m.Status.MapZoom {
-				s := m.Img[i][j]
+				s := m.Img_Floor[i][j]
 				if s != nil {
 					op := &ebiten.DrawImageOptions{}
 					op.GeoM.Translate(3280+float64(i)*(-80)+float64(sumX)+offsetX, float64(startY)+float64(j)*40+offsetY)
@@ -81,10 +81,10 @@ func (m *MapBase) RenderWall(screen *ebiten.Image, offsetX, offsetY float64) {
 			}
 			//视野剔除
 			if j > m.Status.MapTitleX-m.Status.MapZoom && j < m.Status.MapTitleX+m.Status.MapZoom && i > m.Status.MapTitleY-m.Status.MapZoom && i < m.Status.MapTitleY+m.Status.MapZoom {
-				s := m.Img2[i][j].Img
+				s := m.Img_Wall[i][j].Img
 				if s != nil {
 					op := &ebiten.DrawImageOptions{}
-					op.GeoM.Translate(3280+float64(i)*(-80)+float64(sumX)+offsetX, float64(startY)+float64(j)*40+offsetY+float64(m.Img2[i][j].H))
+					op.GeoM.Translate(3280+float64(i)*(-80)+float64(sumX)+offsetX, float64(startY)+float64(j)*40+offsetY+float64(m.Img_Wall[i][j].H))
 					op.GeoM.Scale(Scale, Scale)
 					screen.DrawImage(s, op)
 				}
@@ -95,7 +95,7 @@ func (m *MapBase) RenderWall(screen *ebiten.Image, offsetX, offsetY float64) {
 
 //获取墙体区域
 func (m *MapBase) GetBlock1Aera(x, y int) bool {
-	return m.Img2[y][x].Img == nil
+	return m.Img_Wall[y][x].Img == nil
 }
 
 //

@@ -2,35 +2,27 @@ package status
 
 type StatusManage struct {
 	//Flg               bool //是否可以移动标志
-	ChangeScenceFlg   bool
-	DoorCountFlg      bool
-	LoadingFlg        bool
-	MusicIsPlay       bool
-	OpenBag           bool
-	OpenMiniPanel     bool
-	IsWalk            bool
-	CalculateEnd      bool
-	UIOFFSETX         int
-	ShadowOffsetX     int
-	PLAYERCENTERX     int64
-	PLAYERCENTERY     int64
-	IsTakeItem        bool //是否拿起物品
-	Mouseoffset       int
-	CamerOffsetX      float64
-	CamerOffsetY      float64
-	ReadMapSizeWidth  int
-	ReadMapSizeHeight int
-	MapTitleX         int
-	MapTitleY         int
-	MapZoom           int
-	CurrentGameScence int
-	DisPlayDebugInfo  bool        //是否显示Debug信息
-	IsPlayDropAnmi    bool        //是否播放掉落物品动画
-	IsDropDeal        bool        //是否掉落物品处理中
-	DisplaySort       bool        //人物和物体渲染顺序
-	Queue             chan []byte //消息队列
-	IsNetPlay         bool        //是否网络游玩
-	IsRun             bool
+	ChangeScenceFlg, DoorCountFlg, LoadingFlg bool
+	MusicIsPlay                               bool
+	OpenBag, OpenMiniPanel                    bool
+	IsWalk, IsRun                             bool
+	CalculateEnd                              bool
+	UIOFFSETX                                 int
+	ShadowOffsetX, ShadowOffsetY              int
+	PLAYERCENTERX, PLAYERCENTERY              int64
+	IsTakeItem                                bool //是否拿起物品
+	Mouseoffset                               int
+	CamerOffsetX, CamerOffsetY                float64
+	ReadMapSizeWidth, ReadMapSizeHeight       int
+	MapTitleX, MapTitleY                      int
+	MapZoom                                   int
+	CurrentGameScence                         int
+	DisPlayDebugInfo                          bool        //是否显示Debug信息
+	IsPlayDropAnmi                            bool        //是否播放掉落物品动画
+	IsDropDeal                                bool        //是否掉落物品处理中
+	DisplaySort                               bool        //人物和物体渲染顺序
+	Queue                                     chan []byte //消息队列
+	IsNetPlay                                 bool        //是否网络游玩
 }
 
 func NewStatusManage() *StatusManage {
@@ -46,6 +38,7 @@ func NewStatusManage() *StatusManage {
 		CalculateEnd:    false,
 		UIOFFSETX:       0,
 		ShadowOffsetX:   -60,
+		ShadowOffsetY:   -10,
 		PLAYERCENTERX:   395, //LAYOUTX/2
 		PLAYERCENTERY:   240, //LAYOUTY/2
 		IsTakeItem:      false,

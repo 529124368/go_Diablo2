@@ -195,24 +195,24 @@ func (t *TownN1) LoadMap() {
 	t.Status.ReadMapSizeWidth = w
 	t.Status.ReadMapSizeHeight = h
 	//floor
-	t.Img = make([][]*ebiten.Image, h)
+	t.Img_Floor = make([][]*ebiten.Image, h)
 	for i := 0; i < h; i++ {
-		t.Img[i] = make([]*ebiten.Image, w)
+		t.Img_Floor[i] = make([]*ebiten.Image, w)
 		for j := 0; j < w; j++ {
 			ds1Tile := d.Floors[0].Tile(j, i)
 			if !ds1Tile.Hidden() && ds1Tile.Prop1 != 0 {
 				ds := maps.GetTiles(int(ds1Tile.Style), int(ds1Tile.Sequence), 0, ss.Tiles)
 				if ds != nil {
-					t.Img[i][j] = maps.GetTitleImage(ds[ds1Tile.RandomIndex], ww)
+					t.Img_Floor[i][j] = maps.GetTitleImage(ds[ds1Tile.RandomIndex], ww)
 				}
 			}
 		}
 	}
 
 	//wall
-	t.Img2 = make([][]baseClass.ImgWall, h)
+	t.Img_Wall = make([][]baseClass.ImgWall, h)
 	for i := 0; i < h; i++ {
-		t.Img2[i] = make([]baseClass.ImgWall, w)
+		t.Img_Wall[i] = make([]baseClass.ImgWall, w)
 		for j := 0; j < w; j++ {
 			ds1Tile := d.Walls[0].Tile(j, i)
 			if !ds1Tile.Hidden() && ds1Tile.Prop1 != 0 {
@@ -222,17 +222,17 @@ func (t *TownN1) LoadMap() {
 						dss := maps.GetTiles(int(ds1Tile.Style), int(ds1Tile.Sequence), d2enum.TileLeftPartOfNorthCornerWall, ss2.Tiles)
 						if dss != nil && dss[ds1Tile.RandomIndex].Height < ds[ds1Tile.RandomIndex].Height {
 							m, h := maps.GetWallTitleImage(dss[ds1Tile.RandomIndex], ds1Tile, ww)
-							t.Img2[i][j].Img = m
-							t.Img2[i][j].H = h
+							t.Img_Wall[i][j].Img = m
+							t.Img_Wall[i][j].H = h
 						} else {
 							m, h := maps.GetWallTitleImage(ds[ds1Tile.RandomIndex], ds1Tile, ww)
-							t.Img2[i][j].Img = m
-							t.Img2[i][j].H = h
+							t.Img_Wall[i][j].Img = m
+							t.Img_Wall[i][j].H = h
 						}
 					} else {
 						m, h := maps.GetWallTitleImage(ds[ds1Tile.RandomIndex], ds1Tile, ww)
-						t.Img2[i][j].Img = m
-						t.Img2[i][j].H = h
+						t.Img_Wall[i][j].Img = m
+						t.Img_Wall[i][j].H = h
 					}
 				}
 			}
