@@ -28,10 +28,9 @@ type MapBase struct {
 	Img_Floor    [][]*ebiten.Image
 	Img_Wall     [][]ImgWall
 	Img_Wall_Add [][]ImgWall
-	//TODO
-	DS1     *ds1.DS1
-	DT1LIST []dt1.Tile
-	PA      interfaces.Palette
+	DS1          *ds1.DS1
+	DT1LIST      []dt1.Tile
+	PA           interfaces.Palette
 }
 
 //加载地图图片
@@ -76,7 +75,6 @@ func (m *MapBase) RenderFloor(screen *ebiten.Image, offsetX, offsetY float64) {
 			}
 		}
 	}
-
 }
 
 //渲染地图的建筑
@@ -96,6 +94,11 @@ func (m *MapBase) RenderWall(screen *ebiten.Image, offsetX, offsetY float64) {
 			//视野剔除
 			if j > m.Status.MapTitleX-m.Status.MapZoom && j < m.Status.MapTitleX+m.Status.MapZoom && i > m.Status.MapTitleY-m.Status.MapZoom && i < m.Status.MapTitleY+m.Status.MapZoom {
 				s := m.Img_Wall[i][j].Img
+				if s == nil {
+					s, h := m.GetWall(i, j)
+					m.Img_Wall[i][j].Img = s
+					m.Img_Wall[i][j].H = h
+				}
 				if s != nil {
 					op := &ebiten.DrawImageOptions{}
 					op.GeoM.Translate(3280+float64(i)*(-80)+float64(sumX)+offsetX, float64(startY)+float64(j)*40+offsetY+float64(m.Img_Wall[i][j].H))
@@ -112,6 +115,7 @@ func (m *MapBase) GetBlock1Aera(x, y int) bool {
 	return m.Img_Wall[y][x].Img == nil
 }
 
+//动态生成墙体素材
 func (m *MapBase) GetWall(i, j int) (*ebiten.Image, int) {
 	ds1Tile := m.DS1.Walls[0].Tile(j, i)
 	if !ds1Tile.Hidden() && ds1Tile.Prop1 != 0 {
@@ -135,6 +139,7 @@ func (m *MapBase) GetWall(i, j int) (*ebiten.Image, int) {
 	return nil, 0
 }
 
+//动态生成地面素材
 func (m *MapBase) GetFloor(i, j int) *ebiten.Image {
 	ds1Tile := m.DS1.Floors[0].Tile(j, i)
 	if !ds1Tile.Hidden() && ds1Tile.Prop1 != 0 {
@@ -144,4 +149,20 @@ func (m *MapBase) GetFloor(i, j int) *ebiten.Image {
 		}
 	}
 	return nil
+}
+
+//清理不需要的地图数据
+func (m *MapBase) ClearMap() {
+	for i := 0; i < m.Status.ReadMapSizeHeight; i++ {
+		for j := 0; j < m.Status.ReadMapSizeWidth; j++ {
+			if j > m.Status.MapTitleX-m.Status.MapZoom-3 && j < m.Status.MapTitleX+m.Status.MapZoom+3 &&
+				i > m.Status.MapTitleY-m.Status.MapZoom-3 && i < m.Status.MapTitleY+m.Status.MapZoom+3 {
+				continue
+			} else {
+				m.Img_Wall[i][j].Img = nil
+				m.Img_Wall[i][j].H = 0
+				m.Img_Floor[i][j] = nil
+			}
+		}
+	}
 }

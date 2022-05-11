@@ -14,8 +14,8 @@ type WsNetManage struct {
 }
 
 func NewNet(s *status.StatusManage) *WsNetManage {
-	//url := "ws://124.220.178.68:8082/game?ConToken=zimugeWO**@erfs45656DGKZNNSJD"
-	url := "ws://127.0.0.1:8082/game?ConToken=zimugeWO**@erfs45656DGKZNNSJD"
+	url := "ws://124.220.178.68:8082/game?ConToken=zimugeWO**@erfs45656DGKZNNSJD"
+	//url := "ws://127.0.0.1:8082/game?ConToken=zimugeWO**@erfs45656DGKZNNSJD"
 	ws, _, err := websocket.DefaultDialer.Dial(url, nil)
 	if err != nil {
 		log.Fatal(err)

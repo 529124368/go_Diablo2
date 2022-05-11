@@ -17,6 +17,7 @@ require (
 	github.com/hajimehoshi/go-mp3 v0.3.3 // indirect
 	github.com/hajimehoshi/oto/v2 v2.1.0 // indirect
 	github.com/jezek/xgb v1.0.0 // indirect
+	github.com/robfig/cron/v3 v3.0.1
 	golang.org/x/exp v0.0.0-20201008143054-e3b2a7f2fdc7 // indirect
 	golang.org/x/mobile v0.0.0-20220325161704-447654d348e3 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect

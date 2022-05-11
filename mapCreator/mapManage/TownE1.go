@@ -15,6 +15,7 @@ import (
 	"game/tools"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/OpenDiablo2/OpenDiablo2/d2common/d2enum"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -303,7 +304,7 @@ func (t *TownE1) LoadMap() {
 	dd, _ := t.Image.ReadFile(tools.ObjectPath + "/mapSucai/townE1.ds1")
 	d, _ := ds1.Unmarshal(dd)
 
-	//TODO
+	//存储数据
 	t.DS1 = d
 	t.DT1LIST = ss.Tiles
 	t.PA = ww
@@ -318,6 +319,7 @@ func (t *TownE1) LoadMap() {
 	for i := 0; i < h; i++ {
 		t.Img_Floor[i] = make([]*ebiten.Image, w)
 		for j := 0; j < w; j++ {
+			//限定初始化加载素材范围
 			if i >= 6 && i <= 15 && j >= 32 && j <= 40 {
 				ds1Tile := d.Floors[0].Tile(j, i)
 				if !ds1Tile.Hidden() && ds1Tile.Prop1 != 0 {
@@ -337,27 +339,33 @@ func (t *TownE1) LoadMap() {
 	for i := 0; i < h; i++ {
 		t.Img_Wall[i] = make([]baseClass.ImgWall, w)
 		for j := 0; j < w; j++ {
-			ds1Tile := d.Walls[0].Tile(j, i)
-			if !ds1Tile.Hidden() && ds1Tile.Prop1 != 0 {
-				ds := maps.GetTiles(int(ds1Tile.Style), int(ds1Tile.Sequence), ds1Tile.Type, ss.Tiles)
-				if ds != nil {
-					if ds1Tile.Type == d2enum.TileRightPartOfNorthCornerWall {
-						dss := maps.GetTiles(int(ds1Tile.Style), int(ds1Tile.Sequence), d2enum.TileLeftPartOfNorthCornerWall, ss.Tiles)
-						if dss != nil && dss[ds1Tile.RandomIndex].Height < ds[ds1Tile.RandomIndex].Height {
-							m, h := maps.GetWallTitleImage(dss[ds1Tile.RandomIndex], ds1Tile, ww)
-							t.Img_Wall[i][j].Img = m
-							t.Img_Wall[i][j].H = h
+			//限定初始化加载素材范围
+			if i >= 6 && i <= 15 && j >= 32 && j <= 40 {
+				ds1Tile := d.Walls[0].Tile(j, i)
+				if !ds1Tile.Hidden() && ds1Tile.Prop1 != 0 {
+					ds := maps.GetTiles(int(ds1Tile.Style), int(ds1Tile.Sequence), ds1Tile.Type, ss.Tiles)
+					if ds != nil {
+						if ds1Tile.Type == d2enum.TileRightPartOfNorthCornerWall {
+							dss := maps.GetTiles(int(ds1Tile.Style), int(ds1Tile.Sequence), d2enum.TileLeftPartOfNorthCornerWall, ss.Tiles)
+							if dss != nil && dss[ds1Tile.RandomIndex].Height < ds[ds1Tile.RandomIndex].Height {
+								m, h := maps.GetWallTitleImage(dss[ds1Tile.RandomIndex], ds1Tile, ww)
+								t.Img_Wall[i][j].Img = m
+								t.Img_Wall[i][j].H = h
+							} else {
+								m, h := maps.GetWallTitleImage(ds[ds1Tile.RandomIndex], ds1Tile, ww)
+								t.Img_Wall[i][j].Img = m
+								t.Img_Wall[i][j].H = h
+							}
 						} else {
 							m, h := maps.GetWallTitleImage(ds[ds1Tile.RandomIndex], ds1Tile, ww)
 							t.Img_Wall[i][j].Img = m
 							t.Img_Wall[i][j].H = h
 						}
-					} else {
-						m, h := maps.GetWallTitleImage(ds[ds1Tile.RandomIndex], ds1Tile, ww)
-						t.Img_Wall[i][j].Img = m
-						t.Img_Wall[i][j].H = h
 					}
 				}
+			} else {
+				t.Img_Wall[i][j].Img = nil
+				t.Img_Wall[i][j].H = 0
 			}
 		}
 	}
@@ -424,6 +432,13 @@ func (t *TownE1) LoadMap() {
 	ss = nil
 	d = nil
 	ww = nil
+	//定时任务
+	go func() {
+		for {
+			<-time.After(time.Second * 20)
+			t.ClearMap()
+		}
+	}()
 }
 
 //渲染地图的建筑
