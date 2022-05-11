@@ -84,6 +84,7 @@ func (p *PlayerAI) UpdatePlayerNextMovePositonAI(NewpositonX, NewpositonY float6
 	p.NewDir = dir
 	p.NewpositonX = NewpositonX
 	p.NewpositonY = NewpositonY
+	//根据状态切换速度
 	if types == "r" {
 		p.speed = tools.SPEED_RUN
 	} else if types == "w" {

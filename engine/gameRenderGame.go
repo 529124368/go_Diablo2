@@ -219,18 +219,13 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	//Change map Frame
 	if g.countForMap > 4 {
 		countsFor20++
+		countsFor20 %= 20
 		countsFor8++
+		countsFor8 %= 8
 		//播放掉落动画
 		if g.status.IsPlayDropAnmi {
 			countsFor17++
 		}
 		g.countForMap = 0
-		if countsFor20 >= 20 {
-			countsFor20 = 0
-		}
-		if countsFor8 >= 8 {
-			countsFor8 = 0
-		}
-
 	}
 }
