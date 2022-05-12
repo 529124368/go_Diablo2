@@ -30,7 +30,7 @@ type TownN1 struct {
 	image *embed.FS //静态资源获取
 }
 
-func NewN1(images *embed.FS, sta *status.StatusManage) *TownN1 {
+func NewN1(images *embed.FS) *TownN1 {
 	a := &TownN1{
 		anmiList:      make([]*ebiten.Image, 0),
 		wayList:       make([]*ebiten.Image, 0),
@@ -42,7 +42,6 @@ func NewN1(images *embed.FS, sta *status.StatusManage) *TownN1 {
 		image:         images,
 	}
 	a.Image = images
-	a.Status = sta
 	return a
 }
 
@@ -72,9 +71,9 @@ func (t *TownN1) RenderDropItems(screen *ebiten.Image, offsetX, offsetY float64,
 }
 func (t *TownN1) SortLayer(mapX, mapY int) {
 	if mapY >= 26 || mapY == 16 && mapX >= 47 || mapX == 46 || mapX == 47 {
-		t.Status.DisplaySort = true
+		status.Config.DisplaySort = true
 	} else {
-		t.Status.DisplaySort = false
+		status.Config.DisplaySort = false
 	}
 }
 
@@ -91,12 +90,12 @@ func (t *TownN1) GetCellXY(x, y int) (float64, float64, error) {
 	}
 	startY := 0
 	sumX := 0
-	for i := 0; i < t.Status.ReadMapSizeHeight; i++ {
+	for i := 0; i < status.Config.ReadMapSizeHeight; i++ {
 		if i > 0 {
 			startY += 40
 		}
 		sumX = 0
-		for j := 0; j < t.Status.ReadMapSizeWidth; j++ {
+		for j := 0; j < status.Config.ReadMapSizeWidth; j++ {
 			if j > 0 {
 				sumX += 80
 			}
@@ -192,8 +191,8 @@ func (t *TownN1) LoadMap() {
 
 	w, h := d.Floors[0].Size()
 	//保存地图大小
-	t.Status.ReadMapSizeWidth = w
-	t.Status.ReadMapSizeHeight = h
+	status.Config.ReadMapSizeWidth = w
+	status.Config.ReadMapSizeHeight = h
 	//floor
 	t.Img_Floor = make([][]*ebiten.Image, h)
 	for i := 0; i < h; i++ {

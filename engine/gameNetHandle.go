@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"game/role/human"
+	"game/status"
 	"game/tools"
 	"strconv"
 	"strings"
@@ -21,7 +22,7 @@ type serviceMessage struct {
 //接受服务器端消息
 func (g *Game) ListenMessage() {
 	for {
-		msg, ok := <-g.status.Queue
+		msg, ok := <-status.Config.Queue
 		if !ok {
 			fmt.Println("afs")
 			return
@@ -42,7 +43,7 @@ func (g *Game) unpack(msg []byte) {
 
 //新建角色
 func (g *Game) CreatePlayer(x, y float64, name, playerName string) {
-	r := human.NewPlayerAI(x, y, tools.IDLE, 0, g.status, &asset)
+	r := human.NewPlayerAI(x, y, tools.IDLE, 0, status.Config, &asset)
 	r.PlayerName = playerName
 	r.LoadImages(name, "/man/warrior/", 2)
 	g.playerAI = append(g.playerAI, r)

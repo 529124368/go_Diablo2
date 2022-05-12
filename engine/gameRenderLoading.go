@@ -2,6 +2,7 @@ package engine
 
 import (
 	"fmt"
+	"game/status"
 	"game/tools"
 	"runtime"
 	"strconv"
@@ -15,9 +16,9 @@ var clearFlg = false
 
 //Draw OpenDoor Scence
 func (g *Game) ChangeScenceOpenDoorDraw(screen *ebiten.Image) {
-	if !g.status.DoorCountFlg {
+	if !status.Config.DoorCountFlg {
 		counts = 0
-		g.status.DoorCountFlg = true
+		status.Config.DoorCountFlg = true
 	}
 	//Draw Open Door
 	name := "loading_" + strconv.Itoa(counts)
@@ -27,7 +28,7 @@ func (g *Game) ChangeScenceOpenDoorDraw(screen *ebiten.Image) {
 	op.GeoM.Translate(268, 120)
 	screen.DrawImage(door, op)
 	//Draw Debug
-	if g.status.DisPlayDebugInfo {
+	if status.Config.DisPlayDebugInfo {
 		ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nmouse position %d,%d", int64(ebiten.CurrentFPS()), mouseX, mouseY))
 	}
 }
@@ -51,18 +52,18 @@ func (g *Game) ChangeScenceOpenDoorUpdate() {
 	}
 
 	// Change Scence
-	if counts == 9 && !g.status.LoadingFlg {
-		g.status.LoadingFlg = true
+	if counts == 9 && !status.Config.LoadingFlg {
+		status.Config.LoadingFlg = true
 		w := sync.WaitGroup{}
 		w.Add(1)
 		go func() {
 			//close music
-			g.status.MusicIsPlay = false
+			status.Config.MusicIsPlay = false
 			g.ChangeScene("game")
 			runtime.GC()
 			w.Done()
 		}()
 		w.Wait()
-		g.status.ChangeScenceFlg = false
+		status.Config.ChangeScenceFlg = false
 	}
 }

@@ -2,6 +2,7 @@ package layout
 
 import (
 	"game/interfaces"
+	"game/status"
 	"game/tools"
 	"runtime"
 	"strings"
@@ -117,16 +118,16 @@ func (u *UI) LoadGameImages() {
 		if !isClick {
 			isClick = true
 			go func() {
-				if u.status.IsWalk {
+				if status.Config.IsWalk {
 					i.(*Sprite).imagesName = "walk_button_down"
 					time.Sleep(tools.CLOSEBTNSLEEP)
 					i.(*Sprite).imagesName = "run_button"
-					u.status.IsWalk = false
+					status.Config.IsWalk = false
 				} else {
 					i.(*Sprite).imagesName = "run_button_down"
 					time.Sleep(tools.CLOSEBTNSLEEP)
 					i.(*Sprite).imagesName = "walk_button"
-					u.status.IsWalk = true
+					status.Config.IsWalk = true
 				}
 				runtime.GC()
 				isClick = false
@@ -176,11 +177,11 @@ func (u *UI) LoadGameImages() {
 				}()
 				runtime.GC()
 				//恢复因打开包裹导致的人物偏移
-				u.status.UIOFFSETX = 0
+				status.Config.UIOFFSETX = 0
 				//恢复影子偏移
-				u.status.ShadowOffsetX = -60
+				status.Config.ShadowOffsetX = -60
 				//恢复玩家中心位置
-				u.status.PLAYERCENTERX = 388
+				status.Config.PLAYERCENTERX = 388
 				//恢复地图偏移
 				u.mapManage.ChangeMapTranslate(200, 0)
 				isClick = false
@@ -258,7 +259,7 @@ func (u *UI) LoadGameImages() {
 		if !isClick {
 			isClick = true
 			go func() {
-				if u.status.OpenMiniPanel {
+				if status.Config.OpenMiniPanel {
 					u.setHidden(tools.ISMINICOM)
 					i.(*Sprite).imagesName = "open_minipanel_down"
 					time.Sleep(tools.CLOSEBTNSLEEP)
@@ -292,18 +293,18 @@ func (u *UI) LoadGameImages() {
 			isClick = true
 			go func() {
 				on := i.(*Sprite).imagesName
-				if !u.status.OpenBag {
+				if !status.Config.OpenBag {
 					//判断MINI板子的最左端坐标是否超过最大极限
 					if x, _ := u.MiniPanelCompents[0].GetPosition(); x > 209 {
 						go func() {
 							//设置因打开包裹导致的人物偏移
-							u.status.UIOFFSETX = -200
+							status.Config.UIOFFSETX = -200
 							//修改地图偏移
 							u.mapManage.ChangeMapTranslate(-200, 0)
 							//修改玩家中心位置
-							u.status.PLAYERCENTERX -= 200
+							status.Config.PLAYERCENTERX -= 200
 							//修改人物影子偏移
-							u.status.ShadowOffsetX = u.status.ShadowOffsetX - 5
+							status.Config.ShadowOffsetX = status.Config.ShadowOffsetX - 5
 							for _, v := range u.MiniPanelCompents {
 								v.SetPosition(-100, 0)
 								if v.clickMaxX != 0 {

@@ -15,7 +15,6 @@ import (
 	"game/tools"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/OpenDiablo2/OpenDiablo2/d2common/d2enum"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -46,7 +45,7 @@ type TownE1 struct {
 	NPCAI             [4]*npc.NpcAI //AI NPC
 }
 
-func NewE1(images *embed.FS, sta *status.StatusManage, b *storage.Bag) *TownE1 {
+func NewE1(images *embed.FS, b *storage.Bag) *TownE1 {
 	a := &TownE1{
 		anmiList:      make([]*ebiten.Image, 0),
 		wayList:       make([]*ebiten.Image, 0),
@@ -57,7 +56,6 @@ func NewE1(images *embed.FS, sta *status.StatusManage, b *storage.Bag) *TownE1 {
 		bag:           b,
 	}
 	a.Image = images
-	a.Status = sta
 	return a
 }
 
@@ -80,7 +78,7 @@ func (t *TownE1) LoadAnm() {
 		t.dropAnm = append(t.dropAnm, tools.GetEbitenImage(o))
 	}
 	//设置NPC DC
-	t.NPCAI[0] = npc.NewPlayerAI(4580, 2041, 0, 0, t.Status, t.Image)
+	t.NPCAI[0] = npc.NewPlayerAI(4580, 2041, 0, 0, status.Config, t.Image)
 	t.NPCAI[0].LoadImages("DC", "/NPC/", 1)
 	aiPath := make([]npc.AIEndPoint, 3)
 	aiPath = append(aiPath, npc.AIEndPoint{X: 4674, Y: 1947, Dir: 2})
@@ -89,7 +87,7 @@ func (t *TownE1) LoadAnm() {
 	t.NPCAI[0].SetAIPath(aiPath, 100)
 
 	//设置NPC PS
-	t.NPCAI[1] = npc.NewPlayerAI(6003, 2048, 0, 4, t.Status, t.Image)
+	t.NPCAI[1] = npc.NewPlayerAI(6003, 2048, 0, 4, status.Config, t.Image)
 	t.NPCAI[1].LoadImages("PS", "/NPC/", 1)
 	aiPath = make([]npc.AIEndPoint, 2)
 	aiPath = append(aiPath, npc.AIEndPoint{X: 6200, Y: 2048, Dir: 7})
@@ -97,7 +95,7 @@ func (t *TownE1) LoadAnm() {
 	t.NPCAI[1].SetAIPath(aiPath, 100)
 
 	//设置NPC PS
-	t.NPCAI[2] = npc.NewPlayerAI(4823, 1691, 0, 4, t.Status, t.Image)
+	t.NPCAI[2] = npc.NewPlayerAI(4823, 1691, 0, 4, status.Config, t.Image)
 	t.NPCAI[2].LoadImages("RC", "/NPC/", 1)
 	aiPath = make([]npc.AIEndPoint, 2)
 	aiPath = append(aiPath, npc.AIEndPoint{X: 4823, Y: 1855, Dir: 4})
@@ -107,7 +105,7 @@ func (t *TownE1) LoadAnm() {
 	t.NPCAI[2].SetAIPath(aiPath, 100)
 
 	//设置NPC GH
-	t.NPCAI[3] = npc.NewPlayerAI(3230, 1905, 0, 3, t.Status, t.Image)
+	t.NPCAI[3] = npc.NewPlayerAI(3230, 1905, 0, 3, status.Config, t.Image)
 	t.NPCAI[3].LoadImages("GH", "/NPC/", 1)
 	aiPath = make([]npc.AIEndPoint, 2)
 	aiPath = append(aiPath, npc.AIEndPoint{X: 3482, Y: 1905, Dir: 7})
@@ -158,9 +156,9 @@ func (t *TownE1) RenderDropItems(screen *ebiten.Image, offsetX, offsetY float64,
 //切换渲染顺序
 func (t *TownE1) SortLayer(mapX, mapY int) {
 	if mapY >= 26 || mapY == 16 && mapX >= 47 || mapX == 46 || mapX == 47 || mapY == 8 && mapX == 30 || mapY == 7 && mapX == 30 || mapY == 6 && mapX == 30 {
-		t.Status.DisplaySort = true
+		status.Config.DisplaySort = true
 	} else {
-		t.Status.DisplaySort = false
+		status.Config.DisplaySort = false
 	}
 }
 
@@ -217,12 +215,12 @@ func (t *TownE1) GetCellXY(x, y int) (float64, float64, error) {
 	}
 	startY := 0
 	sumX := 0
-	for i := 0; i < t.Status.ReadMapSizeHeight; i++ {
+	for i := 0; i < status.Config.ReadMapSizeHeight; i++ {
 		if i > 0 {
 			startY += 40
 		}
 		sumX = 0
-		for j := 0; j < t.Status.ReadMapSizeWidth; j++ {
+		for j := 0; j < status.Config.ReadMapSizeWidth; j++ {
 			if j > 0 {
 				sumX += 80
 			}
@@ -311,8 +309,8 @@ func (t *TownE1) LoadMap() {
 
 	w, h := d.Floors[0].Size()
 	//保存地图大小
-	t.Status.ReadMapSizeWidth = w
-	t.Status.ReadMapSizeHeight = h
+	status.Config.ReadMapSizeWidth = w
+	status.Config.ReadMapSizeHeight = h
 
 	//floor
 	t.Img_Floor = make([][]*ebiten.Image, h)
@@ -432,13 +430,8 @@ func (t *TownE1) LoadMap() {
 	ss = nil
 	d = nil
 	ww = nil
-	//定时任务
-	go func() {
-		for {
-			<-time.After(time.Second * 20)
-			t.ClearMap()
-		}
-	}()
+	//继承父类方法
+	t.MapBase.LoadMap()
 }
 
 //渲染地图的建筑
@@ -446,17 +439,17 @@ func (t *TownE1) RenderWall(screen *ebiten.Image, offsetX, offsetY float64) {
 	//补图
 	sumX := 0
 	startY := 0
-	for i := 0; i < t.Status.ReadMapSizeHeight; i++ {
+	for i := 0; i < status.Config.ReadMapSizeHeight; i++ {
 		if i > 0 {
 			startY += 40
 		}
 		sumX = 0
-		for j := 0; j < t.Status.ReadMapSizeWidth; j++ {
+		for j := 0; j < status.Config.ReadMapSizeWidth; j++ {
 			if j > 0 {
 				sumX += 80
 			}
 			//视野剔除
-			if j > t.Status.MapTitleX-t.Status.MapZoom && j < t.Status.MapTitleX+t.Status.MapZoom && i > t.Status.MapTitleY-t.Status.MapZoom && i < t.Status.MapTitleY+t.Status.MapZoom {
+			if j > status.Config.MapTitleX-status.Config.MapZoom && j < status.Config.MapTitleX+status.Config.MapZoom && i > status.Config.MapTitleY-status.Config.MapZoom && i < status.Config.MapTitleY+status.Config.MapZoom {
 				s := t.Img_Wall_Add[i][j].Img
 				if s != nil {
 					op := &ebiten.DrawImageOptions{}

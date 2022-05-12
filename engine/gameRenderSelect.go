@@ -3,6 +3,7 @@ package engine
 import (
 	"fmt"
 	"game/controller"
+	"game/status"
 	"game/tools"
 	"image/color"
 	"strconv"
@@ -62,7 +63,7 @@ func (g *Game) ChangeScenceSelectDraw(screen *ebiten.Image) {
 	screen.DrawImage(ba, opBa)
 
 	//Draw Debug
-	if g.status.DisPlayDebugInfo {
+	if status.Config.DisPlayDebugInfo {
 		ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nmouse position %d,%d", int64(ebiten.CurrentFPS()), mouseX, mouseY))
 	}
 	//Draw Text

@@ -39,18 +39,17 @@ var (
 //UI类
 type UI struct {
 	image             *embed.FS
-	Compents          []*Sprite            //普通UI存放集合
-	HiddenCompents    []*Sprite            //可以被隐藏的UI组件集合
-	MiniPanelCompents []*Sprite            //MINI板的UI集合
-	ItemsCompents     []*SpriteItems       //Items的UI集合
-	status            *status.StatusManage //状态管理器
-	tempBag           [1]*SpriteItems      //临时Items存放
+	Compents          []*Sprite       //普通UI存放集合
+	HiddenCompents    []*Sprite       //可以被隐藏的UI组件集合
+	MiniPanelCompents []*Sprite       //MINI板的UI集合
+	ItemsCompents     []*SpriteItems  //Items的UI集合
+	tempBag           [1]*SpriteItems //临时Items存放
 	fCont             *fonts.FontBase
 	mapManage         interfaces.MapInterface
 	bag               *storage.Bag
 }
 
-func NewUI(images *embed.FS, s *status.StatusManage, f *fonts.FontBase, m interfaces.MapInterface, b *storage.Bag) *UI {
+func NewUI(images *embed.FS, f *fonts.FontBase, m interfaces.MapInterface, b *storage.Bag) *UI {
 
 	ui := &UI{
 		image:             images,
@@ -58,7 +57,6 @@ func NewUI(images *embed.FS, s *status.StatusManage, f *fonts.FontBase, m interf
 		HiddenCompents:    make([]*Sprite, 0, 6),
 		MiniPanelCompents: make([]*Sprite, 0, 6),
 		ItemsCompents:     make([]*SpriteItems, 0, 10),
-		status:            s,
 		fCont:             f,
 		mapManage:         m,
 		bag:               b,
@@ -153,12 +151,12 @@ func (u *UI) AddComponent(s interfaces.SpriteInterface, ImageType uint8) {
 //显示UI
 func (u *UI) SetDisplay(ImageType uint8) {
 	if ImageType == tools.ISHIDDEN {
-		u.status.OpenBag = true
+		status.Config.OpenBag = true
 		for _, v := range u.HiddenCompents {
 			v.isDisplay = true
 		}
 	} else {
-		u.status.OpenMiniPanel = true
+		status.Config.OpenMiniPanel = true
 		for _, v := range u.MiniPanelCompents {
 			v.isDisplay = true
 		}
@@ -169,12 +167,12 @@ func (u *UI) SetDisplay(ImageType uint8) {
 //隐藏UI
 func (u *UI) setHidden(ImageType uint8) {
 	if ImageType == tools.ISHIDDEN {
-		u.status.OpenBag = false
+		status.Config.OpenBag = false
 		for _, v := range u.HiddenCompents {
 			v.isDisplay = false
 		}
 	} else {
-		u.status.OpenMiniPanel = false
+		status.Config.OpenMiniPanel = false
 		for _, v := range u.MiniPanelCompents {
 			v.isDisplay = false
 		}
@@ -217,7 +215,7 @@ func (u *UI) DrawUI(screen *ebiten.Image) {
 		}
 	}
 	//当包裹打开的时候，渲染包裹内物品和装备 TODO
-	if u.status.OpenBag {
+	if status.Config.OpenBag {
 		for _, v := range u.ItemsCompents {
 			//先渲染背景色
 			if v.bgIsDisplay {
@@ -227,7 +225,7 @@ func (u *UI) DrawUI(screen *ebiten.Image) {
 			img, _, _ := u.GetAnimator(tools.PlistR, v.imagesName)
 			screen.DrawImage(img, v.op)
 		}
-		if !u.status.IsTakeItem {
+		if !status.Config.IsTakeItem {
 			//渲染物品信息
 			for _, v := range u.ItemsCompents {
 				//是否显示物品详细
@@ -255,7 +253,7 @@ func (u *UI) EventLoop(mouseX, mouseY int) {
 			}
 		}
 		//包裹打开的情况下监听
-		if u.status.OpenBag {
+		if status.Config.OpenBag {
 			//items UI事件轮询
 			for _, v := range u.ItemsCompents {
 				if v.hasEvent == 1 {
@@ -267,10 +265,10 @@ func (u *UI) EventLoop(mouseX, mouseY int) {
 		}
 
 		//点击包裹区域并且在包裹坐标范围内
-		if u.status.OpenBag && mouseX >= 408 && mouseY >= 6 && mouseX <= 698 && mouseY <= 372 && u.tempBag[0] != nil && u.status.IsTakeItem {
+		if status.Config.OpenBag && mouseX >= 408 && mouseY >= 6 && mouseX <= 698 && mouseY <= 372 && u.tempBag[0] != nil && status.Config.IsTakeItem {
 			s := u.tempBag[0]
 			//给鼠标加一个假偏移，防止双击
-			if u.AddItemToBag(mouseX+u.status.Mouseoffset, mouseY+u.status.Mouseoffset, s.imagesName) {
+			if u.AddItemToBag(mouseX+status.Config.Mouseoffset, mouseY+status.Config.Mouseoffset, s.imagesName) {
 				//清空缓冲区
 				u.ClearTempBag()
 			}
@@ -278,7 +276,7 @@ func (u *UI) EventLoop(mouseX, mouseY int) {
 
 	}
 	//包裹打开的情况下监听
-	if u.status.OpenBag {
+	if status.Config.OpenBag {
 		//items UI事件轮询
 		for _, v := range u.ItemsCompents {
 			if v.hasEvent == 1 {
@@ -445,13 +443,13 @@ func (u *UI) ItemsEvent() func(i interfaces.SpriteInterface, x, y int) {
 		if !isClick {
 			isClick = true
 			go func() {
-				if !u.status.IsTakeItem {
+				if !status.Config.IsTakeItem {
 					//拿起物品flag设置
-					u.status.IsTakeItem = true
+					status.Config.IsTakeItem = true
 					s := i.(*SpriteItems)
 					go func() {
 						time.Sleep(tools.CLOSEBTNSLEEP)
-						u.status.Mouseoffset = 0
+						status.Config.Mouseoffset = 0
 					}()
 					//将拿起的物品放入临时区
 					u.tempBag[0] = s
@@ -519,12 +517,12 @@ func (u *UI) ClearTempBag() string {
 	u.tempBag[0] = nil
 	mouseRoate = -0.5
 	//恢复防止双击的鼠标偏移量
-	u.status.Mouseoffset = 500
+	status.Config.Mouseoffset = 500
 	go func() {
 		time.Sleep(tools.CLOSEBTNSLEEP)
 		isClick = false
-		u.status.IsTakeItem = false
-		u.status.IsDropDeal = false
+		status.Config.IsTakeItem = false
+		status.Config.IsDropDeal = false
 	}()
 	return name
 }

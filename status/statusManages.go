@@ -1,7 +1,8 @@
 package status
 
+var Config *StatusManage
+
 type StatusManage struct {
-	//Flg               bool //是否可以移动标志
 	ChangeScenceFlg, DoorCountFlg, LoadingFlg bool
 	MusicIsPlay                               bool
 	OpenBag, OpenMiniPanel                    bool
@@ -22,7 +23,7 @@ type StatusManage struct {
 	IsDropDeal                                bool        //是否掉落物品处理中
 	DisplaySort                               bool        //人物和物体渲染顺序
 	Queue                                     chan []byte //消息队列
-	IsNetPlay                                 bool        //是否网络游玩
+	IsNetPlay                                 bool        //是否联网游玩
 }
 
 func NewStatusManage() *StatusManage {
@@ -64,4 +65,9 @@ func NewStatusManage() *StatusManage {
 		IsRun:             false,
 	}
 	return n
+}
+
+//初始化
+func init() {
+	Config = NewStatusManage()
 }

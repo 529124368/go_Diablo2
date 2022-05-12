@@ -7,6 +7,7 @@ import (
 	"game/mapCreator/dt1"
 	"game/maps"
 	"game/status"
+	"time"
 
 	"github.com/OpenDiablo2/OpenDiablo2/d2common/d2enum"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -24,7 +25,6 @@ type ImgWall struct {
 type MapBase struct {
 	Image        *embed.FS
 	BgImage      *ebiten.Image
-	Status       *status.StatusManage //状态
 	Img_Floor    [][]*ebiten.Image
 	Img_Wall     [][]ImgWall
 	Img_Wall_Add [][]ImgWall
@@ -35,12 +35,19 @@ type MapBase struct {
 
 //加载地图图片
 func (m *MapBase) LoadMap() {
+	//定时任务
+	go func() {
+		for {
+			<-time.After(time.Second * 20)
+			m.ClearMap()
+		}
+	}()
 }
 
 //改变地图坐标
 func (m *MapBase) ChangeMapTranslate(x, y float64) {
-	m.Status.CamerOffsetX += x
-	m.Status.CamerOffsetY += y
+	status.Config.CamerOffsetX += x
+	status.Config.CamerOffsetY += y
 }
 
 //渲染地图的地砖
@@ -48,17 +55,17 @@ func (m *MapBase) RenderFloor(screen *ebiten.Image, offsetX, offsetY float64) {
 	//floor
 	sumX := 0
 	startY := 0
-	for i := 0; i < m.Status.ReadMapSizeHeight; i++ {
+	for i := 0; i < status.Config.ReadMapSizeHeight; i++ {
 		if i > 0 {
 			startY += 40
 		}
 		sumX = 0
-		for j := 0; j < m.Status.ReadMapSizeWidth; j++ {
+		for j := 0; j < status.Config.ReadMapSizeWidth; j++ {
 			if j > 0 {
 				sumX += 80
 			}
 			//视野剔除
-			if j > m.Status.MapTitleX-m.Status.MapZoom && j < m.Status.MapTitleX+m.Status.MapZoom && i > m.Status.MapTitleY-m.Status.MapZoom && i < m.Status.MapTitleY+m.Status.MapZoom {
+			if j > status.Config.MapTitleX-status.Config.MapZoom && j < status.Config.MapTitleX+status.Config.MapZoom && i > status.Config.MapTitleY-status.Config.MapZoom && i < status.Config.MapTitleY+status.Config.MapZoom {
 				s := m.Img_Floor[i][j]
 				if s == nil {
 					s = m.GetFloor(i, j)
@@ -82,17 +89,17 @@ func (m *MapBase) RenderWall(screen *ebiten.Image, offsetX, offsetY float64) {
 	//wall
 	sumX := 0
 	startY := 0
-	for i := 0; i < m.Status.ReadMapSizeHeight; i++ {
+	for i := 0; i < status.Config.ReadMapSizeHeight; i++ {
 		if i > 0 {
 			startY += 40
 		}
 		sumX = 0
-		for j := 0; j < m.Status.ReadMapSizeWidth; j++ {
+		for j := 0; j < status.Config.ReadMapSizeWidth; j++ {
 			if j > 0 {
 				sumX += 80
 			}
 			//视野剔除
-			if j > m.Status.MapTitleX-m.Status.MapZoom && j < m.Status.MapTitleX+m.Status.MapZoom && i > m.Status.MapTitleY-m.Status.MapZoom && i < m.Status.MapTitleY+m.Status.MapZoom {
+			if j > status.Config.MapTitleX-status.Config.MapZoom && j < status.Config.MapTitleX+status.Config.MapZoom && i > status.Config.MapTitleY-status.Config.MapZoom && i < status.Config.MapTitleY+status.Config.MapZoom {
 				s := m.Img_Wall[i][j].Img
 				if s == nil {
 					s, h := m.GetWall(i, j)
@@ -153,10 +160,10 @@ func (m *MapBase) GetFloor(i, j int) *ebiten.Image {
 
 //清理不需要的地图数据
 func (m *MapBase) ClearMap() {
-	for i := 0; i < m.Status.ReadMapSizeHeight; i++ {
-		for j := 0; j < m.Status.ReadMapSizeWidth; j++ {
-			if j > m.Status.MapTitleX-m.Status.MapZoom-3 && j < m.Status.MapTitleX+m.Status.MapZoom+3 &&
-				i > m.Status.MapTitleY-m.Status.MapZoom-3 && i < m.Status.MapTitleY+m.Status.MapZoom+3 {
+	for i := 0; i < status.Config.ReadMapSizeHeight; i++ {
+		for j := 0; j < status.Config.ReadMapSizeWidth; j++ {
+			if j > status.Config.MapTitleX-status.Config.MapZoom-3 && j < status.Config.MapTitleX+status.Config.MapZoom+3 &&
+				i > status.Config.MapTitleY-status.Config.MapZoom-3 && i < status.Config.MapTitleY+status.Config.MapZoom+3 {
 				continue
 			} else {
 				m.Img_Wall[i][j].Img = nil

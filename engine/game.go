@@ -35,7 +35,6 @@ type Game struct {
 	mapManage          interfaces.MapInterface   //地图等管理
 	ui                 *layout.UI                //UI
 	music              interfaces.MusicInterface //音乐
-	status             *status.StatusManage      //状态管理器
 	font_style         *fonts.FontBase           //字体
 	Ws                 *websocket.Conn
 }
@@ -55,16 +54,14 @@ var asset embed.FS
 
 //GameEngine
 func NewGame() *Game {
-	//statueManage
-	sta := status.NewStatusManage()
 	bag := storage.New()
 	//场景
-	m := mapManage.NewE1(&asset, sta, bag)
+	m := mapManage.NewE1(&asset, bag)
 
 	//字体
 	f := fonts.NewFont(&asset)
 	//UI
-	u := layout.NewUI(&asset, sta, f, m, bag)
+	u := layout.NewUI(&asset, f, m, bag)
 	bag.UI = u
 	//BGM
 	bgm := music.NewMusicBGM(&asset)
@@ -74,7 +71,6 @@ func NewGame() *Game {
 		countForMap: 0,
 		ui:          u,
 		music:       bgm,
-		status:      sta,
 		mapManage:   m,
 		font_style:  f,
 	}
@@ -85,7 +81,7 @@ func NewGame() *Game {
 
 //引擎启动
 func (g *Game) StartEngine() {
-	if g.status.IsNetPlay {
+	if status.Config.IsNetPlay {
 		//网络监听消息
 		go g.ListenMessage()
 	}
@@ -107,7 +103,7 @@ func (g *Game) StartEngine() {
 //关闭所有连接
 func (g *Game) CloseCon() {
 	g.Ws.Close()
-	close(g.status.Queue)
+	close(status.Config.Queue)
 }
 func (g *Game) Update() error {
 	//判断是否是点击屏幕
@@ -118,8 +114,8 @@ func (g *Game) Update() error {
 	}
 
 	//切换场景逻辑
-	if !g.status.ChangeScenceFlg {
-		switch g.status.CurrentGameScence {
+	if !status.Config.ChangeScenceFlg {
+		switch status.Config.CurrentGameScence {
 		case tools.GAMESCENESTART:
 			//进入游戏场景逻辑
 			g.changeScenceGameUpdate()
@@ -141,15 +137,15 @@ func (g *Game) Update() error {
 	}
 	//Debug 信息显示控制
 	if inpututil.IsKeyJustPressed(ebiten.KeyD) {
-		g.status.DisPlayDebugInfo = !g.status.DisPlayDebugInfo
+		status.Config.DisPlayDebugInfo = !status.Config.DisPlayDebugInfo
 	}
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	//判断是否切换场景
-	if !g.status.ChangeScenceFlg {
-		switch g.status.CurrentGameScence {
+	if !status.Config.ChangeScenceFlg {
+		switch status.Config.CurrentGameScence {
 		case tools.GAMESCENESTART:
 			g.ChangeScenceGameDraw(screen)
 		case tools.GAMESCENESELECTROLE:

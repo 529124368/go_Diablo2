@@ -5,6 +5,7 @@ import (
 	"game/controller"
 	"game/engine/ws"
 	"game/role/human"
+	"game/status"
 
 	"game/tools"
 	"math"
@@ -22,24 +23,24 @@ func (g *Game) ChangeScene(name string) {
 	//角色选择场景
 	if name == "select" {
 		//选择角色场景
-		g.status.CurrentGameScence = tools.GAMESCENESELECTROLE
+		status.Config.CurrentGameScence = tools.GAMESCENESELECTROLE
 		g.ui.LoadGameCharaSelectImages()
 		runtime.GC()
 	} else if name == "game" {
 		//进入游戏场景
-		g.status.CurrentGameScence = tools.GAMESCENESTART
+		status.Config.CurrentGameScence = tools.GAMESCENESTART
 		w := sync.WaitGroup{}
 		var ww *ws.WsNetManage = nil
-		if g.status.IsNetPlay {
+		if status.Config.IsNetPlay {
 			//网络链接
-			ww = ws.NewNet(g.status)
+			ww = ws.NewNet(status.Config)
 			g.Ws = ww.Con
 			go ww.Start()
 		}
 		w.Add(3)
 		//Palyer Init
 		go func() {
-			g.player = human.NewPlayer(5280, 1880, tools.IDLE, 0, 0, 0, &asset, g.mapManage, g.status, ww)
+			g.player = human.NewPlayer(5280, 1880, tools.IDLE, 0, 0, 0, &asset, g.mapManage, status.Config, ww)
 			g.player.LoadImages("ba", "/man/warrior/", 2)
 			runtime.GC()
 			w.Done()
@@ -69,9 +70,9 @@ func (g *Game) ChangeScene(name string) {
 func (g *Game) changeScenceGameUpdate() {
 	g.count++
 	g.countForMap++
-	if !g.status.MusicIsPlay {
+	if !status.Config.MusicIsPlay {
 		//音乐
-		g.status.MusicIsPlay = true
+		status.Config.MusicIsPlay = true
 		g.music.PlayMusic("Bar_act2_complete_tombs.wav", tools.MUSICWAV)
 	}
 	if g.player.State != tools.ATTACK && g.player.State != tools.SkILL {
@@ -80,7 +81,7 @@ func (g *Game) changeScenceGameUpdate() {
 	g.player.MouseX = mouseX
 	g.player.MouseY = mouseY
 	//计算鼠标位置
-	dir := tools.CaluteDir(g.status.PLAYERCENTERX, g.status.PLAYERCENTERY, int64(g.player.MouseX), int64(g.player.MouseY))
+	dir := tools.CaluteDir(status.Config.PLAYERCENTERX, status.Config.PLAYERCENTERY, int64(g.player.MouseX), int64(g.player.MouseY))
 
 	//鼠标事件
 	if controller.MouseleftPress() || controller.IsTouch() {
@@ -89,26 +90,26 @@ func (g *Game) changeScenceGameUpdate() {
 			g.player.FlagCanAction = true
 		}
 		//如果打开包裹，包裹已右位置不能点击移动
-		if g.status.OpenBag && mouseX >= tools.LAYOUTX/2 {
+		if status.Config.OpenBag && mouseX >= tools.LAYOUTX/2 {
 			g.player.FlagCanAction = false
 		}
 		//如果打开MINi板子，并且没有打开包裹 以下坐标不可以点击移动
-		if g.status.OpenMiniPanel && !g.status.OpenBag && mouseX >= 305 && mouseX <= 475 && mouseY > 407 {
+		if status.Config.OpenMiniPanel && !status.Config.OpenBag && mouseX >= 305 && mouseX <= 475 && mouseY > 407 {
 			g.player.FlagCanAction = false
 		}
 		//如果打开MINi板子，并且打开包裹 以下坐标不可以点击移动
-		if g.status.OpenMiniPanel && g.status.OpenBag && mouseX >= 205 && mouseX <= 377 && mouseY > 407 {
+		if status.Config.OpenMiniPanel && status.Config.OpenBag && mouseX >= 205 && mouseX <= 377 && mouseY > 407 {
 			g.player.FlagCanAction = false
 		}
 		//如果拿起物品也不可以移动
-		if g.status.IsTakeItem {
+		if status.Config.IsTakeItem {
 			g.player.FlagCanAction = false
 			//这个范围内就是丢弃物品
 			if mouseY < 436 && mouseX < 390 {
-				if !g.status.IsDropDeal {
-					g.status.IsDropDeal = true
+				if !status.Config.IsDropDeal {
+					status.Config.IsDropDeal = true
 					//播放掉落物品动画
-					g.status.IsPlayDropAnmi = true
+					status.Config.IsPlayDropAnmi = true
 					//音乐
 					g.music.PlayMusic("diaoluo.mp3", tools.MUSICMP3)
 					//丢弃物品
@@ -124,11 +125,11 @@ func (g *Game) changeScenceGameUpdate() {
 
 	//鼠标滚轮控制
 	if _, x := ebiten.Wheel(); x != 0 {
-		g.status.MapZoom += int(x)
+		status.Config.MapZoom += int(x)
 	}
 
 	//普通攻击
-	if controller.MouseRightPress() && !g.status.IsTakeItem {
+	if controller.MouseRightPress() && !status.Config.IsTakeItem {
 		if g.player.State != tools.ATTACK {
 			g.player.Counts = 0
 		}
@@ -138,7 +139,7 @@ func (g *Game) changeScenceGameUpdate() {
 		}
 	}
 	//技能
-	if controller.MousePressF1() && !g.status.IsTakeItem {
+	if controller.MousePressF1() && !status.Config.IsTakeItem {
 		//音乐
 		g.music.PlayMusic("File00002184.wav", tools.MUSICWAV)
 		//g.player.SkillName = "狂风"
@@ -166,35 +167,35 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	//获取玩家当前的地图块坐标
 	mapX, mapY := tools.GetFloorPositionAt(g.player.X, g.player.Y)
 	//玩家所在地图的逻辑坐标
-	g.status.MapTitleX = mapX
-	g.status.MapTitleY = mapY
+	status.Config.MapTitleX = mapX
+	status.Config.MapTitleY = mapY
 	g.mapManage.SortLayer(mapX, mapY)
 	//Draw floor
-	g.mapManage.RenderFloor(screen, g.status.CamerOffsetX, g.status.CamerOffsetY)
+	g.mapManage.RenderFloor(screen, status.Config.CamerOffsetX, status.Config.CamerOffsetY)
 	//Draw drop items
-	g.mapManage.RenderDropItems(screen, g.status.CamerOffsetX, g.status.CamerOffsetY, g.player.X, g.player.Y)
+	g.mapManage.RenderDropItems(screen, status.Config.CamerOffsetX, status.Config.CamerOffsetY, g.player.X, g.player.Y)
 	//切换渲染顺序
-	if g.status.DisplaySort {
+	if status.Config.DisplaySort {
 		//Draw player
 		g.player.Render(screen)
-		if g.status.IsNetPlay && len(g.playerAI) > 0 {
+		if status.Config.IsNetPlay && len(g.playerAI) > 0 {
 			for _, v := range g.playerAI {
 				v.Render(screen)
 			}
 		}
 		//Draw Wall
-		g.mapManage.RenderWall(screen, g.status.CamerOffsetX, g.status.CamerOffsetY)
+		g.mapManage.RenderWall(screen, status.Config.CamerOffsetX, status.Config.CamerOffsetY)
 		//Draw map Anmi
-		g.mapManage.Render(screen, countsFor20, countsFor8, g.status.CamerOffsetX, g.status.CamerOffsetY)
+		g.mapManage.Render(screen, countsFor20, countsFor8, status.Config.CamerOffsetX, status.Config.CamerOffsetY)
 
 	} else {
 		//Draw Wall
-		g.mapManage.RenderWall(screen, g.status.CamerOffsetX, g.status.CamerOffsetY)
+		g.mapManage.RenderWall(screen, status.Config.CamerOffsetX, status.Config.CamerOffsetY)
 		//Draw map Anmi
-		g.mapManage.Render(screen, countsFor20, countsFor8, g.status.CamerOffsetX, g.status.CamerOffsetY)
+		g.mapManage.Render(screen, countsFor20, countsFor8, status.Config.CamerOffsetX, status.Config.CamerOffsetY)
 		//Draw player
 		g.player.Render(screen)
-		if g.status.IsNetPlay && len(g.playerAI) > 0 {
+		if status.Config.IsNetPlay && len(g.playerAI) > 0 {
 			for _, v := range g.playerAI {
 				v.Render(screen)
 			}
@@ -204,18 +205,18 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	g.ui.DrawUI(screen)
 
 	//Draw Drop items Anm
-	if g.status.IsPlayDropAnmi {
+	if status.Config.IsPlayDropAnmi {
 		if g.mapManage.PlayDropItemAnm(screen, g.player.X, g.player.Y, dropItemName, countsFor17) {
 			countsFor17 = 0
-			g.status.IsPlayDropAnmi = false
+			status.Config.IsPlayDropAnmi = false
 		}
 	}
 	//Draw Debug
-	if g.status.DisPlayDebugInfo {
-		len := tools.Distance(g.status.PLAYERCENTERX, g.status.PLAYERCENTERY, int64(mouseX), int64(mouseY))
-		re := tools.Angle(math.Abs(float64(int64(mouseY)-g.status.PLAYERCENTERY)), len)
+	if status.Config.DisPlayDebugInfo {
+		len := tools.Distance(status.Config.PLAYERCENTERX, status.Config.PLAYERCENTERY, int64(mouseX), int64(mouseY))
+		re := tools.Angle(math.Abs(float64(int64(mouseY)-status.Config.PLAYERCENTERY)), len)
 		ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nplayer world position %d,%d\nmouse position %d,%d\ndir %d\nAngle %f\nCell XY %d,%d",
-			int64(ebiten.CurrentFPS()), int64(g.player.X), int64(g.player.Y), g.player.MouseX, g.player.MouseY, tools.CaluteDir(g.status.PLAYERCENTERX, g.status.PLAYERCENTERY, int64(g.player.MouseX), int64(g.player.MouseY)), re, mapX, mapY))
+			int64(ebiten.CurrentFPS()), int64(g.player.X), int64(g.player.Y), g.player.MouseX, g.player.MouseY, tools.CaluteDir(status.Config.PLAYERCENTERX, status.Config.PLAYERCENTERY, int64(g.player.MouseX), int64(g.player.MouseY)), re, mapX, mapY))
 	}
 
 	//Change map Frame
@@ -225,7 +226,7 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 		countsFor8++
 		countsFor8 %= 8
 		//播放掉落动画
-		if g.status.IsPlayDropAnmi {
+		if status.Config.IsPlayDropAnmi {
 			countsFor17++
 		}
 		g.countForMap = 0

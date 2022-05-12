@@ -3,6 +3,7 @@ package engine
 import (
 	"fmt"
 	"game/controller"
+	"game/status"
 	"game/tools"
 	"strconv"
 
@@ -15,15 +16,15 @@ func (g *Game) ChangeScenceLoginUpdate() {
 	//切换场景判定
 	if controller.MouseOnceLeftPress() || controller.IsTouch() {
 		if mouseX > 286 && mouseX < 503 && mouseY > 150 && mouseY < 218 || controller.Touch(286, 150, 503, 218) {
-			g.status.ChangeScenceFlg = true
+			status.Config.ChangeScenceFlg = true
 			//切换场景
 			g.ChangeScene("select")
-			g.status.ChangeScenceFlg = false
+			status.Config.ChangeScenceFlg = false
 		}
 	}
 	//音乐控制
-	if !g.status.MusicIsPlay {
-		g.status.MusicIsPlay = true
+	if !status.Config.MusicIsPlay {
+		status.Config.MusicIsPlay = true
 		g.music.PlayBGMusic("Act0-Intro.mp3", tools.MUSICMP3)
 	}
 	g.count++
@@ -58,7 +59,7 @@ func (g *Game) ChangeScenceLoginDraw(screen *ebiten.Image) {
 	opRo.CompositeMode = ebiten.CompositeModeLighter
 	opRo.GeoM.Scale(1, 0.7)
 	screen.DrawImage(right, opRo)
-	if g.status.DisPlayDebugInfo {
+	if status.Config.DisPlayDebugInfo {
 		//Draw Debug
 		ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nmouse position %d,%d\n",
 			int64(ebiten.CurrentFPS()), mouseX, mouseY))

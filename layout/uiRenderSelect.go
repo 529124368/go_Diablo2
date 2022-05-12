@@ -2,6 +2,7 @@ package layout
 
 import (
 	"game/interfaces"
+	"game/status"
 	"game/tools"
 	"runtime"
 	"time"
@@ -28,9 +29,9 @@ func (u *UI) LoadGameCharaSelectImages() {
 				i.(*Sprite).imagesName = on
 				u.SetDisplay(tools.ISHIDDEN)
 				//切换游戏场景到开门loading
-				u.status.ChangeScenceFlg = true
-				u.status.CurrentGameScence = tools.GAMESCENEOPENDOOR
-				u.status.ChangeScenceFlg = false
+				status.Config.ChangeScenceFlg = true
+				status.Config.CurrentGameScence = tools.GAMESCENEOPENDOOR
+				status.Config.ChangeScenceFlg = false
 				isClick = false
 			}()
 		}
