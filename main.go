@@ -15,6 +15,7 @@ const (
 
 func main() {
 	os.Setenv("EBITEN_GRAPHICS_LIBRARY", "opengl")
+	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 	ebiten.SetWindowSize(SCREENWIDTH*2, SCREENHEIGHT*2)
 	ebiten.SetWindowTitle("Golang_DibaloⅡ")
 	ebiten.SetMaxTPS(80)

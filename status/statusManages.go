@@ -28,22 +28,13 @@ type StatusManage struct {
 
 func NewStatusManage() *StatusManage {
 	n := &StatusManage{
-		//Flg:             false,
-		ChangeScenceFlg: false,
-		DoorCountFlg:    false,
-		LoadingFlg:      false,
-		MusicIsPlay:     false,
-		OpenBag:         false,
-		OpenMiniPanel:   false,
-		IsWalk:          true,
-		CalculateEnd:    false,
-		UIOFFSETX:       0,
-		ShadowOffsetX:   -60,
-		ShadowOffsetY:   -10,
-		PLAYERCENTERX:   395, //LAYOUTX/2
-		PLAYERCENTERY:   240, //LAYOUTY/2
-		IsTakeItem:      false,
-		Mouseoffset:     -1800,
+		IsWalk:        true,
+		UIOFFSETX:     0,
+		ShadowOffsetX: -60,
+		ShadowOffsetY: -10,
+		PLAYERCENTERX: 395, //LAYOUTX/2
+		PLAYERCENTERY: 240, //LAYOUTY/2
+		Mouseoffset:   -1800,
 		//玩家初始位置偏移设置
 		CamerOffsetX: -5280 + 395,
 		CamerOffsetY: -1880 + 240,
@@ -56,13 +47,8 @@ func NewStatusManage() *StatusManage {
 		//
 		MapZoom:           8,
 		CurrentGameScence: 1,
-		DisPlayDebugInfo:  false,
-		IsPlayDropAnmi:    false,
-		IsDropDeal:        false,
-		DisplaySort:       false,
 		Queue:             make(chan []byte),
-		IsNetPlay:         false,
-		IsRun:             false,
+		IsNetPlay:         true,
 	}
 	return n
 }
