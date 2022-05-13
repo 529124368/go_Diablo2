@@ -1,7 +1,6 @@
 package engine
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"game/role/human"
@@ -10,14 +9,6 @@ import (
 	"strconv"
 	"strings"
 )
-
-var sm serviceMessage
-
-type serviceMessage struct {
-	Status bool
-	Data   string
-	Mes    string
-}
 
 //接受服务器端消息
 func (g *Game) ListenMessage() {
@@ -29,15 +20,6 @@ func (g *Game) ListenMessage() {
 		}
 		//处理消息
 		g.Handle(msg)
-	}
-}
-
-//解包
-func (g *Game) unpack(msg []byte) {
-	err := json.Unmarshal(msg, &sm)
-	if err != nil {
-		fmt.Println("afss")
-		fmt.Println(err)
 	}
 }
 
@@ -60,15 +42,10 @@ func (g *Game) DeletePlayer(id int) {
 
 }
 
-//移动角色
-func (g *Game) MovePlayer() {
-
-}
-
 //处理消息
 func (g *Game) Handle(msg []byte) {
 	//解包
-	g.unpack(msg)
+	sm := tools.Unpack(msg)
 	//动态创建角色 测试用
 	if len(sm.Data) > 12 && sm.Data[:12] == "@@newplayer|" {
 		d := strings.Split(sm.Data, "|")

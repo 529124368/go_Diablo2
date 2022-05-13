@@ -3,6 +3,8 @@ package tools
 import (
 	"bytes"
 	"container/ring"
+	"fmt"
+	"game/engine/ws/pb"
 	"image"
 	_ "image/png"
 	"log"
@@ -11,6 +13,7 @@ import (
 	"time"
 
 	"github.com/fzipp/texturepacker"
+	"github.com/golang/protobuf/proto"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -309,4 +312,28 @@ func GetOffetByAction(name string) [4]OffsetXY {
 		box[3] = OffsetXY{-10, -15}
 	}
 	return box
+}
+
+//解包
+func Unpack(msg []byte) *pb.Message {
+	m := &pb.Message{}
+	err := proto.Unmarshal(msg, m)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return m
+}
+
+//消息打包
+func Pack(msg string) []byte {
+	m := &pb.Message{
+		Status: true,
+		Data:   msg,
+		Mes:    "",
+	}
+	d, err := proto.Marshal(m)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return d
 }

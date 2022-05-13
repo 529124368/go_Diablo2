@@ -2,6 +2,7 @@ package ws
 
 import (
 	"game/status"
+	"game/tools"
 	"log"
 	"time"
 
@@ -55,7 +56,7 @@ func (w *WsNetManage) Start() {
 
 //往客户端发送消息
 func (w *WsNetManage) SendMessage(msg string) error {
-	err := w.Con.WriteMessage(1, []byte(msg))
+	err := w.Con.WriteMessage(1, tools.Pack(msg))
 	return err
 }
 
