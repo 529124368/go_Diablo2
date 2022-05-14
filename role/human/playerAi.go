@@ -15,7 +15,6 @@ type PlayerAI struct {
 	PlayerName           string            //玩家名字
 	SkillName            string            //技能名称
 	imgOffset            [4]tools.OffsetXY //动作图片偏移
-	speed                float64           //移动速度
 }
 
 //创建玩家
@@ -39,19 +38,6 @@ func NewPlayerAI(x, y float64, state, dir uint8, s *status.StatusManage, images 
 func (p *PlayerAI) LoadImages(name, path string, num uint8) {
 	p.PlayerBase.LoadImages(name, path, num)
 	p.imgOffset = tools.GetOffetByAction(name)
-}
-
-//控制AI玩家新位置的预算
-func (p *PlayerAI) UpdatePlayerNextMovePositonAI(NewpositonX, NewpositonY float64, dir uint8, types string) {
-	p.NewDir = dir
-	p.NewpositonX = NewpositonX
-	p.NewpositonY = NewpositonY
-	//根据状态切换速度
-	if types == "r" {
-		p.speed = tools.SPEED_RUN
-	} else if types == "w" {
-		p.speed = tools.SPEED
-	}
 }
 
 //控制AI玩家新位置的预算
