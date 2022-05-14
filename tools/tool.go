@@ -296,15 +296,10 @@ func GetOffetByAction(name string) [4]OffsetXY {
 	var box [4]OffsetXY
 	switch name {
 	case "ba":
-		box[0] = OffsetXY{-4, -3}
+		box[0] = OffsetXY{0, 0}
 		box[1] = OffsetXY{-4, -3}
-		box[2] = OffsetXY{-50, -30}
-		box[3] = OffsetXY{-50, -30}
-	case "ba1":
-		box[0] = OffsetXY{4, -18}
-		box[1] = OffsetXY{4, -18}
-		box[2] = OffsetXY{-55, -35}
-		box[3] = OffsetXY{-55, -35}
+		box[2] = OffsetXY{-45, -15}
+		box[3] = OffsetXY{-15, -15}
 	case "ba2":
 		box[0] = OffsetXY{3, -7}
 		box[1] = OffsetXY{8, -10}

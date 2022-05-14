@@ -18,7 +18,7 @@ type PlayerAI struct {
 }
 
 //创建玩家
-func NewPlayerAI(x, y float64, state, dir uint8, s *status.StatusManage, images *embed.FS) *PlayerAI {
+func NewPlayerAI(x, y float64, state, dir uint8, images *embed.FS) *PlayerAI {
 	play := &PlayerAI{
 		PlayerName: "",
 		SkillName:  "", //技能名字
@@ -26,7 +26,6 @@ func NewPlayerAI(x, y float64, state, dir uint8, s *status.StatusManage, images 
 	play.X = x //地图坐标X
 	play.Y = y //地图坐标Y
 	play.State = state
-	play.Status = s
 	play.Direction = dir
 	play.Asset = images
 	play.OpS = &ebiten.DrawImageOptions{}
@@ -116,11 +115,11 @@ func (p *PlayerAI) Render(screen *ebiten.Image) {
 	p.OpS.GeoM.Rotate(-0.5)
 	p.OpS.GeoM.Scale(1, 0.5)
 	p.OpS.ColorM.Scale(0, 0, 0, 1)
-	p.OpS.GeoM.Translate(float64(int(p.X)+x-32-25)+p.Status.CamerOffsetX, float64(int(p.Y)+y+35-30)+p.Status.CamerOffsetY)
+	p.OpS.GeoM.Translate(float64(int(p.X)+x-32-25)+status.Config.CamerOffsetX, float64(int(p.Y)+y+35-30)+status.Config.CamerOffsetY)
 	screen.DrawImage(imagess, p.OpS)
 	//Draw Player
 	p.Op.GeoM.Reset()
-	p.Op.GeoM.Translate(float64(int(p.X)+x-25)+p.Status.CamerOffsetX, float64(int(p.Y)+y-30)+p.Status.CamerOffsetY)
+	p.Op.GeoM.Translate(float64(int(p.X)+x-25)+status.Config.CamerOffsetX, float64(int(p.Y)+y-30)+status.Config.CamerOffsetY)
 	p.Op.Filter = ebiten.FilterLinear
 	screen.DrawImage(imagess, p.Op)
 }

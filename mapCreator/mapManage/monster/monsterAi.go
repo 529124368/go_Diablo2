@@ -1,4 +1,4 @@
-package npc
+package monster
 
 import (
 	"embed"
@@ -15,37 +15,37 @@ type AIEndPoint struct {
 	X, Y float64
 	Dir  uint8
 }
-type NpcAI struct {
+type MonsterAI struct {
 	baseClass.PlayerBase                     //继承
-	PlayerName                        string //玩家名字
+	MonsterrName                      string //玩家名字
 	AIWait, AICount, AIf, AIPathCount int
 	AIpath                            []AIEndPoint
 }
 
-//创建NPC
-func NewPlayerAI(x, y float64, state, dir uint8, images *embed.FS) *NpcAI {
-	play := &NpcAI{
-		PlayerName: "",
-		AIWait:     0,
-		AICount:    0,
-		AIf:        0,
+//创建Monster
+func NewMonsterAI(x, y float64, state, dir uint8, images *embed.FS) *MonsterAI {
+	monster := &MonsterAI{
+		MonsterrName: "",
+		AIWait:       0,
+		AICount:      0,
+		AIf:          0,
 	}
-	play.X = x //地图坐标X
-	play.Y = y //地图坐标Y
-	play.State = state
-	play.Direction = dir
-	play.Asset = images
-	play.OpS = &ebiten.DrawImageOptions{}
-	play.Op = &ebiten.DrawImageOptions{}
-	return play
+	monster.X = x //地图坐标X
+	monster.Y = y //地图坐标Y
+	monster.State = state
+	monster.Direction = dir
+	monster.Asset = images
+	monster.OpS = &ebiten.DrawImageOptions{}
+	monster.Op = &ebiten.DrawImageOptions{}
+	return monster
 }
 
 //暗黑破坏神 16方位 移动 AI
-func (p *NpcAI) GetMouseControllerAI(dir uint8) {
+func (p *MonsterAI) GetMouseControllerAI(dir uint8) {
 	if p.FlagCanAction {
 		speed := 0.0
 		//判断是否走路
-		speed = 0.5
+		speed = 2
 		p.SetPlayerState(tools.Walk, dir)
 		//移动判断
 		moveX, moveY := tools.CalculateSpeed(dir, speed)
@@ -54,14 +54,14 @@ func (p *NpcAI) GetMouseControllerAI(dir uint8) {
 	}
 }
 
-//停止AI NPC移动
-func (p *NpcAI) StopPlayerMoveAI() {
+//停止AI Monster移动
+func (p *MonsterAI) StopPlayerMoveAI() {
 	p.NewpositonX = 0
 	p.NewpositonY = 0
 }
 
 //控制AI NPC新位置的预算
-func (p *NpcAI) UpdatePlayerNextMovePositonAI(NewpositonX, NewpositonY float64, dir uint8) {
+func (p *MonsterAI) UpdatePlayerNextMovePositonAI(NewpositonX, NewpositonY float64, dir uint8) {
 	p.AICount = 0
 	p.NewDir = dir
 	p.NewpositonX = NewpositonX
@@ -70,7 +70,7 @@ func (p *NpcAI) UpdatePlayerNextMovePositonAI(NewpositonX, NewpositonY float64, 
 }
 
 //渲染NPC
-func (p *NpcAI) Render(screen *ebiten.Image) {
+func (p *MonsterAI) Render(screen *ebiten.Image) {
 	p.PlayerMoveAI()
 	p.ChangeFrame()
 	p.PlayerBase.Render()
@@ -93,17 +93,17 @@ func (p *NpcAI) Render(screen *ebiten.Image) {
 	p.OpS.GeoM.Rotate(-0.5)
 	p.OpS.GeoM.Scale(1, 0.5)
 	p.OpS.ColorM.Scale(0, 0, 0, 1)
-	p.OpS.GeoM.Translate(float64(int(p.X)+x-32-25)+status.Config.CamerOffsetX, float64(int(p.Y)+y+35-30)+status.Config.CamerOffsetY)
+	p.OpS.GeoM.Translate(float64(int(p.X)+x-30-25)+status.Config.CamerOffsetX, float64(int(p.Y)+y+35-30)+status.Config.CamerOffsetY)
 	screen.DrawImage(imagess, p.OpS)
-	//Draw Player
+	//Draw Monster
 	p.Op.GeoM.Reset()
 	p.Op.GeoM.Translate(float64(int(p.X)+x-25)+status.Config.CamerOffsetX, float64(int(p.Y)+y-30)+status.Config.CamerOffsetY)
 	p.Op.Filter = ebiten.FilterLinear
 	screen.DrawImage(imagess, p.Op)
 }
 
-//控制AI NPC移动
-func (p *NpcAI) PlayerMoveAI() {
+//控制AI Monster移动
+func (p *MonsterAI) PlayerMoveAI() {
 	//AI 移动判断
 	p.AIMove()
 	if p.NewDir == 5 || p.NewDir == 6 || p.NewDir == 7 || p.NewDir == 4 {
@@ -142,7 +142,7 @@ func (p *NpcAI) PlayerMoveAI() {
 }
 
 //AI 移动判断
-func (p *NpcAI) AIMove() {
+func (p *MonsterAI) AIMove() {
 	p.AICount++
 	p.AIf %= p.AIPathCount
 	if !p.FlagCanAction && p.AICount >= p.AIWait {
@@ -155,20 +155,20 @@ func (p *NpcAI) AIMove() {
 ** @params path  AI 移动的路径点
 ** @params speed AI移动速度
 **/
-func (p *NpcAI) SetAIPath(path []AIEndPoint, speed int) {
+func (p *MonsterAI) SetAIPath(path []AIEndPoint, speed int) {
 	p.AIPathCount = len(path)
 	p.AIpath = path
 	p.AIWait = speed
 }
 
 //改变帧数
-func (p *NpcAI) ChangeFrame() {
+func (p *MonsterAI) ChangeFrame() {
 	//根据状态改变帧数
 	if p.State == tools.IDLE {
-		p.FrameNums = 8
+		p.FrameNums = 20
 		p.FrameSpeed = 5
 	} else {
-		p.FrameNums = 8
-		p.FrameSpeed = 7
+		p.FrameNums = 10
+		p.FrameSpeed = 3
 	}
 }

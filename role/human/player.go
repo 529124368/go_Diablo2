@@ -33,7 +33,7 @@ type Player struct {
 }
 
 //创建玩家
-func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m interfaces.MapInterface, s *status.StatusManage, con *ws.WsNetManage) *Player {
+func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m interfaces.MapInterface, con *ws.WsNetManage) *Player {
 	play := &Player{
 		PlayerName: "",
 		MouseX:     mx,
@@ -49,7 +49,6 @@ func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m i
 	play.Direction = dir
 	play.OldDirection = dir
 	play.Asset = images
-	play.Status = s
 	play.OpS = &ebiten.DrawImageOptions{}
 	play.Op = &ebiten.DrawImageOptions{}
 	return play
@@ -66,26 +65,26 @@ func (p *Player) GetMouseController(dir uint8) {
 	if p.FlagCanAction {
 		speed := 0.0
 		//判断是否走路
-		if p.Status.IsWalk && (p.Direction != dir || p.State != tools.Walk) {
+		if status.Config.IsWalk && (p.Direction != dir || p.State != tools.Walk) {
 			speed = tools.SPEED
 			p.SetPlayerState(tools.Walk, dir)
 		}
-		if !p.Status.IsWalk && (p.Direction != dir || p.State != tools.RUN) {
+		if !status.Config.IsWalk && (p.Direction != dir || p.State != tools.RUN) {
 			speed = tools.SPEED_RUN
 			p.SetPlayerState(tools.RUN, dir)
 		}
 		//移动判断
 		moveX, moveY := tools.CalculateSpeed(dir, speed)
 		if p.CanWalk(moveX, moveY, dir) {
-			p.Status.CamerOffsetX += -moveX
-			p.Status.CamerOffsetY += -moveY
+			status.Config.CamerOffsetX += -moveX
+			status.Config.CamerOffsetY += -moveY
 			p.Y += moveY
 			p.X += moveX
 			//网络
-			if p.Status.IsNetPlay {
+			if status.Config.IsNetPlay {
 				//网络
 				act := ""
-				if !p.Status.IsWalk {
+				if !status.Config.IsWalk {
 					act = "r"
 				} else {
 					act = "w"
@@ -102,7 +101,7 @@ func (p *Player) GetMouseController(dir uint8) {
 		} else {
 			p.NewpositonX = 0
 			p.NewpositonY = 0
-			p.Status.CalculateEnd = false
+			status.Config.CalculateEnd = false
 		}
 
 	}
@@ -111,7 +110,7 @@ func (p *Player) GetMouseController(dir uint8) {
 //判断是否可以行走
 func (p *Player) CanWalk(xS, yS float64, dir uint8) bool {
 	x, y := tools.GetFloorPositionAt(p.X+xS-110, p.Y+yS+70)
-	if x >= p.Status.ReadMapSizeWidth || y >= p.Status.ReadMapSizeHeight || x < 0 || y < 0 {
+	if x >= status.Config.ReadMapSizeWidth || y >= status.Config.ReadMapSizeHeight || x < 0 || y < 0 {
 		p.SetPlayerState(tools.IDLE, dir)
 		return false
 	}
@@ -144,10 +143,10 @@ func (p *Player) PlayerMove() {
 		}
 	}
 	//玩家停止
-	if p.State == tools.IDLE && p.Status.IsRun {
-		p.Status.IsRun = false
+	if p.State == tools.IDLE && status.Config.IsRun {
+		status.Config.IsRun = false
 		//网络
-		if p.Status.IsNetPlay {
+		if status.Config.IsNetPlay {
 			ps := &pb.Player{
 				Name: p.PlayerName,
 				X:    p.X,
@@ -159,13 +158,13 @@ func (p *Player) PlayerMove() {
 }
 
 func (p *Player) playerMove() {
-	p.Status.IsRun = true
+	status.Config.IsRun = true
 	p.FlagCanAction = true
 	//判断人物方位
 	if p.OldDirection != p.Direction && !controller.MouseRightPress() {
-		if !p.Status.CalculateEnd {
+		if !status.Config.CalculateEnd {
 			p.newPath = tools.CalculateDirPath(p.OldDirection, p.Direction)
-			p.Status.CalculateEnd = true
+			status.Config.CalculateEnd = true
 		}
 		if len(p.newPath) >= 3 {
 			if p.turnLoOp >= uint8(len(p.newPath)) {
@@ -179,13 +178,13 @@ func (p *Player) playerMove() {
 			p.SetPlayerState(tools.IDLE, p.NewDir)
 		} else {
 			//直接切换方向
-			p.Status.CalculateEnd = false
+			status.Config.CalculateEnd = false
 			p.turnLoOp = 0
 			p.UpdateOldPlayerDir(p.NewDir)
 			p.GetMouseController(p.NewDir)
 		}
 	} else {
-		p.Status.CalculateEnd = false
+		status.Config.CalculateEnd = false
 		p.turnLoOp = 0
 		p.GetMouseController(p.NewDir)
 	}
@@ -196,10 +195,10 @@ func (p *Player) PlayerNextMovePositon(mouseX, mouseY int, dir uint8) {
 	p.NewDir = dir
 	p.NewpositonX = p.X + float64(mouseX) - 395
 	p.NewpositonY = p.Y + float64(mouseY) - 240
-	// if p.Status.IsNetPlay {
+	// if status.Config.IsNetPlay {
 	// 	//网络
 	// 	act := ""
-	// 	if !p.Status.IsWalk {
+	// 	if !status.Config.IsWalk {
 	// 		act = "r"
 	// 	} else {
 	// 		act = "w"
@@ -278,11 +277,11 @@ func (p *Player) Render(screen *ebiten.Image) {
 	p.OpS.GeoM.Rotate(-0.45)
 	p.OpS.GeoM.Scale(1, 0.5)
 	p.OpS.ColorM.Scale(0, 0, 0, 1)
-	p.OpS.GeoM.Translate(float64(tools.LAYOUTX/2+x+p.Status.ShadowOffsetX+p.Status.UIOFFSETX), float64(tools.LAYOUTY/2+y+p.Status.ShadowOffsetY))
+	p.OpS.GeoM.Translate(float64(tools.LAYOUTX/2+x+status.Config.ShadowOffsetX+status.Config.UIOFFSETX), float64(tools.LAYOUTY/2+y+status.Config.ShadowOffsetY))
 	screen.DrawImage(imagess, p.OpS)
 	//Draw Player
 	p.Op.GeoM.Reset()
-	p.Op.GeoM.Translate(float64(tools.LAYOUTX/2+OFFSETX+x+p.Status.UIOFFSETX), float64(tools.LAYOUTY/2+OFFSETY+y))
+	p.Op.GeoM.Translate(float64(tools.LAYOUTX/2+OFFSETX+x+status.Config.UIOFFSETX), float64(tools.LAYOUTY/2+OFFSETY+y))
 	p.Op.Filter = ebiten.FilterLinear
 	screen.DrawImage(imagess, p.Op)
 

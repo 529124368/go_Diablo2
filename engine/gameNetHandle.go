@@ -23,7 +23,7 @@ func (g *Game) ListenMessage() {
 
 //新建角色
 func (g *Game) CreatePlayer(x, y float64, name, playerName string) {
-	r := human.NewPlayerAI(x, y, tools.IDLE, 0, status.Config, &asset)
+	r := human.NewPlayerAI(x, y, tools.IDLE, 0, &asset)
 	r.PlayerName = playerName
 	r.LoadImages(name, "/man/warrior/", 2)
 	g.playerAI = append(g.playerAI, r)

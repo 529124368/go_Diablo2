@@ -2,7 +2,6 @@ package baseClass
 
 import (
 	"embed"
-	"game/status"
 	"game/tools"
 
 	"github.com/fzipp/texturepacker"
@@ -11,14 +10,13 @@ import (
 
 //基础类
 type PlayerBase struct {
-	FlagCanAction                        bool                 //是否可以移动标志
-	X                                    float64              //玩家世界坐标X
-	Y                                    float64              //玩家世界坐标Y
-	State                                uint8                //玩家状态
-	Status                               *status.StatusManage //状态
-	Direction                            uint8                //玩家当前方向
-	OldDirection                         uint8                //玩家旧的方向
-	Asset                                *embed.FS            //静态资源获取
+	FlagCanAction                        bool      //是否可以移动标志
+	X                                    float64   //玩家世界坐标X
+	Y                                    float64   //玩家世界坐标Y
+	State                                uint8     //玩家状态
+	Direction                            uint8     //玩家当前方向
+	OldDirection                         uint8     //玩家旧的方向
+	Asset                                *embed.FS //静态资源获取
 	Plist_sheet, Plist_sheet_2           *texturepacker.SpriteSheet
 	Plist_png, Plist_png_2               *ebiten.Image
 	FrameSpeed, FrameNums, Counts, Count int
@@ -44,6 +42,12 @@ func (p *PlayerBase) LoadImages(name, path string, num uint8) {
 		p.Plist_png_2 = ebiten.NewImageFromImage(pln)
 	}
 	p.SetPlayerState(0, 0)
+}
+
+//复用素材
+func (p *PlayerBase) RepeatedImages(s *texturepacker.SpriteSheet, m *ebiten.Image) {
+	p.Plist_png = m
+	p.Plist_sheet = s
 }
 
 //设置玩家状态

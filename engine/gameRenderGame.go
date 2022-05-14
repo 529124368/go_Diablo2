@@ -40,7 +40,7 @@ func (g *Game) ChangeScene(name string) {
 		w.Add(3)
 		//Palyer Init
 		go func() {
-			g.player = human.NewPlayer(5280, 1880, tools.IDLE, 0, 0, 0, &asset, g.mapManage, status.Config, ww)
+			g.player = human.NewPlayer(5280, 1880, tools.IDLE, 0, 0, 0, &asset, g.mapManage, ww)
 			g.player.LoadImages("ba", "/man/warrior/", 2)
 			runtime.GC()
 			w.Done()
