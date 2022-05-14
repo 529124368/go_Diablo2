@@ -49,7 +49,7 @@ func (g *Game) Handle(msg []byte) {
 		for _, v := range g.playerAI {
 			fmt.Println(sm)
 			if v.PlayerName == sm.Data.Man.Name {
-				v.UpdatePlayerNextMovePositonAI(sm.Data.Man.X, sm.Data.Man.Y, uint8(sm.Data.Man.Dir), sm.Data.Man.State)
+				v.UpdatePlayerPositonAI(sm.Data.Man.X, sm.Data.Man.Y, uint8(sm.Data.Man.Dir), sm.Data.Man.State)
 				return
 			}
 		}
@@ -69,16 +69,16 @@ func (g *Game) Handle(msg []byte) {
 		}
 	}
 	//玩家停止移动
-	// if sm.Flag == "@@MoveEnd" {
-	// 	for _, v := range g.playerAI {
-	// 		if v.PlayerName == sm.Data.Man.Name {
-	// 			v.StopPlayerMoveAI()
-	// 			v.X = sm.Data.Man.X
-	// 			v.Y = sm.Data.Man.Y
-	// 			return
-	// 		}
-	// 	}
-	// }
+	if sm.Flag == "@@MoveEnd" {
+		for _, v := range g.playerAI {
+			if v.PlayerName == sm.Data.Man.Name {
+				v.X = sm.Data.Man.X
+				v.Y = sm.Data.Man.Y
+				v.State = tools.IDLE
+				return
+			}
+		}
+	}
 	//除了我还有谁
 	if sm.Flag == "@@HasPlayer" {
 		d := strings.Split(sm.Data.Data, "|")

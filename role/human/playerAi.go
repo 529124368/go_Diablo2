@@ -5,7 +5,6 @@ import (
 	"game/baseClass"
 	"game/status"
 	"game/tools"
-	"math"
 	"strconv"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -42,55 +41,6 @@ func (p *PlayerAI) LoadImages(name, path string, num uint8) {
 	p.imgOffset = tools.GetOffetByAction(name)
 }
 
-//暗黑破坏神 16方位 移动 鼠标控制 AI
-func (p *PlayerAI) GetMouseControllerAI(dir uint8) {
-	if p.FlagCanAction {
-		//判断是否走路
-		if p.speed == tools.SPEED_RUN {
-			p.SetPlayerState(tools.RUN, dir)
-		} else {
-			p.SetPlayerState(tools.Walk, dir)
-		}
-		//移动判断
-		moveX, moveY := tools.CalculateSpeed(dir, p.speed)
-		p.Y += moveY
-		p.X += moveX
-	}
-}
-
-//控制AI玩家移动
-func (p *PlayerAI) PlayerMoveAI() {
-	if p.NewDir == 5 || p.NewDir == 6 || p.NewDir == 7 || p.NewDir == 4 {
-		if p.NewpositonX != 0 && p.NewpositonY != 0 && (math.Abs(p.X-p.NewpositonX) > 1 || math.Abs(p.Y-p.NewpositonY) > 1) {
-			p.FlagCanAction = true
-			//直接切换方向
-			p.GetMouseControllerAI(p.NewDir)
-		} else {
-			p.FlagCanAction = false
-			p.State = tools.IDLE
-			p.NewpositonX = 0
-			p.NewpositonY = 0
-		}
-	} else {
-		if p.NewpositonX != 0 && p.NewpositonY != 0 && (math.Abs(p.X-p.NewpositonX) > 1 && math.Abs(p.Y-p.NewpositonY) > 1) {
-			p.FlagCanAction = true
-			//直接切换方向
-			p.GetMouseControllerAI(p.NewDir)
-		} else {
-			p.FlagCanAction = false
-			p.State = tools.IDLE
-			p.NewpositonX = 0
-			p.NewpositonY = 0
-		}
-	}
-}
-
-//停止AI玩家移动
-func (p *PlayerAI) StopPlayerMoveAI() {
-	p.NewpositonX = 0
-	p.NewpositonY = 0
-}
-
 //控制AI玩家新位置的预算
 func (p *PlayerAI) UpdatePlayerNextMovePositonAI(NewpositonX, NewpositonY float64, dir uint8, types string) {
 	p.NewDir = dir
@@ -104,9 +54,21 @@ func (p *PlayerAI) UpdatePlayerNextMovePositonAI(NewpositonX, NewpositonY float6
 	}
 }
 
+//控制AI玩家新位置的预算
+func (p *PlayerAI) UpdatePlayerPositonAI(NewpositonX, NewpositonY float64, dir uint8, types string) {
+	p.Direction = dir
+	p.X = NewpositonX
+	p.Y = NewpositonY
+	//根据状态切换速度
+	if types == "r" {
+		p.State = tools.RUN
+	} else if types == "w" {
+		p.State = tools.Walk
+	}
+}
+
 //渲染角色
 func (p *PlayerAI) Render(screen *ebiten.Image) {
-	p.PlayerMoveAI()
 	//改变帧数
 	p.ChangeFrame()
 	//渲染角色

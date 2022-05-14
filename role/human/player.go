@@ -2,7 +2,6 @@ package human
 
 import (
 	"embed"
-	"fmt"
 	"game/baseClass"
 	"game/controller"
 	"game/engine/ws"
@@ -82,6 +81,24 @@ func (p *Player) GetMouseController(dir uint8) {
 			p.Status.CamerOffsetY += -moveY
 			p.Y += moveY
 			p.X += moveX
+			//网络
+			if p.Status.IsNetPlay {
+				//网络
+				act := ""
+				if !p.Status.IsWalk {
+					act = "r"
+				} else {
+					act = "w"
+				}
+				ps := &pb.Player{
+					Name:  p.PlayerName,
+					X:     p.X,
+					Y:     p.Y,
+					Dir:   uint32(p.NewDir),
+					State: act,
+				}
+				p.WsCon.SendMessage(true, "@@Move", "", "", ps)
+			}
 		} else {
 			p.NewpositonX = 0
 			p.NewpositonY = 0
@@ -179,24 +196,23 @@ func (p *Player) PlayerNextMovePositon(mouseX, mouseY int, dir uint8) {
 	p.NewDir = dir
 	p.NewpositonX = p.X + float64(mouseX) - 395
 	p.NewpositonY = p.Y + float64(mouseY) - 240
-	if p.Status.IsNetPlay {
-		//网络
-		act := ""
-		if !p.Status.IsWalk {
-			act = "r"
-		} else {
-			act = "w"
-		}
-		ps := &pb.Player{
-			Name:  p.PlayerName,
-			X:     p.NewpositonX,
-			Y:     p.NewpositonY,
-			Dir:   uint32(p.NewDir),
-			State: act,
-		}
-		fmt.Println("大包消息", ps)
-		p.WsCon.SendMessage(true, "@@Move", "", "", ps)
-	}
+	// if p.Status.IsNetPlay {
+	// 	//网络
+	// 	act := ""
+	// 	if !p.Status.IsWalk {
+	// 		act = "r"
+	// 	} else {
+	// 		act = "w"
+	// 	}
+	// 	ps := &pb.Player{
+	// 		Name:  p.PlayerName,
+	// 		X:     p.NewpositonX,
+	// 		Y:     p.NewpositonY,
+	// 		Dir:   uint32(p.NewDir),
+	// 		State: act,
+	// 	}
+	// 	p.WsCon.SendMessage(true, "@@Move", "", "", ps)
+	// }
 }
 
 //渲染角色
