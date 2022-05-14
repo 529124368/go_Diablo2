@@ -2,9 +2,11 @@ package human
 
 import (
 	"embed"
+	"fmt"
 	"game/baseClass"
 	"game/controller"
 	"game/engine/ws"
+	"game/engine/ws/pb"
 	"game/interfaces"
 	"game/status"
 	"game/tools"
@@ -129,7 +131,12 @@ func (p *Player) PlayerMove() {
 		p.Status.IsRun = false
 		//网络
 		if p.Status.IsNetPlay {
-			p.WsCon.SendMessage("@@MoveEnd|" + p.PlayerName + "|" + strconv.FormatFloat(p.X, 'f', 0, 64) + "|" + strconv.FormatFloat(p.Y, 'f', 0, 64))
+			ps := &pb.Player{
+				Name: p.PlayerName,
+				X:    p.X,
+				Y:    p.Y,
+			}
+			p.WsCon.SendMessage(true, "@@MoveEnd", "", "", ps)
 		}
 	}
 }
@@ -180,7 +187,15 @@ func (p *Player) PlayerNextMovePositon(mouseX, mouseY int, dir uint8) {
 		} else {
 			act = "w"
 		}
-		p.WsCon.SendMessage("@@Move|" + p.PlayerName + "|" + strconv.FormatFloat(p.NewpositonX, 'f', 0, 64) + "|" + strconv.FormatFloat(p.NewpositonY, 'f', 0, 64) + "|" + strconv.Itoa(int(p.NewDir)) + "|" + act)
+		ps := &pb.Player{
+			Name:  p.PlayerName,
+			X:     p.NewpositonX,
+			Y:     p.NewpositonY,
+			Dir:   uint32(p.NewDir),
+			State: act,
+		}
+		fmt.Println("大包消息", ps)
+		p.WsCon.SendMessage(true, "@@Move", "", "", ps)
 	}
 }
 

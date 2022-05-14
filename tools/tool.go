@@ -325,15 +325,19 @@ func Unpack(msg []byte) *pb.Message {
 }
 
 //消息打包
-func Pack(msg string) []byte {
+func Pack(s bool, f, datas, msg string, p *pb.Player) []byte {
 	m := &pb.Message{
-		Status: true,
-		Data:   msg,
-		Mes:    "",
+		Flag: f,
+		Data: &pb.Datas{
+			Status: s,
+			Data:   datas,
+			Mes:    msg,
+			Man:    p,
+		},
 	}
 	d, err := proto.Marshal(m)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("has error###", err)
 	}
 	return d
 }
