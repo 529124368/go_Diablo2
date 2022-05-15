@@ -44,6 +44,11 @@ func (g *Game) DeletePlayer(id int) {
 func (g *Game) Handle(msg []byte) {
 	//解包
 	sm := tools.Unpack(msg)
+	defer func() {
+		//回收
+		sm.Reset()
+		tools.PmPool.Put(sm)
+	}()
 	//角色移动
 	if sm.Flag == "@@Move" {
 		for _, v := range g.playerAI {

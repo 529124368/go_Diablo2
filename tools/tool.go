@@ -10,6 +10,7 @@ import (
 	"log"
 	"math"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/fzipp/texturepacker"
@@ -309,9 +310,18 @@ func GetOffetByAction(name string) [4]OffsetXY {
 	return box
 }
 
+//消息对象复用
+var PmPool = sync.Pool{
+	New: func() interface{} { return new(pb.Message) },
+}
+
+var dataPool = sync.Pool{
+	New: func() interface{} { return new(pb.Datas) },
+}
+
 //解包
 func Unpack(msg []byte) *pb.Message {
-	m := &pb.Message{}
+	m := PmPool.Get().(*pb.Message)
 	err := proto.Unmarshal(msg, m)
 	if err != nil {
 		fmt.Println(err)
@@ -321,16 +331,20 @@ func Unpack(msg []byte) *pb.Message {
 
 //消息打包
 func Pack(s bool, f, datas, msg string, p *pb.Player) []byte {
-	m := &pb.Message{
-		Flag: f,
-		Data: &pb.Datas{
-			Status: s,
-			Data:   datas,
-			Mes:    msg,
-			Man:    p,
-		},
-	}
+	m := PmPool.Get().(*pb.Message)
+	pp := dataPool.Get().(*pb.Datas)
+	m.Flag = f
+	pp.Status = s
+	pp.Data = datas
+	pp.Mes = msg
+	pp.Man = p
+	m.Data = pp
 	d, err := proto.Marshal(m)
+	//放回对象池
+	m.Reset()
+	pp.Reset()
+	dataPool.Put(pp)
+	PmPool.Put(m)
 	if err != nil {
 		fmt.Println("has error###", err)
 	}
