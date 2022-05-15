@@ -65,19 +65,40 @@ func NewE1(images *embed.FS, b *storage.Bag) *TownE1 {
 func (t *TownE1) LoadAnm() {
 	//#######################加载静态物品
 	t.LoadXyList()
+	//写入缓存
+	var pa strings.Builder
 	for i := 0; i < 20; i++ {
-		o, _ := t.Image.ReadFile(tools.ObjectPath + "/fire/frame_" + strconv.Itoa(i) + ".png")
+		pa.Reset()
+		pa.WriteString(tools.ObjectPath)
+		pa.WriteString("/fire/frame_")
+		pa.WriteString(strconv.Itoa(i))
+		pa.WriteString(".png")
+		o, _ := t.Image.ReadFile(pa.String())
 		t.anmiList = append(t.anmiList, tools.GetEbitenImage(o))
-		o, _ = t.Image.ReadFile(tools.ObjectPath + "/huodui/frame_" + strconv.Itoa(i) + ".png")
+		pa.Reset()
+		pa.WriteString(tools.ObjectPath)
+		pa.WriteString("/huodui/frame_")
+		pa.WriteString(strconv.Itoa(i))
+		pa.WriteString(".png")
+		o, _ = t.Image.ReadFile(pa.String())
 		t.huodui = append(t.huodui, tools.GetEbitenImage(o))
 	}
 	for i := 0; i < 15; i++ {
-		o, _ := t.Image.ReadFile(tools.ObjectPath + "/waypoint/frame_" + strconv.Itoa(i) + ".png")
+		pa.Reset()
+		pa.WriteString(tools.ObjectPath)
+		pa.WriteString("/waypoint/frame_")
+		pa.WriteString(strconv.Itoa(i))
+		pa.WriteString(".png")
+		o, _ := t.Image.ReadFile(pa.String())
 		t.wayList = append(t.wayList, tools.GetEbitenImage(o))
 
 	}
 	for i := 0; i < 17; i++ {
-		o, _ := t.Image.ReadFile("resource/itemsdrop/box_" + strconv.Itoa(i) + ".png")
+		pa.Reset()
+		pa.WriteString("resource/itemsdrop/box_")
+		pa.WriteString(strconv.Itoa(i))
+		pa.WriteString(".png")
+		o, _ := t.Image.ReadFile(pa.String())
 		t.dropAnm = append(t.dropAnm, tools.GetEbitenImage(o))
 	}
 	//########################加载NPC
@@ -101,7 +122,7 @@ func (t *TownE1) LoadAnm() {
 	//设置NPC PS
 	t.NPCAI[2] = npc.NewPlayerAI(4823, 1691, 0, 4, t.Image)
 	t.NPCAI[2].LoadImages("RC", "/NPC/", 1)
-	aiPath = make([]npc.AIEndPoint, 2)
+	aiPath = make([]npc.AIEndPoint, 4)
 	aiPath = append(aiPath, npc.AIEndPoint{X: 4823, Y: 1855, Dir: 4})
 	aiPath = append(aiPath, npc.AIEndPoint{X: 4918, Y: 1759, Dir: 2})
 	aiPath = append(aiPath, npc.AIEndPoint{X: 4823, Y: 1855, Dir: 0})
@@ -111,7 +132,7 @@ func (t *TownE1) LoadAnm() {
 	//设置NPC GH
 	t.NPCAI[3] = npc.NewPlayerAI(3230, 1905, 0, 3, t.Image)
 	t.NPCAI[3].LoadImages("GH", "/NPC/", 1)
-	aiPath = make([]npc.AIEndPoint, 2)
+	aiPath = make([]npc.AIEndPoint, 4)
 	aiPath = append(aiPath, npc.AIEndPoint{X: 3482, Y: 1905, Dir: 7})
 	aiPath = append(aiPath, npc.AIEndPoint{X: 3354, Y: 2005, Dir: 0})
 	aiPath = append(aiPath, npc.AIEndPoint{X: 3482, Y: 1905, Dir: 2})
@@ -298,31 +319,54 @@ func (t *TownE1) InsertOnLoadItesm(name string, x, y float64) {
 
 //加载地图图片
 func (t *TownE1) LoadMap() {
+	//写入缓存
+	var pa strings.Builder
 	//加载动态地图
 	//加载调色板
-	r, _ := t.Image.ReadFile(tools.ObjectPath + "/mapSucai/pal.dat")
+	pa.WriteString(tools.ObjectPath)
+	pa.WriteString("/mapSucai/pal.dat")
+	r, _ := t.Image.ReadFile(pa.String())
 	ww, _ := dat.Load(r)
 	//加载地块dt1素材
-	re, _ := t.Image.ReadFile(tools.ObjectPath + "/mapSucai/floor.dt1")
+	pa.Reset()
+	pa.WriteString(tools.ObjectPath)
+	pa.WriteString("/mapSucai/floor.dt1")
+	re, _ := t.Image.ReadFile(pa.String())
 	ss, _ := dt1.LoadDT1(re)
-	re, _ = t.Image.ReadFile(tools.ObjectPath + "/mapSucai/objects.dt1")
+	pa.Reset()
+	pa.WriteString(tools.ObjectPath)
+	pa.WriteString("/mapSucai/objects.dt1")
+	re, _ = t.Image.ReadFile(pa.String())
 	ss1, _ := dt1.LoadDT1(re)
-
-	re, _ = t.Image.ReadFile(tools.ObjectPath + "/mapSucai/outdoor/objects.dt1")
+	pa.Reset()
+	pa.WriteString(tools.ObjectPath)
+	pa.WriteString("/mapSucai/outdoor/objects.dt1")
+	re, _ = t.Image.ReadFile(pa.String())
 	ss2, _ := dt1.LoadDT1(re)
-	re, _ = t.Image.ReadFile(tools.ObjectPath + "/mapSucai/outdoor/treegroups.dt1")
+	pa.Reset()
+	pa.WriteString(tools.ObjectPath)
+	pa.WriteString("/mapSucai/outdoor/treegroups.dt1")
+	re, _ = t.Image.ReadFile(pa.String())
 	ss3, _ := dt1.LoadDT1(re)
-
-	re, _ = t.Image.ReadFile(tools.ObjectPath + "/mapSucai/fence.dt1")
+	pa.Reset()
+	pa.WriteString(tools.ObjectPath)
+	pa.WriteString("/mapSucai/fence.dt1")
+	re, _ = t.Image.ReadFile(pa.String())
 	ss4, _ := dt1.LoadDT1(re)
-
-	re, _ = t.Image.ReadFile(tools.ObjectPath + "/mapSucai/outdoor/bridge.dt1")
+	pa.Reset()
+	pa.WriteString(tools.ObjectPath)
+	pa.WriteString("/mapSucai/outdoor/bridge.dt1")
+	re, _ = t.Image.ReadFile(pa.String())
 	ss5, _ := dt1.LoadDT1(re)
-
-	re, _ = t.Image.ReadFile(tools.ObjectPath + "/mapSucai/outdoor/stonewall.dt1")
+	pa.Reset()
+	pa.WriteString(tools.ObjectPath)
+	pa.WriteString("/mapSucai/outdoor/stonewall.dt1")
+	re, _ = t.Image.ReadFile(pa.String())
 	ss6, _ := dt1.LoadDT1(re)
-
-	re, _ = t.Image.ReadFile(tools.ObjectPath + "/mapSucai/outdoor/river.dt1")
+	pa.Reset()
+	pa.WriteString(tools.ObjectPath)
+	pa.WriteString("/mapSucai/outdoor/river.dt1")
+	re, _ = t.Image.ReadFile(pa.String())
 	ss7, err := dt1.LoadDT1(re)
 
 	ss2.Tiles = append(ss2.Tiles, ss1.Tiles...)
@@ -337,7 +381,10 @@ func (t *TownE1) LoadMap() {
 		fmt.Println(err)
 	}
 	//读取DS1文件
-	dd, _ := t.Image.ReadFile(tools.ObjectPath + "/mapSucai/townE1.ds1")
+	pa.Reset()
+	pa.WriteString(tools.ObjectPath)
+	pa.WriteString("/mapSucai/townE1.ds1")
+	dd, _ := t.Image.ReadFile(pa.String())
 	d, _ := ds1.Unmarshal(dd)
 
 	//存储数据

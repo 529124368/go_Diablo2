@@ -7,6 +7,7 @@ import (
 	"game/tools"
 	"math"
 	"strconv"
+	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -74,19 +75,22 @@ func (p *MonsterAI) Render(screen *ebiten.Image) {
 	p.PlayerMoveAI()
 	p.ChangeFrame()
 	p.PlayerBase.Render()
-	//
-	var name string
+	//写入缓存
+	var name strings.Builder
 	block := 1
+	name.WriteString(strconv.Itoa(int(p.Direction)))
 	switch p.State {
 	case tools.IDLE:
-		name = strconv.Itoa(int(p.Direction)) + "_stand_" + strconv.Itoa(p.Counts)
+		name.WriteString("_stand_")
+
 	case tools.Walk:
 		if p.Counts >= 8 {
 			p.Counts = 0
 		}
-		name = strconv.Itoa(int(p.Direction)) + "_walk_" + strconv.Itoa(p.Counts)
+		name.WriteString("_walk_")
 	}
-	imagess, x, y := p.GetAnimator("man", name, uint8(block))
+	name.WriteString(strconv.Itoa(p.Counts))
+	imagess, x, y := p.GetAnimator("man", name.String(), uint8(block))
 	//Draw Shadow
 	p.OpS.GeoM.Reset()
 	p.OpS.Filter = ebiten.FilterLinear

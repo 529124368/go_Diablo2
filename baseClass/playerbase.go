@@ -3,6 +3,7 @@ package baseClass
 import (
 	"embed"
 	"game/tools"
+	"strings"
 
 	"github.com/fzipp/texturepacker"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -27,16 +28,37 @@ type PlayerBase struct {
 
 //加載素材
 func (p *PlayerBase) LoadImages(name, path string, num uint8) {
+	//写入缓存
+	var st strings.Builder
+	st.WriteString("resource")
+	st.WriteString(path)
+	st.WriteString(name)
+	st.WriteString(".png")
 	//加载玩家素材第一部分
-	plist, _ := p.Asset.ReadFile("resource" + path + name + ".png")
-	plist_json, _ := p.Asset.ReadFile("resource" + path + name + ".json")
+	plist, _ := p.Asset.ReadFile(st.String())
+	st.Reset()
+	st.WriteString("resource")
+	st.WriteString(path)
+	st.WriteString(name)
+	st.WriteString(".json")
+	plist_json, _ := p.Asset.ReadFile(st.String())
 	pli, pln := tools.GetImageFromPlistPaletted(plist, plist_json)
 	p.Plist_sheet = pli
 	p.Plist_png = ebiten.NewImageFromImage(pln)
 	if num == 2 {
 		//加载玩家素材第二部分
-		plist, _ = p.Asset.ReadFile("resource" + path + name + "_act.png")
-		plist_json, _ = p.Asset.ReadFile("resource" + path + name + "_act.json")
+		st.Reset()
+		st.WriteString("resource")
+		st.WriteString(path)
+		st.WriteString(name)
+		st.WriteString("_act.png")
+		plist, _ = p.Asset.ReadFile(st.String())
+		st.Reset()
+		st.WriteString("resource")
+		st.WriteString(path)
+		st.WriteString(name)
+		st.WriteString("_act.json")
+		plist_json, _ = p.Asset.ReadFile(st.String())
 		pli, pln = tools.GetImageFromPlistPaletted(plist, plist_json)
 		p.Plist_sheet_2 = pli
 		p.Plist_png_2 = ebiten.NewImageFromImage(pln)

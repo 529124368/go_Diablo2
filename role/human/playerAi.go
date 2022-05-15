@@ -6,6 +6,7 @@ import (
 	"game/status"
 	"game/tools"
 	"strconv"
+	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -58,34 +59,37 @@ func (p *PlayerAI) Render(screen *ebiten.Image) {
 	p.ChangeFrame()
 	//渲染角色
 	p.PlayerBase.Render()
-	var name string
+	//写入缓存
+	var name strings.Builder
 	block := 1
 	//nameSkill := ""
+	name.WriteString(strconv.Itoa(int(p.Direction)))
 	switch p.State {
 	case tools.ATTACK:
-		name = strconv.Itoa(int(p.Direction)) + "_attack_" + strconv.Itoa(p.Counts)
+		name.WriteString("_attack_")
 	case tools.SkILL:
 		block = 2
 		if p.Counts >= 14 {
 			p.Counts = 0
 		}
-		name = strconv.Itoa(int(p.Direction)) + "_skill_" + strconv.Itoa(p.Counts)
+		name.WriteString("_skill_")
 	case tools.IDLE:
-		name = strconv.Itoa(int(p.Direction)) + "_stand_" + strconv.Itoa(p.Counts)
+		name.WriteString("_stand_")
 	case tools.Walk:
 		if p.Counts >= 8 {
 			p.Counts = 0
 		}
-		name = strconv.Itoa(int(p.Direction)) + "_run_" + strconv.Itoa(p.Counts)
+		name.WriteString("_run_")
 	case tools.RUN:
 		block = 2
 		if p.Counts >= 8 {
 			p.Counts = 0
 		}
-		name = strconv.Itoa(int(p.Direction)) + "_run2_" + strconv.Itoa(p.Counts)
+		name.WriteString("_run2_")
 	}
+	name.WriteString(strconv.Itoa(p.Counts))
 
-	imagess, x, y := p.GetAnimator("man", name, uint8(block))
+	imagess, x, y := p.GetAnimator("man", name.String(), uint8(block))
 	//Idel -> Walk Offset
 	if p.State == tools.Walk {
 		x += p.imgOffset[0].X

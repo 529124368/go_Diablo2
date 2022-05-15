@@ -48,7 +48,7 @@ func NewStatusManage() *StatusManage {
 		MapZoom:           8,
 		CurrentGameScence: 1,
 		Queue:             make(chan []byte),
-		//IsNetPlay:         true,
+		IsNetPlay:         true,
 	}
 	return n
 }
