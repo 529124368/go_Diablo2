@@ -75,9 +75,9 @@ func (p *PlayerBase) RepeatedImages(s *texturepacker.SpriteSheet, m *ebiten.Imag
 //设置玩家状态
 func (p *PlayerBase) SetPlayerState(s, d uint8) {
 	p.State = s
-	if p.FlagCanAction {
-		p.Direction = d
-	}
+
+	p.Direction = d
+
 }
 
 //更新旧的方向

@@ -3,7 +3,6 @@ package human
 import (
 	"embed"
 	"game/baseClass"
-	"game/controller"
 	"game/engine/ws"
 	"game/engine/ws/pb"
 	"game/interfaces"
@@ -126,6 +125,11 @@ func (p *Player) CanWalk(xS, yS float64, dir uint8) bool {
 
 //本机玩家移动
 func (p *Player) PlayerMove() {
+	//判断人物方位
+	if p.OldDirection != p.Direction {
+		//切换方向
+		p.ChangeDir()
+	}
 	if p.NewDir == 5 || p.NewDir == 6 || p.NewDir == 7 || p.NewDir == 4 {
 		if p.NewpositonX != 0 && p.NewpositonY != 0 && (math.Abs(p.X-p.NewpositonX) > 1 || math.Abs(p.Y-p.NewpositonY) > 1) {
 			p.playerMove()
@@ -161,32 +165,35 @@ func (p *Player) PlayerMove() {
 func (p *Player) playerMove() {
 	status.Config.IsRun = true
 	p.FlagCanAction = true
-	//判断人物方位
-	if p.OldDirection != p.Direction && !controller.MouseRightPress() {
-		if !status.Config.CalculateEnd {
-			p.newPath = tools.CalculateDirPath(p.OldDirection, p.Direction)
-			status.Config.CalculateEnd = true
-		}
-		if len(p.newPath) >= 3 {
-			if p.turnLoOp >= uint8(len(p.newPath)) {
-				p.turnLoOp = uint8(len(p.newPath) - 1)
-				p.NewDir = p.newPath[p.turnLoOp]
-				p.UpdateOldPlayerDir(p.Direction)
-			} else {
-				p.NewDir = p.newPath[p.turnLoOp]
-			}
-			p.turnLoOp++
-			p.SetPlayerState(tools.IDLE, p.NewDir)
-		} else {
-			//直接切换方向
-			status.Config.CalculateEnd = false
-			p.turnLoOp = 0
+	if !status.Config.CalculateEnd {
+		p.GetMouseController(p.NewDir)
+	}
+}
+
+//改变方向
+func (p *Player) ChangeDir() {
+	if !status.Config.CalculateEnd {
+		p.newPath = tools.CalculateDirPath(p.OldDirection, p.Direction)
+		status.Config.CalculateEnd = true
+	}
+	if len(p.newPath) >= 3 {
+		if p.turnLoOp == uint8(len(p.newPath)) {
+			//转变方向完成
+			p.turnLoOp = uint8(len(p.newPath) - 1)
+			p.NewDir = p.newPath[p.turnLoOp]
 			p.UpdateOldPlayerDir(p.NewDir)
-			p.GetMouseController(p.NewDir)
+			p.turnLoOp = 0
+			status.Config.CalculateEnd = false
+		} else {
+			p.NewDir = p.newPath[p.turnLoOp]
 		}
+		p.turnLoOp++
+		p.SetPlayerState(tools.IDLE, p.NewDir)
 	} else {
+		//直接切换方向
 		status.Config.CalculateEnd = false
 		p.turnLoOp = 0
+		p.UpdateOldPlayerDir(p.NewDir)
 		p.GetMouseController(p.NewDir)
 	}
 }
@@ -196,23 +203,6 @@ func (p *Player) PlayerNextMovePositon(mouseX, mouseY int, dir uint8) {
 	p.NewDir = dir
 	p.NewpositonX = p.X + float64(mouseX) - 395
 	p.NewpositonY = p.Y + float64(mouseY) - 240
-	// if status.Config.IsNetPlay {
-	// 	//网络
-	// 	act := ""
-	// 	if !status.Config.IsWalk {
-	// 		act = "r"
-	// 	} else {
-	// 		act = "w"
-	// 	}
-	// 	ps := &pb.Player{
-	// 		Name:  p.PlayerName,
-	// 		X:     p.NewpositonX,
-	// 		Y:     p.NewpositonY,
-	// 		Dir:   uint32(p.NewDir),
-	// 		State: act,
-	// 	}
-	// 	p.WsCon.SendMessage(true, "@@Move", "", "", ps)
-	// }
 }
 
 //渲染角色

@@ -133,10 +133,7 @@ func (g *Game) changeScenceGameUpdate() {
 		if g.player.State != tools.ATTACK {
 			g.player.Counts = 0
 		}
-		g.player.FlagCanAction = false
-		if g.player.Direction != dir || g.player.State != tools.ATTACK {
-			g.player.SetPlayerState(tools.ATTACK, dir)
-		}
+		g.player.SetPlayerState(tools.ATTACK, dir)
 	}
 	//技能
 	if controller.MousePressF1() && !status.Config.IsTakeItem {
@@ -146,10 +143,7 @@ func (g *Game) changeScenceGameUpdate() {
 		if g.player.State != tools.SkILL {
 			g.player.Counts = 0
 		}
-		g.player.FlagCanAction = false
-		if g.player.Direction != dir || g.player.State != tools.SkILL {
-			g.player.SetPlayerState(tools.SkILL, dir)
-		}
+		g.player.SetPlayerState(tools.SkILL, dir)
 	}
 	//主机玩家移动
 	g.player.PlayerMove()
