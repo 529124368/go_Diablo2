@@ -42,14 +42,14 @@ func NewMonsterAI(x, y float64, state, dir uint8, images *embed.FS) *MonsterAI {
 }
 
 //暗黑破坏神 16方位 移动 AI
-func (p *MonsterAI) GetMouseControllerAI(dir uint8) {
+func (p *MonsterAI) GetMouseControllerAI(dir uint8, dx, dy float64) {
 	if p.FlagCanAction {
 		speed := 0.0
 		//判断是否走路
-		speed = 2
+		speed = tools.SPEED
 		p.SetPlayerState(tools.Walk, dir)
 		//移动判断
-		moveX, moveY := tools.CalculateSpeed(dir, speed)
+		moveX, moveY := tools.CalculateSpeed(dir, speed, dx, dy)
 		p.Y += moveY
 		p.X += moveX
 	}
@@ -110,38 +110,22 @@ func (p *MonsterAI) Render(screen *ebiten.Image) {
 func (p *MonsterAI) PlayerMoveAI() {
 	//AI 移动判断
 	p.AIMove()
-	if p.NewDir == 5 || p.NewDir == 6 || p.NewDir == 7 || p.NewDir == 4 {
-		//移动
-		if p.NewpositonX != 0 && p.NewpositonY != 0 && (math.Abs(p.X-p.NewpositonX) > 0 || math.Abs(p.Y-p.NewpositonY) > 0) {
-			p.FlagCanAction = true
-			//直接切换方向
-			p.GetMouseControllerAI(p.NewDir)
-		} else {
-			p.FlagCanAction = false
-			p.State = tools.IDLE
-			if p.NewpositonX != 0 && p.NewpositonY != 0 {
-				p.X = p.NewpositonX
-				p.Y = p.NewpositonY
-			}
-			p.NewpositonX = 0
-			p.NewpositonY = 0
-		}
+	dx := math.Abs(p.X - p.NewpositonX)
+	dy := math.Abs(p.Y - p.NewpositonY)
+	//移动
+	if p.NewpositonX != 0 && p.NewpositonY != 0 && (dx > 0.9 && dy >= 0.9) {
+		p.FlagCanAction = true
+		//直接切换方向
+		p.GetMouseControllerAI(p.NewDir, dx, dy)
 	} else {
-		//移动
-		if p.NewpositonX != 0 && p.NewpositonY != 0 && (math.Abs(p.X-p.NewpositonX) > 0 && math.Abs(p.Y-p.NewpositonY) > 0) {
-			p.FlagCanAction = true
-			//直接切换方向
-			p.GetMouseControllerAI(p.NewDir)
-		} else {
-			p.FlagCanAction = false
-			p.State = tools.IDLE
-			if p.NewpositonX != 0 && p.NewpositonY != 0 {
-				p.X = p.NewpositonX
-				p.Y = p.NewpositonY
-			}
-			p.NewpositonX = 0
-			p.NewpositonY = 0
+		p.FlagCanAction = false
+		p.State = tools.IDLE
+		if p.NewpositonX != 0 && p.NewpositonY != 0 {
+			p.X = p.NewpositonX
+			p.Y = p.NewpositonY
 		}
+		p.NewpositonX = 0
+		p.NewpositonY = 0
 	}
 }
 

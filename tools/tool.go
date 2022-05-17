@@ -5,6 +5,7 @@ import (
 	"container/ring"
 	"fmt"
 	"game/engine/ws/pb"
+	"game/status"
 	"image"
 	_ "image/png"
 	"log"
@@ -24,12 +25,12 @@ const (
 	RUN                 uint8         = 3
 	ATTACK              uint8         = 2
 	SkILL               uint8         = 4
-	SPEED               float64       = 2 //玩家走路移动速度
-	SPEED_RUN           float64       = 3 //玩家跑步移动速度
-	ISHIDDEN            uint8         = 1 //装备栏等隐藏标识
-	ISITEMS             uint8         = 0 //物品和装备标识
-	ISMINICOM           uint8         = 2 //MINI板标识
-	ISNORCOM            uint8         = 3 //无标识 占位用
+	SPEED               float64       = 150 //玩家走路移动速度
+	SPEED_RUN           float64       = 200 //玩家跑步移动速度
+	ISHIDDEN            uint8         = 1   //装备栏等隐藏标识
+	ISITEMS             uint8         = 0   //物品和装备标识
+	ISMINICOM           uint8         = 2   //MINI板标识
+	ISNORCOM            uint8         = 3   //无标识 占位用
 	LAYOUTX             int           = 790
 	LAYOUTY             int           = 480
 	CLOSEBTNSLEEP       time.Duration = 200000000 //按钮按下弹起动画sleep时间
@@ -49,53 +50,77 @@ const (
 //Calculate Direction
 func CaluteDir(x, y, x_tar, y_tar int64) uint8 {
 	len := Distance(x, y, x_tar, y_tar)
-	//TODO  240 is PLAYERCENTERY
-	a := Angle(math.Abs(float64(int64(y_tar)-240)), len)
+	a := Angle(math.Abs(float64(int64(y_tar)-status.Config.PLAYERCENTERY)), len)
 
 	if x < x_tar && y > y_tar {
-		if a > 0 && a <= 30 {
+		if a > 0 && a <= 15 {
+			return 7
+		}
+		if a > 15 && a <= 35 {
 			return 13
 		}
-		if a > 30 && a <= 60 {
+		if a > 35 && a <= 55 {
 			return 2
 		}
-		if a > 60 && a < 90 {
+		if a > 55 && a < 75 {
 			return 12
+		}
+		if a > 75 && a < 90 {
+			return 6
 		}
 	}
 	if x < x_tar && y < y_tar {
-		if a > 0 && a <= 30 {
+		if a > 0 && a <= 15 {
+			return 7
+		}
+		if a > 15 && a <= 35 {
 			return 14
 		}
-		if a > 30 && a <= 60 {
+		if a > 35 && a <= 55 {
 			return 3
 		}
-		if a > 60 && a < 90 {
+		if a > 55 && a < 75 {
 			return 15
+		}
+		if a > 75 && a < 90 {
+			return 4
 		}
 	}
 
 	if x > x_tar && y < y_tar {
-		if a > 0 && a <= 30 {
+		if a > 0 && a <= 15 {
+			return 5
+		}
+		if a > 15 && a <= 35 {
 			return 9
 		}
-		if a > 30 && a <= 60 {
+		if a > 35 && a <= 55 {
 			return 0
 		}
-		if a > 60 && a < 90 {
+		if a > 55 && a < 75 {
 			return 8
+		}
+		if a > 75 && a < 90 {
+			return 4
 		}
 	}
 	if x > x_tar && y > y_tar {
-		if a > 0 && a <= 30 {
+		if a > 0 && a <= 15 {
+			return 5
+		}
+		if a > 15 && a <= 35 {
 			return 10
 		}
-		if a > 30 && a <= 60 {
+		if a > 35 && a <= 55 {
 			return 1
 		}
-		if a > 60 && a < 90 {
+		if a > 55 && a <= 75 {
 			return 11
 		}
+		if a > 75 && a < 90 {
+			return 6
+		}
+
 	}
 
 	if x > x_tar && float64(y) == math.Abs(float64(y_tar)) {
@@ -248,41 +273,26 @@ func GetFloorPositionAt(x, y float64) (int, int) {
 }
 
 //根据方向计算偏移距离
-func CalculateSpeed(dir uint8, speed float64) (float64, float64) {
+func CalculateSpeed(dir uint8, speed, dx, dy float64) (float64, float64) {
 	moveX, moveY := 0.0, 0.0
+	s := math.Sqrt(dx*dx + dy*dy)
 	switch dir {
-	case 0:
-		moveX, moveY = -speed, speed
-	case 1:
-		moveX, moveY = -speed, -speed
-	case 2:
-		moveX, moveY = speed, -speed
-	case 3:
-		moveX, moveY = speed, speed
+	case 0, 8, 9:
+		moveX, moveY = -dx/s*speed/60, dy/s*speed/60
+	case 1, 10, 11:
+		moveX, moveY = -dx/s*speed/60, -dy/s*speed/60
+	case 2, 12, 13:
+		moveX, moveY = dx/s*speed/60, -dy/s*speed/60
+	case 3, 14, 15:
+		moveX, moveY = dx/s*speed/60, dy/s*speed/60
 	case 4:
-		moveX, moveY = 0, speed
+		moveX, moveY = 0, dy/s*speed/60
 	case 5:
-		moveX, moveY = -speed, 0
+		moveX, moveY = -dx/s*speed/60, 0
 	case 6:
-		moveX, moveY = 0, -speed
+		moveX, moveY = 0, -dy/s*speed/60
 	case 7:
-		moveX, moveY = speed, 0
-	case 8:
-		moveX, moveY = 1-speed, speed
-	case 9:
-		moveX, moveY = -speed, speed-1
-	case 10:
-		moveX, moveY = -speed, 1-speed
-	case 11:
-		moveX, moveY = 1-speed, -speed
-	case 12:
-		moveX, moveY = speed-1, -speed
-	case 13:
-		moveX, moveY = speed, 1-speed
-	case 14:
-		moveX, moveY = speed, speed-1
-	case 15:
-		moveX, moveY = speed-1, speed
+		moveX, moveY = dx/s*speed/60, 0
 	}
 	return moveX, moveY
 }

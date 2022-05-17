@@ -61,7 +61,7 @@ func (p *Player) LoadImages(name, path string, num uint8) {
 }
 
 //暗黑破坏神 16方位 移动 鼠标控制
-func (p *Player) GetMouseController(dir uint8) {
+func (p *Player) GetMouseController(dir uint8, dx, dy float64) {
 	if p.FlagCanAction {
 		speed := 0.0
 		//判断是否走路
@@ -74,7 +74,7 @@ func (p *Player) GetMouseController(dir uint8) {
 			p.SetPlayerState(tools.RUN, dir)
 		}
 		//移动判断
-		moveX, moveY := tools.CalculateSpeed(dir, speed)
+		moveX, moveY := tools.CalculateSpeed(dir, speed, dx, dy)
 		if p.CanWalk(moveX, moveY, dir) {
 			status.Config.CamerOffsetX += -moveX
 			status.Config.CamerOffsetY += -moveY
@@ -130,23 +130,26 @@ func (p *Player) PlayerMove() {
 		//切换方向
 		p.ChangeDir()
 	}
+	dx := math.Abs(p.X - p.NewpositonX)
+	dy := math.Abs(p.Y - p.NewpositonY)
 	if p.NewDir == 5 || p.NewDir == 6 || p.NewDir == 7 || p.NewDir == 4 {
-		if p.NewpositonX != 0 && p.NewpositonY != 0 && (math.Abs(p.X-p.NewpositonX) > 1 || math.Abs(p.Y-p.NewpositonY) > 1) {
-			p.playerMove()
+		if p.NewpositonX != 0 && p.NewpositonY != 0 && (dx > 2 || dy > 2) {
+			p.playerMove(dx, dy)
 		} else {
 			p.FlagCanAction = false
 			p.NewpositonX = 0
 			p.NewpositonY = 0
 		}
 	} else {
-		if p.NewpositonX != 0 && p.NewpositonY != 0 && (math.Abs(p.X-p.NewpositonX) > 1 && math.Abs(p.Y-p.NewpositonY) > 1) {
-			p.playerMove()
+		if p.NewpositonX != 0 && p.NewpositonY != 0 && (dx > 2 && dy >= 2) {
+			p.playerMove(dx, dy)
 		} else {
 			p.FlagCanAction = false
 			p.NewpositonX = 0
 			p.NewpositonY = 0
 		}
 	}
+
 	//玩家停止
 	if p.State == tools.IDLE && status.Config.IsRun {
 		status.Config.IsRun = false
@@ -162,11 +165,11 @@ func (p *Player) PlayerMove() {
 	}
 }
 
-func (p *Player) playerMove() {
+func (p *Player) playerMove(dx, dy float64) {
 	status.Config.IsRun = true
 	p.FlagCanAction = true
 	if !status.Config.CalculateEnd {
-		p.GetMouseController(p.NewDir)
+		p.GetMouseController(p.NewDir, dx, dy)
 	}
 }
 
@@ -181,7 +184,8 @@ func (p *Player) ChangeDir() {
 			//转变方向完成
 			p.turnLoOp = uint8(len(p.newPath) - 1)
 			p.NewDir = p.newPath[p.turnLoOp]
-			p.UpdateOldPlayerDir(p.NewDir)
+			//更新旧的方向
+			p.OldDirection = p.NewDir
 			p.turnLoOp = 0
 			status.Config.CalculateEnd = false
 		} else {
@@ -193,16 +197,25 @@ func (p *Player) ChangeDir() {
 		//直接切换方向
 		status.Config.CalculateEnd = false
 		p.turnLoOp = 0
-		p.UpdateOldPlayerDir(p.NewDir)
-		p.GetMouseController(p.NewDir)
+		//更新旧的方向
+		p.OldDirection = p.Direction
 	}
 }
 
 //玩家到新位置的预算
 func (p *Player) PlayerNextMovePositon(mouseX, mouseY int, dir uint8) {
 	p.NewDir = dir
-	p.NewpositonX = p.X + float64(mouseX) - 395
-	p.NewpositonY = p.Y + float64(mouseY) - 240
+	switch p.NewDir {
+	case 5, 7:
+		p.NewpositonX = p.X + float64(mouseX) - float64(status.Config.PLAYERCENTERX)
+		p.NewpositonY = p.Y
+	case 4, 6:
+		p.NewpositonX = p.X
+		p.NewpositonY = p.Y + float64(mouseY) - float64(status.Config.PLAYERCENTERY)
+	default:
+		p.NewpositonX = p.X + float64(mouseX) - float64(status.Config.PLAYERCENTERX)
+		p.NewpositonY = p.Y + float64(mouseY) - float64(status.Config.PLAYERCENTERY)
+	}
 }
 
 //渲染角色
