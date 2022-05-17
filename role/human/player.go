@@ -61,7 +61,7 @@ func (p *Player) LoadImages(name, path string, num uint8) {
 }
 
 //暗黑破坏神 16方位 移动 鼠标控制
-func (p *Player) GetMouseController(dir uint8, dx, dy float64) {
+func (p *Player) GetMouseController(dir uint8, dx, dy, dis float64) {
 	if p.FlagCanAction {
 		speed := 0.0
 		//判断是否走路
@@ -74,7 +74,7 @@ func (p *Player) GetMouseController(dir uint8, dx, dy float64) {
 			p.SetPlayerState(tools.RUN, dir)
 		}
 		//移动判断
-		moveX, moveY := tools.CalculateSpeed(dir, speed, dx, dy)
+		moveX, moveY := tools.CalculateSpeed(dir, speed, dx, dy, dis)
 		if p.CanWalk(moveX, moveY, dir) {
 			status.Config.CamerOffsetX += -moveX
 			status.Config.CamerOffsetY += -moveY
@@ -132,22 +132,13 @@ func (p *Player) PlayerMove() {
 	}
 	dx := math.Abs(p.X - p.NewpositonX)
 	dy := math.Abs(p.Y - p.NewpositonY)
-	if p.NewDir == 5 || p.NewDir == 6 || p.NewDir == 7 || p.NewDir == 4 {
-		if p.NewpositonX != 0 && p.NewpositonY != 0 && (dx > 2 || dy > 2) {
-			p.playerMove(dx, dy)
-		} else {
-			p.FlagCanAction = false
-			p.NewpositonX = 0
-			p.NewpositonY = 0
-		}
+	dis := math.Sqrt(dx*dx + dy*dy)
+	if p.NewpositonX != 0 && p.NewpositonY != 0 && dis > 2 {
+		p.playerMove(dx, dy, dis)
 	} else {
-		if p.NewpositonX != 0 && p.NewpositonY != 0 && (dx > 2 && dy >= 2) {
-			p.playerMove(dx, dy)
-		} else {
-			p.FlagCanAction = false
-			p.NewpositonX = 0
-			p.NewpositonY = 0
-		}
+		p.FlagCanAction = false
+		p.NewpositonX = 0
+		p.NewpositonY = 0
 	}
 
 	//玩家停止
@@ -165,11 +156,11 @@ func (p *Player) PlayerMove() {
 	}
 }
 
-func (p *Player) playerMove(dx, dy float64) {
+func (p *Player) playerMove(dx, dy, dis float64) {
 	status.Config.IsRun = true
 	p.FlagCanAction = true
 	if !status.Config.CalculateEnd {
-		p.GetMouseController(p.NewDir, dx, dy)
+		p.GetMouseController(p.NewDir, dx, dy, dis)
 	}
 }
 

@@ -106,9 +106,9 @@ func (t *TownE1) LoadAnm() {
 	t.NPCAI[0] = npc.NewPlayerAI(4580, 2041, 0, 0, t.Image)
 	t.NPCAI[0].LoadImages("DC", "/NPC/", 1)
 	aiPath := make([]npc.AIEndPoint, 3)
-	aiPath = append(aiPath, npc.AIEndPoint{X: 4674, Y: 1947, Dir: 2})
-	aiPath = append(aiPath, npc.AIEndPoint{X: 4780, Y: 2053, Dir: 3})
-	aiPath = append(aiPath, npc.AIEndPoint{X: 4580, Y: 2055, Dir: 5})
+	aiPath = append(aiPath, npc.AIEndPoint{X: 4674, Y: 1999, Dir: 2})
+	aiPath = append(aiPath, npc.AIEndPoint{X: 4780, Y: 2041, Dir: 3})
+	aiPath = append(aiPath, npc.AIEndPoint{X: 4580, Y: 2041, Dir: 5})
 	t.NPCAI[0].SetAIPath(aiPath, 100)
 
 	//设置NPC PS
@@ -116,7 +116,7 @@ func (t *TownE1) LoadAnm() {
 	t.NPCAI[1].LoadImages("PS", "/NPC/", 1)
 	aiPath = make([]npc.AIEndPoint, 2)
 	aiPath = append(aiPath, npc.AIEndPoint{X: 6200, Y: 2048, Dir: 7})
-	aiPath = append(aiPath, npc.AIEndPoint{X: 6003, Y: 2050, Dir: 5})
+	aiPath = append(aiPath, npc.AIEndPoint{X: 6003, Y: 2048, Dir: 5})
 	t.NPCAI[1].SetAIPath(aiPath, 100)
 
 	//设置NPC RC
@@ -143,28 +143,28 @@ func (t *TownE1) LoadAnm() {
 	t.MonsterAI[0] = monster.NewMonsterAI(5138, 2052, 0, 4, t.Image)
 	t.MonsterAI[0].LoadImages("FC", "/monster/", 1)
 	aiMPath := make([]monster.AIEndPoint, 2)
-	aiMPath = append(aiMPath, monster.AIEndPoint{X: 5288, Y: 2054, Dir: 7})
+	aiMPath = append(aiMPath, monster.AIEndPoint{X: 5288, Y: 2052, Dir: 7})
 	aiMPath = append(aiMPath, monster.AIEndPoint{X: 5138, Y: 2052, Dir: 5})
 	t.MonsterAI[0].SetAIPath(aiMPath, 100)
 
 	t.MonsterAI[1] = monster.NewMonsterAI(5070, 2052, 0, 2, t.Image)
 	t.MonsterAI[1].RepeatedImages(t.MonsterAI[0].Plist_sheet, t.MonsterAI[0].Plist_png)
 	aiMPath = make([]monster.AIEndPoint, 2)
-	aiMPath = append(aiMPath, monster.AIEndPoint{X: 5188, Y: 2055, Dir: 7})
+	aiMPath = append(aiMPath, monster.AIEndPoint{X: 5188, Y: 2052, Dir: 7})
 	aiMPath = append(aiMPath, monster.AIEndPoint{X: 5070, Y: 2052, Dir: 5})
 	t.MonsterAI[1].SetAIPath(aiMPath, 100)
 
 	t.MonsterAI[2] = monster.NewMonsterAI(5088, 2015, 0, 3, t.Image)
 	t.MonsterAI[2].RepeatedImages(t.MonsterAI[0].Plist_sheet, t.MonsterAI[0].Plist_png)
 	aiMPath = make([]monster.AIEndPoint, 2)
-	aiMPath = append(aiMPath, monster.AIEndPoint{X: 5188, Y: 2018, Dir: 7})
-	aiMPath = append(aiMPath, monster.AIEndPoint{X: 5070, Y: 2015, Dir: 5})
+	aiMPath = append(aiMPath, monster.AIEndPoint{X: 5188, Y: 2015, Dir: 7})
+	aiMPath = append(aiMPath, monster.AIEndPoint{X: 5088, Y: 2015, Dir: 5})
 	t.MonsterAI[2].SetAIPath(aiMPath, 100)
 
 	t.MonsterAI[3] = monster.NewMonsterAI(5130, 2015, 0, 4, t.Image)
 	t.MonsterAI[3].RepeatedImages(t.MonsterAI[0].Plist_sheet, t.MonsterAI[0].Plist_png)
 	aiMPath = make([]monster.AIEndPoint, 2)
-	aiMPath = append(aiMPath, monster.AIEndPoint{X: 5198, Y: 2020, Dir: 7})
+	aiMPath = append(aiMPath, monster.AIEndPoint{X: 5198, Y: 2015, Dir: 7})
 	aiMPath = append(aiMPath, monster.AIEndPoint{X: 5130, Y: 2015, Dir: 5})
 	t.MonsterAI[3].SetAIPath(aiMPath, 100)
 }

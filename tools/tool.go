@@ -273,9 +273,8 @@ func GetFloorPositionAt(x, y float64) (int, int) {
 }
 
 //根据方向计算偏移距离
-func CalculateSpeed(dir uint8, speed, dx, dy float64) (float64, float64) {
+func CalculateSpeed(dir uint8, speed, dx, dy, s float64) (float64, float64) {
 	moveX, moveY := 0.0, 0.0
-	s := math.Sqrt(dx*dx + dy*dy)
 	switch dir {
 	case 0, 8, 9:
 		moveX, moveY = -dx/s*speed/60, dy/s*speed/60

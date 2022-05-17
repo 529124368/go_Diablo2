@@ -42,14 +42,14 @@ func NewMonsterAI(x, y float64, state, dir uint8, images *embed.FS) *MonsterAI {
 }
 
 //暗黑破坏神 16方位 移动 AI
-func (p *MonsterAI) GetMouseControllerAI(dir uint8, dx, dy float64) {
+func (p *MonsterAI) GetMouseControllerAI(dir uint8, dx, dy, std float64) {
 	if p.FlagCanAction {
 		speed := 0.0
 		//判断是否走路
 		speed = tools.SPEED
 		p.SetPlayerState(tools.Walk, dir)
 		//移动判断
-		moveX, moveY := tools.CalculateSpeed(dir, speed, dx, dy)
+		moveX, moveY := tools.CalculateSpeed(dir, speed, dx, dy, std)
 		p.Y += moveY
 		p.X += moveX
 	}
@@ -112,11 +112,12 @@ func (p *MonsterAI) PlayerMoveAI() {
 	p.AIMove()
 	dx := math.Abs(p.X - p.NewpositonX)
 	dy := math.Abs(p.Y - p.NewpositonY)
+	std := math.Sqrt(dx*dx + dy*dy)
 	//移动
-	if p.NewpositonX != 0 && p.NewpositonY != 0 && (dx > 0.9 && dy >= 0.9) {
+	if p.NewpositonX != 0 && p.NewpositonY != 0 && std > 1 {
 		p.FlagCanAction = true
 		//直接切换方向
-		p.GetMouseControllerAI(p.NewDir, dx, dy)
+		p.GetMouseControllerAI(p.NewDir, dx, dy, std)
 	} else {
 		p.FlagCanAction = false
 		p.State = tools.IDLE
