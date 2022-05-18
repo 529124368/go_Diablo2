@@ -20,11 +20,3 @@ func (b *Block) Format() BlockDataFormat {
 
 	return BlockFormatRLE
 }
-
-func (b *Block) unknown1() []byte {
-	return make([]byte, numUnknownBlockBytes)
-}
-
-func (b *Block) unknown2() []byte {
-	return make([]byte, numUnknownBlockBytes)
-}

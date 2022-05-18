@@ -69,6 +69,9 @@ func (g *Game) ChangeScene(name string) {
 //Draw Game Update
 func (g *Game) changeScenceGameUpdate() {
 	g.count++
+	if g.count >= 100 {
+		g.count = 0
+	}
 	g.countForMap++
 	if !status.Config.MusicIsPlay {
 		//音乐
@@ -146,7 +149,7 @@ func (g *Game) changeScenceGameUpdate() {
 		g.player.SetPlayerState(tools.SkILL, dir)
 	}
 	//主机玩家移动
-	g.player.PlayerMove()
+	g.player.PlayerMove(&g.count)
 	//事件循环监听 是否有按钮点击事件
 	g.ui.EventLoop(mouseX, mouseY)
 }

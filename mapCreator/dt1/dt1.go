@@ -267,18 +267,3 @@ func ImgIndexToRGBA(indexData []byte, palette interfaces.Palette) []byte {
 
 	return colorData
 }
-
-// func Screenshot(s *ebiten.Image) *image.RGBA {
-// 	width, height := s.Size()
-
-// 	bounds := image.Rectangle{Min: image.Point{X: 0, Y: 0}, Max: image.Point{X: width, Y: height}}
-// 	rgba := image.NewRGBA(bounds)
-
-// 	for y := 0; y < height; y++ {
-// 		for x := 0; x < width; x++ {
-// 			rgba.Set(x, y, s.At(x, y))
-// 		}
-// 	}
-
-// 	return rgba
-// }

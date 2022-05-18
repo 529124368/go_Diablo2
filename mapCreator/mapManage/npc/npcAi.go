@@ -46,7 +46,7 @@ func (p *NpcAI) GetMouseControllerAI(dir uint8, dx, dy, std float64) {
 	if p.FlagCanAction {
 		speed := 0.0
 		//判断是否走路
-		speed = 70
+		speed = 50
 		p.SetPlayerState(tools.Walk, dir)
 		//移动判断
 		moveX, moveY := tools.CalculateSpeed(dir, speed, dx, dy, std)

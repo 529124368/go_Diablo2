@@ -61,7 +61,7 @@ func (p *Player) LoadImages(name, path string, num uint8) {
 }
 
 //暗黑破坏神 16方位 移动 鼠标控制
-func (p *Player) GetMouseController(dir uint8, dx, dy, dis float64) {
+func (p *Player) GetMouseController(dir uint8, dx, dy, dis float64, count *int) {
 	if p.FlagCanAction {
 		speed := 0.0
 		//判断是否走路
@@ -76,12 +76,14 @@ func (p *Player) GetMouseController(dir uint8, dx, dy, dis float64) {
 		//移动判断
 		moveX, moveY := tools.CalculateSpeed(dir, speed, dx, dy, dis)
 		if p.CanWalk(moveX, moveY, dir) {
-			status.Config.CamerOffsetX += -moveX
-			status.Config.CamerOffsetY += -moveY
+			//相机偏移
+			status.Config.CamerOffsetX -= moveX
+			status.Config.CamerOffsetY -= moveY
+			//玩家偏移
 			p.Y += moveY
 			p.X += moveX
-			//网络
-			if status.Config.IsNetPlay {
+			//网络  %2 通过加大数字可以降低网服务器发送消息频率
+			if status.Config.IsNetPlay && *count%2 == 0 {
 				//网络
 				act := ""
 				if !status.Config.IsWalk {
@@ -117,14 +119,13 @@ func (p *Player) CanWalk(xS, yS float64, dir uint8) bool {
 	//根据地图判断是否可以走
 	if p.map_c.GetBlock1Aera(x, y) || p.map_c.GetBlock1AeraUpdate(x, y) {
 		return true
-	} else {
-		p.SetPlayerState(tools.IDLE, dir)
-		return false
 	}
+	p.SetPlayerState(tools.IDLE, dir)
+	return false
 }
 
 //本机玩家移动
-func (p *Player) PlayerMove() {
+func (p *Player) PlayerMove(count *int) {
 	//判断人物方位
 	if p.OldDirection != p.Direction {
 		//切换方向
@@ -134,7 +135,7 @@ func (p *Player) PlayerMove() {
 	dy := math.Abs(p.Y - p.NewpositonY)
 	dis := math.Sqrt(dx*dx + dy*dy)
 	if p.NewpositonX != 0 && p.NewpositonY != 0 && dis > 2 {
-		p.playerMove(dx, dy, dis)
+		p.playerMove(dx, dy, dis, count)
 	} else {
 		p.FlagCanAction = false
 		p.NewpositonX = 0
@@ -156,11 +157,11 @@ func (p *Player) PlayerMove() {
 	}
 }
 
-func (p *Player) playerMove(dx, dy, dis float64) {
+func (p *Player) playerMove(dx, dy, dis float64, count *int) {
 	status.Config.IsRun = true
 	p.FlagCanAction = true
 	if !status.Config.CalculateEnd {
-		p.GetMouseController(p.NewDir, dx, dy, dis)
+		p.GetMouseController(p.NewDir, dx, dy, dis, count)
 	}
 }
 

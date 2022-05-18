@@ -416,7 +416,6 @@ func (t *TownE1) LoadMap() {
 			}
 		}
 	}
-
 	//wall
 	t.Img_Wall = make([][]baseClass.ImgWall, h)
 	for i := 0; i < h; i++ {

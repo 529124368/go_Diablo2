@@ -1,7 +1,6 @@
 package engine
 
 import (
-	"fmt"
 	"game/role/human"
 	"game/status"
 	"game/tools"
@@ -52,7 +51,6 @@ func (g *Game) Handle(msg []byte) {
 	//角色移动
 	if sm.Flag == "@@Move" {
 		for _, v := range g.playerAI {
-			fmt.Println(sm)
 			if v.PlayerName == sm.Data.Man.Name {
 				v.UpdatePlayerPositonAI(sm.Data.Man.X, sm.Data.Man.Y, uint8(sm.Data.Man.Dir), sm.Data.Man.State)
 				return

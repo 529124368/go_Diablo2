@@ -268,8 +268,13 @@ func GetFloorPositionAt(x, y float64) (int, int) {
 	M_Minus_N := (x - 3280) / 80
 	M_Plus_N := y / 40
 	xx := math.Floor((M_Minus_N + M_Plus_N) / 2)
-	yy := math.Floor((M_Minus_N+M_Plus_N)/2 - M_Minus_N)
+	yy := math.Floor((M_Plus_N - M_Minus_N) / 2)
 	return int(xx), int(yy)
+}
+
+//根据瓦片坐标计算世界坐标
+func TileToWorld(Tilex, Tiley int) (float64, float64) {
+	return float64(3280 + (Tilex-Tiley)*80), float64((Tilex + Tiley) * 40)
 }
 
 //根据方向计算偏移距离
