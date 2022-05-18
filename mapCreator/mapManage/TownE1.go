@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"game/baseClass"
+	"game/fonts"
+	"game/layout"
 	"game/mapCreator/dat"
 	"game/mapCreator/ds1"
 	"game/mapCreator/dt1"
@@ -14,6 +16,7 @@ import (
 	"game/status"
 	"game/storage"
 	"game/tools"
+	"image/color"
 	"strconv"
 	"strings"
 
@@ -33,6 +36,9 @@ type dropItem struct {
 	name string
 	pos  postion
 }
+
+var dropImgCont *ebiten.Image
+
 type TownE1 struct {
 	baseClass.MapBase                 //继承
 	anmiList          []*ebiten.Image //火把动画图集
@@ -47,16 +53,20 @@ type TownE1 struct {
 	MonsterAI         [4]*monster.MonsterAI //AI Monster
 }
 
-func NewE1(images *embed.FS, b *storage.Bag) *TownE1 {
+func NewE1(images *embed.FS, b *storage.Bag, f *fonts.FontBase) *TownE1 {
+	//初始化
+	dropImgCont = ebiten.NewImage(30, 20)
+	dropImgCont.Fill(color.White)
 	a := &TownE1{
-		anmiList:      make([]*ebiten.Image, 0),
-		wayList:       make([]*ebiten.Image, 0),
-		huodui:        make([]*ebiten.Image, 0),
-		dropAnm:       make([]*ebiten.Image, 0),
-		dropItemsList: make([]dropItem, 0),
-		op:            make([]*ebiten.DrawImageOptions, 0),
+		anmiList:      make([]*ebiten.Image, 0, 20),
+		wayList:       make([]*ebiten.Image, 0, 15),
+		huodui:        make([]*ebiten.Image, 0, 20),
+		dropAnm:       make([]*ebiten.Image, 0, 17),
+		dropItemsList: make([]dropItem, 0, 5),
+		op:            make([]*ebiten.DrawImageOptions, 0, 17),
 		bag:           b,
 	}
+	a.Fonts = f
 	a.Image = images
 	return a
 }
@@ -189,22 +199,41 @@ func (t *TownE1) LoadXyList() {
 }
 
 //渲染掉落物品
-func (t *TownE1) RenderDropItems(screen *ebiten.Image, offsetX, offsetY float64, playX, playY float64) {
+func (t *TownE1) RenderDropItems(screen *ebiten.Image, offsetX, offsetY float64, playX, playY float64, mx, my int) {
+
 	//掉落物品
 	for i := 0; i < len(t.dropItemsList); i++ {
+		//物品
 		op := &ebiten.DrawImageOptions{}
+		opContent := &ebiten.DrawImageOptions{}
 		op.GeoM.Translate(t.dropItemsList[i].pos.x+offsetX, t.dropItemsList[i].pos.y+offsetY)
 		screen.DrawImage(t.dropAnm[16], op)
-		if tools.Distance(int64(playX), int64(playY), int64(t.dropItemsList[i].pos.x), int64(t.dropItemsList[i].pos.y+130)) <= 30 {
-			if t.bag.InsertBag(t.dropItemsList[i].name) {
-				if i != len(t.dropItemsList)-1 {
-					t.dropItemsList = append(t.dropItemsList[:i], t.dropItemsList[i+1:]...)
-				} else {
-					t.dropItemsList = t.dropItemsList[:i]
+		//掉落物品介绍文
+		opContent.ColorM.Scale(0, 0, 0, 0.7)
+		opContent.GeoM.Translate(t.dropItemsList[i].pos.x+offsetX, t.dropItemsList[i].pos.y+120+offsetY)
+		screen.DrawImage(dropImgCont, opContent)
+		//Draw Text
+		t.Fonts.Render(screen, 2, int(t.dropItemsList[i].pos.x+offsetX), int(t.dropItemsList[i].pos.y+130+offsetY), t.dropItemsList[i].name, 7.2, 120, color.RGBA{R: 255, G: 0, B: 0, A: 255})
+		//if tools.Distance(int64(playX), int64(playY), int64(t.dropItemsList[i].pos.x), int64(t.dropItemsList[i].pos.y+130)) <= 30 {
+		mwx, mwy := tools.CalculateScreenToWorld(mx, my, int(playX), int(playY))
+		if tools.Distance(int64(mwx), int64(mwy), int64(t.dropItemsList[i].pos.x), int64(t.dropItemsList[i].pos.y+130)) <= 20 {
+			layout.ChangeMouseicon(1)
+			//是否左键点击
+			if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
+				if t.bag.InsertBag(t.dropItemsList[i].name) {
+					layout.ChangeMouseicon(2)
+					if i != len(t.dropItemsList)-1 {
+						t.dropItemsList = append(t.dropItemsList[:i], t.dropItemsList[i+1:]...)
+					} else {
+						t.dropItemsList = t.dropItemsList[:i]
+					}
 				}
 			}
+		} else {
+			layout.ChangeMouseicon(2)
 		}
 	}
+
 }
 
 //切换渲染顺序

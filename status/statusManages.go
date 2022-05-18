@@ -32,12 +32,12 @@ func NewStatusManage() *StatusManage {
 		UIOFFSETX:     0,
 		ShadowOffsetX: -60,
 		ShadowOffsetY: -10,
-		PLAYERCENTERX: 395, //LAYOUTX/2
-		PLAYERCENTERY: 240, //LAYOUTY/2
+		PLAYERCENTERX: 790 / 2, //LAYOUTX/2
+		PLAYERCENTERY: 480 / 2, //LAYOUTY/2
 		Mouseoffset:   -1800,
 		//玩家初始位置偏移设置
-		CamerOffsetX: -5280 + 395,
-		CamerOffsetY: -1880 + 240,
+		CamerOffsetX: -5280 + 790/2,
+		CamerOffsetY: -1880 + 480/2,
 		//读取地图的尺寸
 		ReadMapSizeWidth:  0,
 		ReadMapSizeHeight: 0,

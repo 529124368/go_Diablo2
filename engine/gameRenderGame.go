@@ -69,9 +69,7 @@ func (g *Game) ChangeScene(name string) {
 //Draw Game Update
 func (g *Game) changeScenceGameUpdate() {
 	g.count++
-	if g.count >= 100 {
-		g.count = 0
-	}
+	g.count %= 100
 	g.countForMap++
 	if !status.Config.MusicIsPlay {
 		//音乐
@@ -170,7 +168,7 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	//Draw floor
 	g.mapManage.RenderFloor(screen, status.Config.CamerOffsetX, status.Config.CamerOffsetY)
 	//Draw drop items
-	g.mapManage.RenderDropItems(screen, status.Config.CamerOffsetX, status.Config.CamerOffsetY, g.player.X, g.player.Y)
+	g.mapManage.RenderDropItems(screen, status.Config.CamerOffsetX, status.Config.CamerOffsetY, g.player.X, g.player.Y, mouseX, mouseY)
 	//切换渲染顺序
 	if status.Config.DisplaySort {
 		//Draw player

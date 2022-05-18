@@ -55,11 +55,11 @@ var asset embed.FS
 //GameEngine
 func NewGame() *Game {
 	bag := storage.New()
-	//场景
-	m := mapManage.NewE1(&asset, bag)
 
 	//字体
 	f := fonts.NewFont(&asset)
+	//场景
+	m := mapManage.NewE1(&asset, bag, f)
 	//UI
 	u := layout.NewUI(&asset, f, m, bag)
 	bag.UI = u

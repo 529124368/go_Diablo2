@@ -2,6 +2,7 @@ package baseClass
 
 import (
 	"embed"
+	"game/fonts"
 	"game/interfaces"
 	"game/mapCreator/ds1"
 	"game/mapCreator/dt1"
@@ -31,6 +32,7 @@ type MapBase struct {
 	DS1          *ds1.DS1
 	DT1LIST      []dt1.Tile
 	PA           interfaces.Palette
+	Fonts        *fonts.FontBase
 }
 
 //加载地图图片

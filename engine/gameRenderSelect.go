@@ -67,5 +67,5 @@ func (g *Game) ChangeScenceSelectDraw(screen *ebiten.Image) {
 		ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nmouse position %d,%d", int64(ebiten.CurrentFPS()), mouseX, mouseY))
 	}
 	//Draw Text
-	g.font_style.Render(screen, 640, 446, "开始游戏", 8, 130, color.White)
+	g.font_style.Render(screen, 0, 640, 446, "开始游戏", 8, 130, color.White)
 }

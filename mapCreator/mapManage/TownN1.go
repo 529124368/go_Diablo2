@@ -61,7 +61,7 @@ func (t *TownN1) LoadXyList() {
 }
 
 //渲染掉落物品
-func (t *TownN1) RenderDropItems(screen *ebiten.Image, offsetX, offsetY float64, playX, playY float64) {
+func (t *TownN1) RenderDropItems(screen *ebiten.Image, offsetX, offsetY float64, playX, playY float64, mx, my int) {
 	//掉落物品
 	for i := 0; i < len(t.dropItemsList); i++ {
 		op := &ebiten.DrawImageOptions{}

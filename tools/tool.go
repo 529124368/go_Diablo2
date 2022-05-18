@@ -177,6 +177,13 @@ func Angle(y float64, len float64) float64 {
 	return math.Asin(y/len) * 180 / math.Pi
 }
 
+//计算屏幕坐标到世界坐标
+func CalculateScreenToWorld(mx, my, px, py int) (int, int) {
+	dx := mx - int(status.Config.PLAYERCENTERX)
+	dy := my - int(status.Config.PLAYERCENTERY)
+	return dx + px, dy + py
+}
+
 //计算转头角度一栏
 func CalculateDirPath(oldDir, newDir uint8) []uint8 {
 	pathList := ring.New(16)

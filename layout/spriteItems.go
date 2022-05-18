@@ -111,11 +111,10 @@ func QuickCreateItems(x, y float64, name string, sheet *texturepacker.SpriteShee
 		op.bgIsDisplay = false
 	}
 	//物品详细
-	ContImage := ebiten.NewImage(op.size.width*2, op.size.height*2)
-	ContImage.Fill(color.White)
+	op.imageContent = ebiten.NewImage(op.size.width*2, op.size.height*2)
+	op.imageContent.Fill(color.White)
 	op.opContent.ColorM.Scale(0, 0, 0, 0.7)
 	op.opContent.GeoM.Translate(x-float64(op.size.width/2), y+25)
-	op.imageContent = ContImage
 	//
 	op.hasEvent = 1
 	//添加鼠标悬停事件

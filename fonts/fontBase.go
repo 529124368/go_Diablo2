@@ -16,16 +16,15 @@ type FontBase struct {
 	DPI    float64
 	tt     *truetype.Font
 	asset  *embed.FS
-	f_face font.Face
+	f_face [3]font.Face
 }
 
 func NewFont(ass *embed.FS) *FontBase {
 	f := &FontBase{
-		Size:   10,
-		DPI:    150,
-		tt:     nil,
-		f_face: nil,
-		asset:  ass,
+		Size:  10,
+		DPI:   150,
+		tt:    nil,
+		asset: ass,
 	}
 	return f
 }
@@ -40,34 +39,29 @@ func (f *FontBase) LoadFont(path string) {
 		log.Fatal(err)
 	}
 	f.tt = tt
+	//type 1
 	face := truetype.NewFace(f.tt, &truetype.Options{
-		Size:    f.Size,
-		DPI:     f.DPI,
+		Size:    8,
+		DPI:     130,
 		Hinting: font.HintingFull,
 	})
-	f.f_face = face
-}
-
-func (f *FontBase) RenderByCustomer(screen *ebiten.Image, size, dpi float64, x, y int, cont string) {
-	f_face := truetype.NewFace(f.tt, &truetype.Options{
-		Size:    size,
-		DPI:     dpi,
+	f.f_face[0] = face
+	//type 2
+	face = truetype.NewFace(f.tt, &truetype.Options{
+		Size:    7.2,
+		DPI:     150,
 		Hinting: font.HintingFull,
 	})
-	text.Draw(screen, cont, f_face, x, y, color.RGBA{R: 255, G: 0, B: 0, A: 255})
+	f.f_face[1] = face
+	//type 2
+	face = truetype.NewFace(f.tt, &truetype.Options{
+		Size:    7.2,
+		DPI:     120,
+		Hinting: font.HintingFull,
+	})
+	f.f_face[2] = face
 }
 
-func (f *FontBase) Render(screen *ebiten.Image, x, y int, cont string, size, dpi float64, f_color color.Color) {
-	if f.Size != size || f.DPI != dpi {
-		f.f_face.Close()
-		face := truetype.NewFace(f.tt, &truetype.Options{
-			Size:    size,
-			DPI:     dpi,
-			Hinting: font.HintingFull,
-		})
-		f.Size = size
-		f.DPI = dpi
-		f.f_face = face
-	}
-	text.Draw(screen, cont, f.f_face, x, y, f_color)
+func (f *FontBase) Render(screen *ebiten.Image, i uint8, x, y int, cont string, size, dpi float64, f_color color.Color) {
+	text.Draw(screen, cont, f.f_face[i], x, y, f_color)
 }

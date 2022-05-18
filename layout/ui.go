@@ -21,14 +21,14 @@ import (
 )
 
 var (
+	change                     bool = false
 	selectSenceBg              *ebiten.Image
 	plist_png, plist_R_png     *ebiten.Image
 	plist_sheet, plist_R_sheet *texturepacker.SpriteSheet
 	isClick                    bool = false
-	mouseIcon                  *ebiten.Image
+	MouseIcon, MouseIconTake   *ebiten.Image
 	mouseIconCopy              ebiten.Image
 	opMouse                    *ebiten.DrawImageOptions
-	mouseRoate                 float64                  = -0.5
 	HPImage                    *ebiten.Image            = nil //血条备份
 	HPop                       *ebiten.DrawImageOptions       //血条备份
 	DeletedHPSum, DeletedMPSum int                      = 0, 0
@@ -64,7 +64,9 @@ func NewUI(images *embed.FS, f *fonts.FontBase, m interfaces.MapInterface, b *st
 	//鼠标Icon设置
 	opMouse = &ebiten.DrawImageOptions{}
 	ss, _ := ui.image.ReadFile("resource/UI/mouse.png")
-	mouseIcon = tools.GetEbitenImage(ss)
+	MouseIcon = tools.GetEbitenImage(ss)
+	ss, _ = ui.image.ReadFile("resource/UI/mouse_take.png")
+	MouseIconTake = tools.GetEbitenImage(ss)
 	return ui
 }
 
@@ -232,7 +234,7 @@ func (u *UI) DrawUI(screen *ebiten.Image) {
 				if v.contentIsDisplay {
 					screen.DrawImage(v.imageContent, v.opContent)
 					//Draw Text
-					u.fCont.Render(screen, int(v.imagex)-20, int(v.imagey)+50, "属性:xx\n攻击:+2\n敏捷:+4", 7.2, 150, color.RGBA{R: 255, G: 255, B: 255, A: 255})
+					u.fCont.Render(screen, 1, int(v.imagex)-20, int(v.imagey)+50, "属性:xx\n攻击:+2\n敏捷:+4", 7.2, 150, color.RGBA{R: 255, G: 255, B: 255, A: 255})
 				}
 			}
 		}
@@ -389,10 +391,13 @@ func (u *UI) DelItemFromBag(imageX, imageY int) {
 //重新绘制鼠标ICON
 func (u *UI) DrawMouseIcon(screen *ebiten.Image, mouseX, mouseY int) {
 	opMouse.GeoM.Reset()
-	opMouse.GeoM.Rotate(mouseRoate)
 	opMouse.Filter = ebiten.FilterLinear
 	opMouse.GeoM.Translate(float64(mouseX), float64(mouseY))
-	screen.DrawImage(mouseIcon, opMouse)
+	if !change {
+		screen.DrawImage(MouseIcon, opMouse)
+	} else {
+		screen.DrawImage(MouseIconTake, opMouse)
+	}
 
 }
 
@@ -453,10 +458,9 @@ func (u *UI) ItemsEvent() func(i interfaces.SpriteInterface, x, y int) {
 					}()
 					//将拿起的物品放入临时区
 					u.tempBag[0] = s
-					mouseIconCopy = *mouseIcon
+					mouseIconCopy = *MouseIcon
 					img, _, _ := u.GetAnimator(tools.PlistR, s.imagesName)
-					mouseIcon = img
-					mouseRoate = 0
+					MouseIcon = img
 					//拿起物品，从包裹中删除物品
 					u.DelItemFromBag(int(s.imagex), int(s.imagey))
 				}
@@ -511,11 +515,10 @@ func (u *UI) JudgeIsEquipArea(mousex, mousey int) (int, int, uint8) {
 func (u *UI) ClearTempBag() string {
 	name := ""
 	//鼠标还原
-	mouseIcon = &mouseIconCopy
+	MouseIcon = &mouseIconCopy
 	//清理临时区
 	name = u.tempBag[0].imagesName
 	u.tempBag[0] = nil
-	mouseRoate = -0.5
 	//恢复防止双击的鼠标偏移量
 	status.Config.Mouseoffset = 500
 	go func() {
@@ -525,4 +528,14 @@ func (u *UI) ClearTempBag() string {
 		status.Config.IsDropDeal = false
 	}()
 	return name
+}
+
+func ChangeMouseicon(i uint) {
+	switch i {
+	case 1:
+		change = true
+	default:
+		change = false
+
+	}
 }
