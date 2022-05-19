@@ -28,6 +28,7 @@ var (
 	isClick                    bool = false
 	MouseIcon, MouseIconTake   *ebiten.Image
 	mouseIconCopy              ebiten.Image
+	PHp                        *ebiten.Image //玩家HP
 	opMouse                    *ebiten.DrawImageOptions
 	HPImage                    *ebiten.Image            = nil //血条备份
 	HPop                       *ebiten.DrawImageOptions       //血条备份
@@ -67,6 +68,9 @@ func NewUI(images *embed.FS, f *fonts.FontBase, m interfaces.MapInterface, b *st
 	MouseIcon = tools.GetEbitenImage(ss)
 	ss, _ = ui.image.ReadFile("resource/UI/mouse_take.png")
 	MouseIconTake = tools.GetEbitenImage(ss)
+	//
+	ss, _ = ui.image.ReadFile("resource/UI/hp_bar.png")
+	PHp = tools.GetEbitenImage(ss)
 	return ui
 }
 
@@ -238,6 +242,12 @@ func (u *UI) DrawUI(screen *ebiten.Image) {
 				}
 			}
 		}
+	}
+	//玩家血条显示
+	if status.Config.CurrentGameScence == tools.GAMESCENESTART {
+		hop := new(ebiten.DrawImageOptions)
+		hop.GeoM.Translate(float64(status.Config.PLAYERCENTERX-25), float64(status.Config.PLAYERCENTERY-60))
+		screen.DrawImage(PHp, hop)
 	}
 }
 

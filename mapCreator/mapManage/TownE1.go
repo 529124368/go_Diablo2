@@ -22,6 +22,7 @@ import (
 
 	"github.com/OpenDiablo2/OpenDiablo2/d2common/d2enum"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 var Scale float64 = 1
@@ -200,7 +201,7 @@ func (t *TownE1) LoadXyList() {
 
 //渲染掉落物品
 func (t *TownE1) RenderDropItems(screen *ebiten.Image, offsetX, offsetY float64, playX, playY float64, mx, my int) {
-
+	sum := 0
 	//掉落物品
 	for i := 0; i < len(t.dropItemsList); i++ {
 		//物品
@@ -214,12 +215,12 @@ func (t *TownE1) RenderDropItems(screen *ebiten.Image, offsetX, offsetY float64,
 		screen.DrawImage(dropImgCont, opContent)
 		//Draw Text
 		t.Fonts.Render(screen, 2, int(t.dropItemsList[i].pos.x+offsetX), int(t.dropItemsList[i].pos.y+130+offsetY), t.dropItemsList[i].name, 7.2, 120, color.RGBA{R: 255, G: 0, B: 0, A: 255})
-		//if tools.Distance(int64(playX), int64(playY), int64(t.dropItemsList[i].pos.x), int64(t.dropItemsList[i].pos.y+130)) <= 30 {
 		mwx, mwy := tools.CalculateScreenToWorld(mx, my, int(playX), int(playY))
-		if tools.Distance(int64(mwx), int64(mwy), int64(t.dropItemsList[i].pos.x), int64(t.dropItemsList[i].pos.y+130)) <= 20 {
-			layout.ChangeMouseicon(1)
+		dis := tools.Distance(int64(mwx), int64(mwy), int64(t.dropItemsList[i].pos.x), int64(t.dropItemsList[i].pos.y+130))
+		if dis <= 40 {
+			sum++
 			//是否左键点击
-			if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
+			if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 				if t.bag.InsertBag(t.dropItemsList[i].name) {
 					layout.ChangeMouseicon(2)
 					if i != len(t.dropItemsList)-1 {
@@ -229,9 +230,12 @@ func (t *TownE1) RenderDropItems(screen *ebiten.Image, offsetX, offsetY float64,
 					}
 				}
 			}
-		} else {
-			layout.ChangeMouseicon(2)
 		}
+	}
+	if sum > 0 {
+		layout.ChangeMouseicon(1)
+	} else {
+		layout.ChangeMouseicon(2)
 	}
 
 }
