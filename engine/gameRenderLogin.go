@@ -39,7 +39,7 @@ func (g *Game) ChangeScenceLoginUpdate() {
 //Draw Login Scence
 func (g *Game) ChangeScenceLoginDraw(screen *ebiten.Image) {
 	//Draw UI
-	g.ui.DrawUI(screen)
+	g.ui.DrawUI(screen, mouseX, mouseY)
 
 	//Draw Logo Left
 	name := "logoFireLeft_" + strconv.Itoa(counts)

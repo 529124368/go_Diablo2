@@ -251,31 +251,47 @@ func (p *Player) PlayerContr(count *int) {
 				}
 			}
 		}
+		//移动
 		if p.FlagCanAction {
 			//计算新的位置
 			p.PlayerNextMovePositon(p.MouseX, p.MouseY, dir)
 		}
 	}
-
-	//普通攻击
-	if controller.MouseRightPress() && !status.Config.IsTakeItem {
-		if p.State != tools.ATTACK {
-			p.Counts = 0
-		}
-		p.SetPlayerState(tools.ATTACK, dir)
-	}
-	//技能
-	if controller.MousePressF1() && !status.Config.IsTakeItem {
-		//音乐
-		p.music.PlayMusic("File00002184.wav", tools.MUSICWAV)
-		//g.player.SkillName = "狂风"
-		if p.State != tools.SkILL {
-			p.Counts = 0
-		}
-		p.SetPlayerState(tools.SkILL, dir)
-	}
 	//玩家移动监听
 	p.PlayerMove(count)
+
+	//攻击和技能
+	if !p.FlagCanAction {
+		//普通攻击
+		if controller.MouseRightPress() && !status.Config.IsTakeItem {
+			if p.State != tools.ATTACK {
+				p.Counts = 0
+			}
+			p.SetPlayerState(tools.ATTACK, dir)
+			//网络
+			if status.Config.IsNetPlay && *count%2 == 0 {
+				act := "act"
+				ps := &pb.Player{
+					Name:  p.PlayerName,
+					X:     p.X,
+					Y:     p.Y,
+					Dir:   uint32(p.Direction),
+					State: act,
+				}
+				p.WsCon.SendMessage(true, "@@Attack", "", "", ps)
+			}
+		}
+		//技能
+		if controller.MousePressF1() && !status.Config.IsTakeItem {
+			//音乐
+			p.music.PlayMusic("File00002184.wav", tools.MUSICWAV)
+			//g.player.SkillName = "狂风"
+			if p.State != tools.SkILL {
+				p.Counts = 0
+			}
+			p.SetPlayerState(tools.SkILL, dir)
+		}
+	}
 }
 
 //渲染角色
@@ -291,21 +307,26 @@ func (p *Player) Render(screen *ebiten.Image) {
 	name.WriteString(strconv.Itoa(int(p.Direction)))
 	switch p.State {
 	case tools.ATTACK:
+		status.Config.IsAttack = true
 		name.WriteString("_attack_")
 	case tools.SkILL:
+		status.Config.IsAttack = true
 		block = 2
 		if p.Counts >= 14 {
 			p.Counts = 0
 		}
 		name.WriteString("_skill_")
 	case tools.IDLE:
+		status.Config.IsAttack = false
 		name.WriteString("_stand_")
 	case tools.Walk:
+		status.Config.IsAttack = false
 		if p.Counts >= 8 {
 			p.Counts = 0
 		}
 		name.WriteString("_run_")
 	case tools.RUN:
+		status.Config.IsAttack = false
 		block = 2
 		if p.Counts >= 8 {
 			p.Counts = 0

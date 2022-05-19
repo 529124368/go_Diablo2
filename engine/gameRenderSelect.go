@@ -41,7 +41,7 @@ func (g *Game) ChangeScenceSelectDraw(screen *ebiten.Image) {
 	opm.GeoM.Scale(1, 0.8)
 	screen.DrawImage(g.ui.GetSelectBGImage(), opm)
 	//Draw UI
-	g.ui.DrawUI(screen)
+	g.ui.DrawUI(screen, mouseX, mouseY)
 	//Draw Fire 场景火堆
 	name := "fire_" + strconv.Itoa(counts)
 	fire, _, _ := g.ui.GetAnimator(tools.PlistN, name)

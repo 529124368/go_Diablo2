@@ -53,6 +53,14 @@ func (p *PlayerAI) UpdatePlayerPositonAI(NewpositonX, NewpositonY float64, dir u
 	}
 }
 
+//控制AI玩家状态
+func (p *PlayerAI) UpdatePlayerState(s uint8) {
+	if p.State == tools.IDLE && s != p.State {
+		p.Counts = 0
+	}
+	p.State = s
+}
+
 //渲染角色
 func (p *PlayerAI) Render(screen *ebiten.Image) {
 	//改变帧数

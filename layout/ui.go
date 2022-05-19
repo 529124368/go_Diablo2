@@ -12,6 +12,7 @@ import (
 	"game/tools"
 	"image"
 	"image/color"
+	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -21,6 +22,7 @@ import (
 )
 
 var (
+	//count                      int  = 0
 	change                     bool = false
 	selectSenceBg              *ebiten.Image
 	plist_png, plist_R_png     *ebiten.Image
@@ -29,6 +31,7 @@ var (
 	MouseIcon, MouseIconTake   *ebiten.Image
 	mouseIconCopy              ebiten.Image
 	PHp                        *ebiten.Image //玩家HP
+	SkillIcon                  *ebiten.Image //技能显示
 	opMouse                    *ebiten.DrawImageOptions
 	HPImage                    *ebiten.Image            = nil //血条备份
 	HPop                       *ebiten.DrawImageOptions       //血条备份
@@ -71,6 +74,9 @@ func NewUI(images *embed.FS, f *fonts.FontBase, m interfaces.MapInterface, b *st
 	//
 	ss, _ = ui.image.ReadFile("resource/UI/hp_bar.png")
 	PHp = tools.GetEbitenImage(ss)
+	//
+	ss, _ = ui.image.ReadFile("resource/UI/skillIcon.png")
+	SkillIcon = tools.GetEbitenImage(ss)
 	return ui
 }
 
@@ -195,7 +201,7 @@ func (u *UI) ClearSlice(cap int) {
 }
 
 //渲染UI
-func (u *UI) DrawUI(screen *ebiten.Image) {
+func (u *UI) DrawUI(screen *ebiten.Image, mouseX, mouseY int) {
 	//渲染UI
 	for k, v := range u.Compents {
 		if v.layer == 0 && v.isDisplay {
@@ -248,6 +254,18 @@ func (u *UI) DrawUI(screen *ebiten.Image) {
 		hop := new(ebiten.DrawImageOptions)
 		hop.GeoM.Translate(float64(status.Config.PLAYERCENTERX-25), float64(status.Config.PLAYERCENTERY-60))
 		screen.DrawImage(PHp, hop)
+	}
+
+	//显示Icon
+	if status.Config.CurrentGameScence == tools.GAMESCENESTART && status.Config.IsAttack {
+		d := math.Atan2(float64(mouseY)-float64(status.Config.PLAYERCENTERY), float64(mouseX)-float64(status.Config.PLAYERCENTERX))
+		hop := new(ebiten.DrawImageOptions)
+		hop.GeoM.Scale(0.15, 0.15)
+		w, h := SkillIcon.Size()
+		hop.GeoM.Translate(-float64(w)*0.15/2, -float64(h)*0.15)
+		hop.GeoM.Rotate(d + 90*math.Pi/180)
+		hop.GeoM.Translate(float64(tools.LAYOUTX/2), float64(tools.LAYOUTY/2))
+		screen.DrawImage(SkillIcon, hop)
 	}
 }
 

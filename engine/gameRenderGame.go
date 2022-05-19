@@ -76,6 +76,7 @@ func (g *Game) changeScenceGameUpdate() {
 	if g.player.State != tools.ATTACK && g.player.State != tools.SkILL {
 		g.player.State = tools.IDLE
 	}
+	//更新鼠标坐标信息
 	g.player.MouseX = mouseX
 	g.player.MouseY = mouseY
 
@@ -104,12 +105,11 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	g.mapManage.SortLayer(mapX, mapY)
 	//Draw floor
 	g.mapManage.RenderFloor(screen, status.Config.CamerOffsetX, status.Config.CamerOffsetY)
-	//Draw drop items
-	g.mapManage.RenderDropItems(screen, status.Config.CamerOffsetX, status.Config.CamerOffsetY, g.player.X, g.player.Y, mouseX, mouseY)
 	//切换渲染顺序
 	if status.Config.DisplaySort {
 		//Draw player
 		g.player.Render(screen)
+		//网络
 		if status.Config.IsNetPlay && len(g.playerAI) > 0 {
 			for _, v := range g.playerAI {
 				v.Render(screen)
@@ -127,15 +127,17 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 		g.mapManage.Render(screen, countsFor20, countsFor8, status.Config.CamerOffsetX, status.Config.CamerOffsetY)
 		//Draw player
 		g.player.Render(screen)
+		//网络
 		if status.Config.IsNetPlay && len(g.playerAI) > 0 {
 			for _, v := range g.playerAI {
 				v.Render(screen)
 			}
 		}
 	}
+	//Draw drop items
+	g.mapManage.RenderDropItems(screen, status.Config.CamerOffsetX, status.Config.CamerOffsetY, g.player.X, g.player.Y, mouseX, mouseY)
 	//Draw UI
-	g.ui.DrawUI(screen)
-
+	g.ui.DrawUI(screen, mouseX, mouseY)
 	//Draw Drop items Anm
 	if status.Config.IsPlayDropAnmi {
 		if g.mapManage.PlayDropItemAnm(screen, g.player.X, g.player.Y, status.Config.DropItemName, countsFor17) {
