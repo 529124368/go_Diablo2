@@ -3,6 +3,7 @@ package status
 var Config *StatusManage
 
 type StatusManage struct {
+	DropItemName                              string //掉落在地面上的物品名字
 	ChangeScenceFlg, DoorCountFlg, LoadingFlg bool
 	MusicIsPlay                               bool
 	OpenBag, OpenMiniPanel                    bool

@@ -2,7 +2,6 @@ package engine
 
 import (
 	"fmt"
-	"game/controller"
 	"game/engine/ws"
 	"game/role/human"
 	"game/status"
@@ -15,8 +14,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
-
-var dropItemName = ""
 
 //切换游戏场景
 func (g *Game) ChangeScene(name string) {
@@ -40,7 +37,7 @@ func (g *Game) ChangeScene(name string) {
 		w.Add(3)
 		//Palyer Init
 		go func() {
-			g.player = human.NewPlayer(5280, 1880, tools.IDLE, 0, 0, 0, &asset, g.mapManage, ww)
+			g.player = human.NewPlayer(5280, 1880, tools.IDLE, 0, 0, 0, &asset, g.mapManage, ww, g.ui, g.music)
 			g.player.LoadImages("ba", "/man/warrior/", 2)
 			runtime.GC()
 			w.Done()
@@ -81,73 +78,13 @@ func (g *Game) changeScenceGameUpdate() {
 	}
 	g.player.MouseX = mouseX
 	g.player.MouseY = mouseY
-	//计算鼠标位置
-	dir := tools.CaluteDir(status.Config.PLAYERCENTERX, status.Config.PLAYERCENTERY, int64(g.player.MouseX), int64(g.player.MouseY))
-
-	//鼠标事件
-	if controller.MouseleftPress() || controller.IsTouch() {
-		//防止点击UI界面也移动
-		if mouseY < 436 {
-			g.player.FlagCanAction = true
-		}
-		//如果打开包裹，包裹已右位置不能点击移动
-		if status.Config.OpenBag && mouseX >= tools.LAYOUTX/2 {
-			g.player.FlagCanAction = false
-		}
-		//如果打开MINi板子，并且没有打开包裹 以下坐标不可以点击移动
-		if status.Config.OpenMiniPanel && !status.Config.OpenBag && mouseX >= 305 && mouseX <= 475 && mouseY > 407 {
-			g.player.FlagCanAction = false
-		}
-		//如果打开MINi板子，并且打开包裹 以下坐标不可以点击移动
-		if status.Config.OpenMiniPanel && status.Config.OpenBag && mouseX >= 205 && mouseX <= 377 && mouseY > 407 {
-			g.player.FlagCanAction = false
-		}
-		//如果拿起物品也不可以移动
-		if status.Config.IsTakeItem {
-			g.player.FlagCanAction = false
-			//这个范围内就是丢弃物品
-			if mouseY < 436 && mouseX < 390 {
-				if !status.Config.IsDropDeal {
-					status.Config.IsDropDeal = true
-					//播放掉落物品动画
-					status.Config.IsPlayDropAnmi = true
-					//音乐
-					g.music.PlayMusic("diaoluo.mp3", tools.MUSICMP3)
-					//丢弃物品
-					dropItemName = g.ui.ClearTempBag()
-				}
-			}
-		}
-		if g.player.FlagCanAction {
-			//计算新的位置
-			g.player.PlayerNextMovePositon(mouseX, mouseY, dir)
-		}
-	}
 
 	//鼠标滚轮控制
 	if _, x := ebiten.Wheel(); x != 0 {
 		status.Config.MapZoom += int(x)
 	}
-
-	//普通攻击
-	if controller.MouseRightPress() && !status.Config.IsTakeItem {
-		if g.player.State != tools.ATTACK {
-			g.player.Counts = 0
-		}
-		g.player.SetPlayerState(tools.ATTACK, dir)
-	}
-	//技能
-	if controller.MousePressF1() && !status.Config.IsTakeItem {
-		//音乐
-		g.music.PlayMusic("File00002184.wav", tools.MUSICWAV)
-		//g.player.SkillName = "狂风"
-		if g.player.State != tools.SkILL {
-			g.player.Counts = 0
-		}
-		g.player.SetPlayerState(tools.SkILL, dir)
-	}
-	//主机玩家移动
-	g.player.PlayerMove(&g.count)
+	//主机玩家控制
+	g.player.PlayerContr(&g.count)
 	//事件循环监听 是否有按钮点击事件
 	g.ui.EventLoop(mouseX, mouseY)
 }
@@ -201,7 +138,7 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 
 	//Draw Drop items Anm
 	if status.Config.IsPlayDropAnmi {
-		if g.mapManage.PlayDropItemAnm(screen, g.player.X, g.player.Y, dropItemName, countsFor17) {
+		if g.mapManage.PlayDropItemAnm(screen, g.player.X, g.player.Y, status.Config.DropItemName, countsFor17) {
 			countsFor17 = 0
 			status.Config.IsPlayDropAnmi = false
 		}

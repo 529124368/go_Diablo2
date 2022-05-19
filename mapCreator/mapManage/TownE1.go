@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"game/baseClass"
+	"game/controller"
 	"game/fonts"
 	"game/layout"
 	"game/mapCreator/dat"
@@ -22,7 +23,6 @@ import (
 
 	"github.com/OpenDiablo2/OpenDiablo2/d2common/d2enum"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 var Scale float64 = 1
@@ -220,7 +220,7 @@ func (t *TownE1) RenderDropItems(screen *ebiten.Image, offsetX, offsetY float64,
 		if dis <= 40 {
 			sum++
 			//是否左键点击
-			if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+			if controller.MouseOnceLeftPress() {
 				if t.bag.InsertBag(t.dropItemsList[i].name) {
 					layout.ChangeMouseicon(2)
 					if i != len(t.dropItemsList)-1 {

@@ -181,7 +181,7 @@ func (u *UI) LoadGameImages() {
 				//恢复影子偏移
 				status.Config.ShadowOffsetX = -60
 				//恢复玩家中心位置
-				status.Config.PLAYERCENTERX = 388
+				status.Config.PLAYERCENTERX = 395
 				//恢复地图偏移
 				u.mapManage.ChangeMapTranslate(200, 0)
 				isClick = false

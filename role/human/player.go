@@ -3,9 +3,11 @@ package human
 import (
 	"embed"
 	"game/baseClass"
+	"game/controller"
 	"game/engine/ws"
 	"game/engine/ws/pb"
 	"game/interfaces"
+	"game/layout"
 	"game/status"
 	"game/tools"
 	"math"
@@ -21,11 +23,13 @@ const (
 )
 
 type Player struct {
-	baseClass.PlayerBase                         //继承
-	PlayerName           string                  //玩家名字
-	MouseX, MouseY       int                     //鼠标X坐标 鼠标Y坐标
-	SkillName            string                  //技能名称
-	map_c                interfaces.MapInterface //地图
+	baseClass.PlayerBase                           //继承
+	PlayerName           string                    //玩家名字
+	MouseX, MouseY       int                       //鼠标X坐标 鼠标Y坐标
+	SkillName            string                    //技能名称
+	map_c                interfaces.MapInterface   //地图
+	uiContr              *layout.UI                //UI
+	music                interfaces.MusicInterface //音乐
 	newPath              []uint8
 	turnLoOp             uint8
 	WsCon                *ws.WsNetManage   //net
@@ -33,7 +37,7 @@ type Player struct {
 }
 
 //创建玩家
-func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m interfaces.MapInterface, con *ws.WsNetManage) *Player {
+func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m interfaces.MapInterface, con *ws.WsNetManage, ui *layout.UI, ms interfaces.MusicInterface) *Player {
 	play := &Player{
 		PlayerName: "",
 		MouseX:     mx,
@@ -42,6 +46,8 @@ func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m i
 		map_c:      m,
 		turnLoOp:   0,
 		WsCon:      con,
+		uiContr:    ui,
+		music:      ms,
 	}
 	play.X = x //地图坐标X
 	play.Y = y //地图坐标Y
@@ -135,7 +141,11 @@ func (p *Player) PlayerMove(count *int) {
 	dy := math.Abs(p.Y - p.NewpositonY)
 	dis := math.Sqrt(dx*dx + dy*dy)
 	if p.NewpositonX != 0 && p.NewpositonY != 0 && dis > 2 {
-		p.playerMove(dx, dy, dis, count)
+		status.Config.IsRun = true
+		p.FlagCanAction = true
+		if !status.Config.CalculateEnd {
+			p.GetMouseController(p.NewDir, dx, dy, dis, count)
+		}
 	} else {
 		p.FlagCanAction = false
 		p.NewpositonX = 0
@@ -154,14 +164,6 @@ func (p *Player) PlayerMove(count *int) {
 			}
 			p.WsCon.SendMessage(true, "@@MoveEnd", "", "", ps)
 		}
-	}
-}
-
-func (p *Player) playerMove(dx, dy, dis float64, count *int) {
-	status.Config.IsRun = true
-	p.FlagCanAction = true
-	if !status.Config.CalculateEnd {
-		p.GetMouseController(p.NewDir, dx, dy, dis, count)
 	}
 }
 
@@ -208,6 +210,72 @@ func (p *Player) PlayerNextMovePositon(mouseX, mouseY int, dir uint8) {
 		p.NewpositonX = p.X + float64(mouseX) - float64(status.Config.PLAYERCENTERX)
 		p.NewpositonY = p.Y + float64(mouseY) - float64(status.Config.PLAYERCENTERY)
 	}
+}
+
+//角色控制
+func (p *Player) PlayerContr(count *int) {
+	//计算鼠标位置
+	dir := tools.CaluteDir(status.Config.PLAYERCENTERX, status.Config.PLAYERCENTERY, int64(p.MouseX), int64(p.MouseY))
+
+	//鼠标事件
+	if controller.MouseleftPress() || controller.IsTouch() {
+		//防止点击UI界面也移动
+		if p.MouseY < 436 {
+			p.FlagCanAction = true
+		}
+		//如果打开包裹，包裹已右位置不能点击移动
+		if status.Config.OpenBag && p.MouseX >= tools.LAYOUTX/2 {
+			p.FlagCanAction = false
+		}
+		//如果打开MINi板子，并且没有打开包裹 以下坐标不可以点击移动
+		if status.Config.OpenMiniPanel && !status.Config.OpenBag && p.MouseX >= 305 && p.MouseX <= 475 && p.MouseY > 407 {
+			p.FlagCanAction = false
+		}
+		//如果打开MINi板子，并且打开包裹 以下坐标不可以点击移动
+		if status.Config.OpenMiniPanel && status.Config.OpenBag && p.MouseX >= 205 && p.MouseX <= 377 && p.MouseY > 407 {
+			p.FlagCanAction = false
+		}
+		//如果拿起物品也不可以移动
+		if status.Config.IsTakeItem {
+			p.FlagCanAction = false
+			//这个范围内就是丢弃物品
+			if p.MouseY < 436 && p.MouseX < 390 {
+				if !status.Config.IsDropDeal {
+					status.Config.IsDropDeal = true
+					//播放掉落物品动画
+					status.Config.IsPlayDropAnmi = true
+					//音乐
+					p.music.PlayMusic("diaoluo.mp3", tools.MUSICMP3)
+					//丢弃物品
+					status.Config.DropItemName = p.uiContr.ClearTempBag()
+				}
+			}
+		}
+		if p.FlagCanAction {
+			//计算新的位置
+			p.PlayerNextMovePositon(p.MouseX, p.MouseY, dir)
+		}
+	}
+
+	//普通攻击
+	if controller.MouseRightPress() && !status.Config.IsTakeItem {
+		if p.State != tools.ATTACK {
+			p.Counts = 0
+		}
+		p.SetPlayerState(tools.ATTACK, dir)
+	}
+	//技能
+	if controller.MousePressF1() && !status.Config.IsTakeItem {
+		//音乐
+		p.music.PlayMusic("File00002184.wav", tools.MUSICWAV)
+		//g.player.SkillName = "狂风"
+		if p.State != tools.SkILL {
+			p.Counts = 0
+		}
+		p.SetPlayerState(tools.SkILL, dir)
+	}
+	//玩家移动监听
+	p.PlayerMove(count)
 }
 
 //渲染角色

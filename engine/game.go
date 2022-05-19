@@ -55,7 +55,6 @@ var asset embed.FS
 //GameEngine
 func NewGame() *Game {
 	bag := storage.New()
-
 	//字体
 	f := fonts.NewFont(&asset)
 	//场景
