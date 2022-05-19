@@ -98,6 +98,9 @@ func (p *PlayerBase) Render() {
 	//Change player Frame
 	if p.Count > p.FrameSpeed {
 		p.Counts++
+		if (p.State == tools.ATTACK || p.State == tools.SkILL) && p.Counts == p.FrameNums {
+			p.SetPlayerState(tools.IDLE, p.Direction)
+		}
 		p.Counts %= p.FrameNums
 		p.Count = 0
 	}

@@ -7,7 +7,7 @@ type StatusManage struct {
 	ChangeScenceFlg, DoorCountFlg, LoadingFlg bool
 	MusicIsPlay                               bool
 	OpenBag, OpenMiniPanel                    bool
-	IsWalk, IsRun                             bool
+	IsWalk, IsRun, IsAttack                   bool
 	CalculateEnd                              bool
 	UIOFFSETX                                 int
 	ShadowOffsetX, ShadowOffsetY              int

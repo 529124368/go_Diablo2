@@ -82,6 +82,18 @@ func (g *Game) Handle(msg []byte) {
 			}
 		}
 	}
+	//玩家攻击
+	if sm.Flag == "@@Attack" {
+		for _, v := range g.playerAI {
+			if v.PlayerName == sm.Data.Man.Name {
+				v.X = sm.Data.Man.X
+				v.Y = sm.Data.Man.Y
+				v.Direction = uint8(sm.Data.Man.Dir)
+				v.UpdatePlayerState(tools.ATTACK)
+				return
+			}
+		}
+	}
 	//除了我还有谁
 	if sm.Flag == "@@HasPlayer" {
 		d := strings.Split(sm.Data.Data, "|")
