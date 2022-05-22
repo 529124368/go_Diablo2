@@ -12,7 +12,7 @@ type StatusManage struct {
 	UIOFFSETX                                 int
 	ShadowOffsetX, ShadowOffsetY              int
 	PLAYERCENTERX, PLAYERCENTERY              int64
-	IsTakeItem                                bool //是否拿起物品
+	IsTakeItem, IsTakeJoyStick                bool //是否拿起物品
 	Mouseoffset                               int
 	CamerOffsetX, CamerOffsetY                float64
 	ReadMapSizeWidth, ReadMapSizeHeight       int

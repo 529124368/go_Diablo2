@@ -7,7 +7,6 @@ import (
 	"game/status"
 
 	"game/tools"
-	"math"
 	"runtime"
 	"sync"
 
@@ -84,8 +83,11 @@ func (g *Game) changeScenceGameUpdate() {
 	if _, x := ebiten.Wheel(); x != 0 {
 		status.Config.MapZoom += int(x)
 	}
+	//摇杆
+	g.ui.JoyStick.Update()
 	//主机玩家控制
 	g.player.PlayerContr(&g.count)
+
 	//事件循环监听 是否有按钮点击事件
 	g.ui.EventLoop(mouseX, mouseY)
 }
@@ -147,8 +149,7 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	}
 	//Draw Debug
 	if status.Config.DisPlayDebugInfo {
-		len := tools.Distance(status.Config.PLAYERCENTERX, status.Config.PLAYERCENTERY, int64(mouseX), int64(mouseY))
-		re := tools.Angle(math.Abs(float64(int64(mouseY)-status.Config.PLAYERCENTERY)), len)
+		re := tools.CaluteDirAtan2(status.Config.PLAYERCENTERX, status.Config.PLAYERCENTERY, int64(mouseX), int64(mouseY))
 		ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nplayer world position %d,%d\nmouse position %d,%d\ndir %d\nAngle %f\nCell XY %d,%d",
 			int64(ebiten.CurrentFPS()), int64(g.player.X), int64(g.player.Y), g.player.MouseX, g.player.MouseY, tools.CaluteDir(status.Config.PLAYERCENTERX, status.Config.PLAYERCENTERY, int64(g.player.MouseX), int64(g.player.MouseY)), re, mapX, mapY))
 	}

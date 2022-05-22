@@ -47,94 +47,72 @@ const (
 	PlistR              uint8         = 2
 )
 
+//Calculate Angle
+func CaluteDirAtan2(x, y, x_tar, y_tar int64) float64 {
+	dx := float64(x_tar - x)
+	dy := float64(y_tar - y)
+	j := math.Atan2(dy, dx) * 180 / math.Pi
+	if j >= -270 && j < -90 {
+		j = 270 + 180 + j
+	} else {
+		j = j + 90
+	}
+	return j
+}
+
 //Calculate Direction
 func CaluteDir(x, y, x_tar, y_tar int64) uint8 {
-	len := Distance(x, y, x_tar, y_tar)
-	a := Angle(math.Abs(float64(int64(y_tar)-status.Config.PLAYERCENTERY)), len)
-
-	if x < x_tar && y > y_tar {
-		if a > 0 && a <= 15 {
-			return 7
-		}
-		if a > 15 && a <= 35 {
-			return 13
-		}
-		if a > 35 && a <= 55 {
-			return 2
-		}
-		if a > 55 && a < 75 {
-			return 12
-		}
-		if a > 75 && a < 90 {
-			return 6
-		}
-	}
-	if x < x_tar && y < y_tar {
-		if a > 0 && a <= 15 {
-			return 7
-		}
-		if a > 15 && a <= 35 {
-			return 14
-		}
-		if a > 35 && a <= 55 {
-			return 3
-		}
-		if a > 55 && a < 75 {
-			return 15
-		}
-		if a > 75 && a < 90 {
-			return 4
-		}
-	}
-
-	if x > x_tar && y < y_tar {
-		if a > 0 && a <= 15 {
-			return 5
-		}
-		if a > 15 && a <= 35 {
-			return 9
-		}
-		if a > 35 && a <= 55 {
-			return 0
-		}
-		if a > 55 && a < 75 {
-			return 8
-		}
-		if a > 75 && a < 90 {
-			return 4
-		}
-	}
-	if x > x_tar && y > y_tar {
-		if a > 0 && a <= 15 {
-			return 5
-		}
-		if a > 15 && a <= 35 {
-			return 10
-		}
-		if a > 35 && a <= 55 {
-			return 1
-		}
-		if a > 55 && a <= 75 {
-			return 11
-		}
-		if a > 75 && a < 90 {
-			return 6
-		}
-
-	}
-
-	if x > x_tar && float64(y) == math.Abs(float64(y_tar)) {
-		return 5
-	}
-	if x < x_tar && float64(y) == math.Abs(float64(y_tar)) {
-		return 7
-	}
-	if float64(x) == math.Abs(float64(x_tar)) && y > y_tar {
+	d := CaluteDirAtan2(x, y, x_tar, y_tar)
+	if d >= 0 && d < 15 || d >= 345 && d < 360 {
 		return 6
 	}
-	if float64(x) == math.Abs(float64(x_tar)) && y < y_tar {
+	if d >= 15 && d < 35 {
+		return 12
+	}
+	if d >= 35 && d < 55 {
+		return 2
+	}
+	if d >= 55 && d < 75 {
+		return 13
+	}
+	if d >= 75 && d < 105 {
+		return 7
+	}
+	if d >= 105 && d < 125 {
+		return 14
+	}
+	if d >= 125 && d < 145 {
+		return 3
+	}
+	if d >= 145 && d < 165 {
+		return 15
+	}
+	if d >= 165 && d < 195 {
 		return 4
 	}
+	if d >= 195 && d < 215 {
+		return 8
+	}
+	if d >= 215 && d < 235 {
+		return 0
+	}
+
+	if d >= 235 && d < 255 {
+		return 9
+	}
+	if d >= 255 && d < 285 {
+		return 5
+	}
+	if d >= 285 && d < 305 {
+		return 10
+	}
+	if d >= 305 && d < 325 {
+		return 1
+	}
+	if d >= 325 && d < 345 {
+		return 11
+	}
+
 	return 0
 }
 
@@ -170,11 +148,6 @@ func Distance(xa, ya, xb, yb int64) float64 {
 	x := math.Abs(float64(xa - xb))
 	y := math.Abs(float64(ya - yb))
 	return math.Sqrt(x*x + y*y)
-}
-
-//Calculate Angle
-func Angle(y float64, len float64) float64 {
-	return math.Asin(y/len) * 180 / math.Pi
 }
 
 //计算屏幕坐标到世界坐标

@@ -7,6 +7,7 @@ import (
 	"game/controller"
 	"game/fonts"
 	"game/interfaces"
+	joystick "game/layout/joyStick"
 	"game/status"
 	"game/storage"
 	"game/tools"
@@ -51,6 +52,7 @@ type UI struct {
 	fCont             *fonts.FontBase
 	mapManage         interfaces.MapInterface
 	bag               *storage.Bag
+	JoyStick          *joystick.JoyStickBase //摇杆
 }
 
 func NewUI(images *embed.FS, f *fonts.FontBase, m interfaces.MapInterface, b *storage.Bag) *UI {
@@ -64,6 +66,7 @@ func NewUI(images *embed.FS, f *fonts.FontBase, m interfaces.MapInterface, b *st
 		fCont:             f,
 		mapManage:         m,
 		bag:               b,
+		JoyStick:          joystick.NewJoyStick(images),
 	}
 	//鼠标Icon设置
 	opMouse = &ebiten.DrawImageOptions{}
@@ -256,17 +259,34 @@ func (u *UI) DrawUI(screen *ebiten.Image, mouseX, mouseY int) {
 		screen.DrawImage(PHp, hop)
 	}
 
-	//显示Icon
-	if status.Config.CurrentGameScence == tools.GAMESCENESTART && status.Config.IsAttack {
-		d := math.Atan2(float64(mouseY)-float64(status.Config.PLAYERCENTERY), float64(mouseX)-float64(status.Config.PLAYERCENTERX))
-		hop := new(ebiten.DrawImageOptions)
-		hop.GeoM.Scale(0.15, 0.15)
-		w, h := SkillIcon.Size()
-		hop.GeoM.Translate(-float64(w)*0.15/2, -float64(h)*0.15)
-		hop.GeoM.Rotate(d + 90*math.Pi/180)
-		hop.GeoM.Translate(float64(tools.LAYOUTX/2), float64(tools.LAYOUTY/2))
-		screen.DrawImage(SkillIcon, hop)
+	//显示技能Icon
+	if status.Config.CurrentGameScence == tools.GAMESCENESTART {
+		// if status.Config.IsAttack {
+		// 	d := math.Atan2(float64(mouseY)-float64(status.Config.PLAYERCENTERY), float64(mouseX)-float64(status.Config.PLAYERCENTERX))
+		// 	hop := new(ebiten.DrawImageOptions)
+		// 	hop.GeoM.Scale(0.15, 0.15)
+		// 	w, h := SkillIcon.Size()
+		// 	hop.GeoM.Translate(-float64(w)*0.15/2, -float64(h)*0.15)
+		// 	hop.GeoM.Rotate(d + 90*math.Pi/180)
+		// 	hop.GeoM.Translate(float64(tools.LAYOUTX/2), float64(tools.LAYOUTY/2))
+		// 	screen.DrawImage(SkillIcon, hop)
+
+		// }
+		if u.JoyStick.Dir != -1 {
+
+			hop := new(ebiten.DrawImageOptions)
+			hop.GeoM.Scale(0.15, 0.15)
+			w, h := SkillIcon.Size()
+			hop.GeoM.Translate(-float64(w)*0.15/2, -float64(h)*0.15)
+			hop.GeoM.Rotate(u.JoyStick.Dir * math.Pi / 180)
+			hop.GeoM.Translate(float64(tools.LAYOUTX/2), float64(tools.LAYOUTY/2))
+			screen.DrawImage(SkillIcon, hop)
+
+		}
+		//摇杆
+		u.JoyStick.Draw(screen)
 	}
+
 }
 
 //事件轮询

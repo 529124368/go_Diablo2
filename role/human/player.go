@@ -235,6 +235,10 @@ func (p *Player) PlayerContr(count *int) {
 		if status.Config.OpenMiniPanel && status.Config.OpenBag && p.MouseX >= 205 && p.MouseX <= 377 && p.MouseY > 407 {
 			p.FlagCanAction = false
 		}
+		//摇杆区域 TODO
+		if status.Config.IsTakeJoyStick {
+			p.FlagCanAction = false
+		}
 		//如果拿起物品也不可以移动
 		if status.Config.IsTakeItem {
 			p.FlagCanAction = false
@@ -251,6 +255,7 @@ func (p *Player) PlayerContr(count *int) {
 				}
 			}
 		}
+
 		//移动
 		if p.FlagCanAction {
 			//计算新的位置
