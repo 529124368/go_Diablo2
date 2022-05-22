@@ -172,7 +172,7 @@ func (s *Stroke) SetDraggingObject(object interface{}) {
 
 //main
 type JoyStickBase struct {
-	//touchIDs             []ebiten.TouchID
+	touchIDs             []ebiten.TouchID
 	strokes              map[*Stroke]struct{}
 	JoyStickM, JoyStickB *Sprite
 	Dir                  float64
@@ -231,12 +231,12 @@ func (j *JoyStickBase) Update() error {
 		j.strokes[s] = struct{}{}
 	}
 	//触摸屏幕
-	// j.touchIDs = inpututil.AppendJustPressedTouchIDs(j.touchIDs[:0])
-	// for _, id := range j.touchIDs {
-	// 	s := NewStroke(&TouchStrokeSource{ID: id})
-	// 	s.SetDraggingObject(j.spriteAt(s.Position()))
-	// 	j.strokes[s] = struct{}{}
-	// }
+	j.touchIDs = inpututil.AppendJustPressedTouchIDs(j.touchIDs[:0])
+	for _, id := range j.touchIDs {
+		s := NewStroke(&TouchStrokeSource{ID: id})
+		s.SetDraggingObject(j.spriteAt(s.Position()))
+		j.strokes[s] = struct{}{}
+	}
 
 	if len(j.strokes) > 0 {
 		status.Config.IsTakeJoyStick = true
