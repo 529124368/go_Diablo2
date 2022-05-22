@@ -83,10 +83,23 @@ func (g *Game) changeScenceGameUpdate() {
 	if _, x := ebiten.Wheel(); x != 0 {
 		status.Config.MapZoom += int(x)
 	}
+	//计算鼠标位置
+
 	//摇杆
 	g.ui.JoyStick.Update()
+	nextx := 0
+	nexty := 0
+	var dir uint8
+	if g.ui.JoyStick.Dir != -1 {
+		dir = tools.CaluteDir(g.ui.JoyStick.Dir)
+		nextx, nexty = tools.CaluteDisXY(10, g.ui.JoyStick.Dir)
+	} else {
+		//dir = g.player.Direction
+		dir = tools.CaluteDir(tools.CaluteDirAtan2(status.Config.PLAYERCENTERX, status.Config.PLAYERCENTERY, int64(mouseX), int64(mouseY)))
+		g.player.StopMove()
+	}
 	//主机玩家控制
-	g.player.PlayerContr(&g.count)
+	g.player.PlayerContr(nextx, nexty, dir, &g.count)
 
 	//事件循环监听 是否有按钮点击事件
 	g.ui.EventLoop(mouseX, mouseY)
@@ -150,8 +163,8 @@ func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	//Draw Debug
 	if status.Config.DisPlayDebugInfo {
 		re := tools.CaluteDirAtan2(status.Config.PLAYERCENTERX, status.Config.PLAYERCENTERY, int64(mouseX), int64(mouseY))
-		ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nplayer world position %d,%d\nmouse position %d,%d\ndir %d\nAngle %f\nCell XY %d,%d",
-			int64(ebiten.CurrentFPS()), int64(g.player.X), int64(g.player.Y), g.player.MouseX, g.player.MouseY, tools.CaluteDir(status.Config.PLAYERCENTERX, status.Config.PLAYERCENTERY, int64(g.player.MouseX), int64(g.player.MouseY)), re, mapX, mapY))
+		ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS %d\nplayer world position %d,%d\nmouse position %d,%d\nDir %v\nCell XY %d,%d",
+			int64(ebiten.CurrentFPS()), int64(g.player.X), int64(g.player.Y), g.player.MouseX, g.player.MouseY, tools.CaluteDir(re), mapX, mapY))
 	}
 
 	//Change map Frame

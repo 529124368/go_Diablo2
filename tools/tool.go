@@ -60,9 +60,15 @@ func CaluteDirAtan2(x, y, x_tar, y_tar int64) float64 {
 	return j
 }
 
+//Calculate Angle
+func CaluteDisXY(dis, d float64) (int, int) {
+	x := math.Sin(d*math.Pi/180) * dis
+	y := math.Cos(d*math.Pi/180) * dis
+	return int(math.Floor(395 + x)), int(math.Floor(240 - y))
+}
+
 //Calculate Direction
-func CaluteDir(x, y, x_tar, y_tar int64) uint8 {
-	d := CaluteDirAtan2(x, y, x_tar, y_tar)
+func CaluteDir(d float64) uint8 {
 	if d >= 0 && d < 15 || d >= 345 && d < 360 {
 		return 6
 	}
@@ -259,6 +265,7 @@ func TileToWorld(Tilex, Tiley int) (float64, float64) {
 
 //根据方向计算偏移距离
 func CalculateSpeed(dir uint8, speed, dx, dy, s float64) (float64, float64) {
+	// 1/60 is dt 1s 内刷新帧数
 	moveX, moveY := 0.0, 0.0
 	switch dir {
 	case 0, 8, 9:
@@ -270,13 +277,13 @@ func CalculateSpeed(dir uint8, speed, dx, dy, s float64) (float64, float64) {
 	case 3, 14, 15:
 		moveX, moveY = dx/s*speed/60, dy/s*speed/60
 	case 4:
-		moveX, moveY = 0, dy/s*speed/60
+		moveX, moveY = 0, speed/60
 	case 5:
-		moveX, moveY = -dx/s*speed/60, 0
+		moveX, moveY = -speed/60, 0
 	case 6:
-		moveX, moveY = 0, -dy/s*speed/60
+		moveX, moveY = 0, -speed/60
 	case 7:
-		moveX, moveY = dx/s*speed/60, 0
+		moveX, moveY = speed/60, 0
 	}
 	return moveX, moveY
 }

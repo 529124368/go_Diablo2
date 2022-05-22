@@ -167,6 +167,13 @@ func (p *Player) PlayerMove(count *int) {
 	}
 }
 
+//停止玩家
+func (p *Player) StopMove() {
+	p.FlagCanAction = false
+	p.NewpositonX = 0
+	p.NewpositonY = 0
+}
+
 //改变方向
 func (p *Player) ChangeDir() {
 	if !status.Config.CalculateEnd {
@@ -213,12 +220,9 @@ func (p *Player) PlayerNextMovePositon(mouseX, mouseY int, dir uint8) {
 }
 
 //角色控制
-func (p *Player) PlayerContr(count *int) {
-	//计算鼠标位置
-	dir := tools.CaluteDir(status.Config.PLAYERCENTERX, status.Config.PLAYERCENTERY, int64(p.MouseX), int64(p.MouseY))
-
+func (p *Player) PlayerContr(nextX, nextY int, dir uint8, count *int) {
 	//鼠标事件
-	if controller.MouseleftPress() || controller.IsTouch() {
+	if !status.Config.IsTakeJoyStick && (controller.MouseleftPress() || controller.IsTouch()) {
 		//防止点击UI界面也移动
 		if p.MouseY < 436 {
 			p.FlagCanAction = true
@@ -233,10 +237,6 @@ func (p *Player) PlayerContr(count *int) {
 		}
 		//如果打开MINi板子，并且打开包裹 以下坐标不可以点击移动
 		if status.Config.OpenMiniPanel && status.Config.OpenBag && p.MouseX >= 205 && p.MouseX <= 377 && p.MouseY > 407 {
-			p.FlagCanAction = false
-		}
-		//摇杆区域 TODO
-		if status.Config.IsTakeJoyStick {
 			p.FlagCanAction = false
 		}
 		//如果拿起物品也不可以移动
@@ -261,6 +261,10 @@ func (p *Player) PlayerContr(count *int) {
 			//计算新的位置
 			p.PlayerNextMovePositon(p.MouseX, p.MouseY, dir)
 		}
+	}
+	if status.Config.IsTakeJoyStick {
+		//计算新的位置
+		p.PlayerNextMovePositon(nextX, nextY, dir)
 	}
 	//玩家移动监听
 	p.PlayerMove(count)

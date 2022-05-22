@@ -273,7 +273,6 @@ func (u *UI) DrawUI(screen *ebiten.Image, mouseX, mouseY int) {
 
 		// }
 		if u.JoyStick.Dir != -1 {
-
 			hop := new(ebiten.DrawImageOptions)
 			hop.GeoM.Scale(0.15, 0.15)
 			w, h := SkillIcon.Size()
@@ -281,8 +280,8 @@ func (u *UI) DrawUI(screen *ebiten.Image, mouseX, mouseY int) {
 			hop.GeoM.Rotate(u.JoyStick.Dir * math.Pi / 180)
 			hop.GeoM.Translate(float64(tools.LAYOUTX/2), float64(tools.LAYOUTY/2))
 			screen.DrawImage(SkillIcon, hop)
-
 		}
+
 		//摇杆
 		u.JoyStick.Draw(screen)
 	}
