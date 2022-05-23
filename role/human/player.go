@@ -241,7 +241,7 @@ func (p *Player) PlayerContr(nextX, nextY int, dir uint8, count *int) {
 
 	} else {
 		//PC端操作
-		if controller.MouseleftPress() || controller.IsTouch() {
+		if controller.MouseleftPress() {
 			//防止点击UI界面也移动
 			if p.MouseY < 436 {
 				p.FlagCanAction = true
