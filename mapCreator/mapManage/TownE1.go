@@ -121,33 +121,31 @@ func (t *TownE1) LoadAnm() {
 	aiPath = append(aiPath, npc.AIEndPoint{X: 4780, Y: 2041, Dir: 3})
 	aiPath = append(aiPath, npc.AIEndPoint{X: 4580, Y: 2041, Dir: 5})
 	t.NPCAI[0].SetAIPath(aiPath, 100)
-
-	//设置NPC PS
+	// //设置NPC PS
 	t.NPCAI[1] = npc.NewPlayerAI(6003, 2048, 0, 4, t.Image)
 	t.NPCAI[1].LoadImages("PS", "/NPC/", 1)
 	aiPath = make([]npc.AIEndPoint, 2)
-	aiPath = append(aiPath, npc.AIEndPoint{X: 6200, Y: 2048, Dir: 7})
-	aiPath = append(aiPath, npc.AIEndPoint{X: 6003, Y: 2048, Dir: 5})
+	aiPath = append(aiPath, npc.AIEndPoint{X: 6200, Y: 2048, Dir: tools.CaluteDir(tools.CaluteDirAtan2(6003, 2048, 6200, 2048))})
+	aiPath = append(aiPath, npc.AIEndPoint{X: 6003, Y: 2048, Dir: tools.CaluteDir(tools.CaluteDirAtan2(6200, 2048, 6003, 2048))})
 	t.NPCAI[1].SetAIPath(aiPath, 100)
 
-	//设置NPC RC
-	t.NPCAI[2] = npc.NewPlayerAI(4823, 1691, 0, 4, t.Image)
+	// //设置NPC RC
+	t.NPCAI[2] = npc.NewPlayerAI(4799, 1702, 0, 4, t.Image)
 	t.NPCAI[2].LoadImages("RC", "/NPC/", 1)
 	aiPath = make([]npc.AIEndPoint, 4)
-	aiPath = append(aiPath, npc.AIEndPoint{X: 4825, Y: 1855, Dir: 4})
-	aiPath = append(aiPath, npc.AIEndPoint{X: 4918, Y: 1759, Dir: 2})
-	aiPath = append(aiPath, npc.AIEndPoint{X: 4825, Y: 1855, Dir: 0})
-	aiPath = append(aiPath, npc.AIEndPoint{X: 4823, Y: 1691, Dir: 6})
+	aiPath = append(aiPath, npc.AIEndPoint{X: 4980, Y: 1758, Dir: 3})
+	aiPath = append(aiPath, npc.AIEndPoint{X: 4892, Y: 1867, Dir: 0})
+	aiPath = append(aiPath, npc.AIEndPoint{X: 4728, Y: 1812, Dir: 1})
+	aiPath = append(aiPath, npc.AIEndPoint{X: 4799, Y: 1702, Dir: 2})
 	t.NPCAI[2].SetAIPath(aiPath, 100)
-
-	//设置NPC GH
-	t.NPCAI[3] = npc.NewPlayerAI(3230, 1905, 0, 3, t.Image)
+	// //设置NPC GH
+	t.NPCAI[3] = npc.NewPlayerAI(3226, 1914, 0, 3, t.Image)
 	t.NPCAI[3].LoadImages("GH", "/NPC/", 1)
 	aiPath = make([]npc.AIEndPoint, 4)
-	aiPath = append(aiPath, npc.AIEndPoint{X: 3482, Y: 1905, Dir: 7})
-	aiPath = append(aiPath, npc.AIEndPoint{X: 3354, Y: 2005, Dir: 0})
-	aiPath = append(aiPath, npc.AIEndPoint{X: 3482, Y: 1907, Dir: 2})
-	aiPath = append(aiPath, npc.AIEndPoint{X: 3230, Y: 1905, Dir: 5})
+	aiPath = append(aiPath, npc.AIEndPoint{X: 3424, Y: 1914, Dir: 7})
+	aiPath = append(aiPath, npc.AIEndPoint{X: 3360, Y: 2033, Dir: 0})
+	aiPath = append(aiPath, npc.AIEndPoint{X: 3290, Y: 1849, Dir: 1})
+	aiPath = append(aiPath, npc.AIEndPoint{X: 3226, Y: 1914, Dir: 0})
 	t.NPCAI[3].SetAIPath(aiPath, 100)
 
 	//########################加载Monster
@@ -290,7 +288,10 @@ func (t *TownE1) Render(screen *ebiten.Image, frameIndexFor20, frameIndexFor12 i
 
 	//AI NPC
 	for _, v := range t.NPCAI {
-		v.Render(screen)
+		if v != nil {
+			v.Render(screen)
+		}
+
 	}
 
 	//AI Monster

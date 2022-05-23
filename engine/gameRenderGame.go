@@ -85,18 +85,23 @@ func (g *Game) changeScenceGameUpdate() {
 	}
 	//计算鼠标位置
 
-	//摇杆
-	g.ui.JoyStick.Update()
+	//控制玩家
 	nextx := 0
 	nexty := 0
 	var dir uint8
-	if g.ui.JoyStick.Dir != -1 {
-		dir = tools.CaluteDir(g.ui.JoyStick.Dir)
-		nextx, nexty = tools.CaluteDisXY(10, g.ui.JoyStick.Dir)
+	//手机端
+	if status.Config.IsMobile {
+		g.ui.JoyStick.Update()
+		if g.ui.JoyStick.Dir != -1 {
+			dir = tools.CaluteDir(g.ui.JoyStick.Dir)
+			nextx, nexty = tools.CaluteDisXY(10, g.ui.JoyStick.Dir)
+		} else {
+			dir = g.player.Direction
+			g.player.StopMove()
+		}
 	} else {
-		//dir = g.player.Direction
+		//pc端
 		dir = tools.CaluteDir(tools.CaluteDirAtan2(status.Config.PLAYERCENTERX, status.Config.PLAYERCENTERY, int64(mouseX), int64(mouseY)))
-		g.player.StopMove()
 	}
 	//主机玩家控制
 	g.player.PlayerContr(nextx, nexty, dir, &g.count)

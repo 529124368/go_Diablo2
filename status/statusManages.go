@@ -12,7 +12,7 @@ type StatusManage struct {
 	UIOFFSETX                                 int
 	ShadowOffsetX, ShadowOffsetY              int
 	PLAYERCENTERX, PLAYERCENTERY              int64
-	IsTakeItem, IsTakeJoyStick                bool //是否拿起物品
+	IsTakeItem, IsTakeJoyStick                bool //是否拿起物品/是否使用摇杆
 	Mouseoffset                               int
 	CamerOffsetX, CamerOffsetY                float64
 	ReadMapSizeWidth, ReadMapSizeHeight       int
@@ -25,6 +25,7 @@ type StatusManage struct {
 	DisplaySort                               bool        //人物和物体渲染顺序
 	Queue                                     chan []byte //消息队列
 	IsNetPlay                                 bool        //是否联网游玩
+	IsMobile                                  bool        //是否手机端
 }
 
 func NewStatusManage() *StatusManage {
@@ -50,6 +51,7 @@ func NewStatusManage() *StatusManage {
 		CurrentGameScence: 1,
 		Queue:             make(chan []byte),
 		//IsNetPlay:         true, //是否联网
+		IsMobile: true,
 	}
 	return n
 }

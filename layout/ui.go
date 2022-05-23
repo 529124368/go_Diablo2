@@ -56,7 +56,8 @@ type UI struct {
 }
 
 func NewUI(images *embed.FS, f *fonts.FontBase, m interfaces.MapInterface, b *storage.Bag) *UI {
-
+	//初始化摇杆坐标和移动半径
+	joystick.Init(58, 270, 76, 288, 50)
 	ui := &UI{
 		image:             images,
 		Compents:          make([]*Sprite, 0, 12),
@@ -260,7 +261,7 @@ func (u *UI) DrawUI(screen *ebiten.Image, mouseX, mouseY int) {
 	}
 
 	//显示技能Icon
-	if status.Config.CurrentGameScence == tools.GAMESCENESTART {
+	if status.Config.IsMobile && (status.Config.CurrentGameScence == tools.GAMESCENESTART) {
 		// if status.Config.IsAttack {
 		// 	d := math.Atan2(float64(mouseY)-float64(status.Config.PLAYERCENTERY), float64(mouseX)-float64(status.Config.PLAYERCENTERX))
 		// 	hop := new(ebiten.DrawImageOptions)

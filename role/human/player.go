@@ -176,24 +176,33 @@ func (p *Player) StopMove() {
 
 //改变方向
 func (p *Player) ChangeDir() {
-	if !status.Config.CalculateEnd {
-		p.newPath = tools.CalculateDirPath(p.OldDirection, p.Direction)
-		status.Config.CalculateEnd = true
-	}
-	if len(p.newPath) >= 3 {
-		if p.turnLoOp == uint8(len(p.newPath)) {
-			//转变方向完成
-			p.turnLoOp = uint8(len(p.newPath) - 1)
-			p.NewDir = p.newPath[p.turnLoOp]
-			//更新旧的方向
-			p.OldDirection = p.NewDir
-			p.turnLoOp = 0
-			status.Config.CalculateEnd = false
-		} else {
-			p.NewDir = p.newPath[p.turnLoOp]
+	//非攻击和放技能的情况下需要进行转体动画
+	if p.State != tools.ATTACK && p.State != tools.SkILL {
+		if !status.Config.CalculateEnd {
+			p.newPath = tools.CalculateDirPath(p.OldDirection, p.Direction)
+			status.Config.CalculateEnd = true
 		}
-		p.turnLoOp++
-		p.SetPlayerState(tools.IDLE, p.NewDir)
+		if len(p.newPath) >= 3 {
+			if p.turnLoOp == uint8(len(p.newPath)) {
+				//转变方向完成
+				p.turnLoOp = uint8(len(p.newPath) - 1)
+				p.NewDir = p.newPath[p.turnLoOp]
+				//更新旧的方向
+				p.OldDirection = p.NewDir
+				p.turnLoOp = 0
+				status.Config.CalculateEnd = false
+			} else {
+				p.NewDir = p.newPath[p.turnLoOp]
+			}
+			p.turnLoOp++
+			p.SetPlayerState(tools.IDLE, p.NewDir)
+		} else {
+			//直接切换方向
+			status.Config.CalculateEnd = false
+			p.turnLoOp = 0
+			//更新旧的方向
+			p.OldDirection = p.Direction
+		}
 	} else {
 		//直接切换方向
 		status.Config.CalculateEnd = false
@@ -201,6 +210,7 @@ func (p *Player) ChangeDir() {
 		//更新旧的方向
 		p.OldDirection = p.Direction
 	}
+
 }
 
 //玩家到新位置的预算
@@ -221,50 +231,56 @@ func (p *Player) PlayerNextMovePositon(mouseX, mouseY int, dir uint8) {
 
 //角色控制
 func (p *Player) PlayerContr(nextX, nextY int, dir uint8, count *int) {
-	//鼠标事件
-	if !status.Config.IsTakeJoyStick && (controller.MouseleftPress() || controller.IsTouch()) {
-		//防止点击UI界面也移动
-		if p.MouseY < 436 {
-			p.FlagCanAction = true
-		}
-		//如果打开包裹，包裹已右位置不能点击移动
-		if status.Config.OpenBag && p.MouseX >= tools.LAYOUTX/2 {
-			p.FlagCanAction = false
-		}
-		//如果打开MINi板子，并且没有打开包裹 以下坐标不可以点击移动
-		if status.Config.OpenMiniPanel && !status.Config.OpenBag && p.MouseX >= 305 && p.MouseX <= 475 && p.MouseY > 407 {
-			p.FlagCanAction = false
-		}
-		//如果打开MINi板子，并且打开包裹 以下坐标不可以点击移动
-		if status.Config.OpenMiniPanel && status.Config.OpenBag && p.MouseX >= 205 && p.MouseX <= 377 && p.MouseY > 407 {
-			p.FlagCanAction = false
-		}
-		//如果拿起物品也不可以移动
-		if status.Config.IsTakeItem {
-			p.FlagCanAction = false
-			//这个范围内就是丢弃物品
-			if p.MouseY < 436 && p.MouseX < 390 {
-				if !status.Config.IsDropDeal {
-					status.Config.IsDropDeal = true
-					//播放掉落物品动画
-					status.Config.IsPlayDropAnmi = true
-					//音乐
-					p.music.PlayMusic("diaoluo.mp3", tools.MUSICMP3)
-					//丢弃物品
-					status.Config.DropItemName = p.uiContr.ClearTempBag()
-				}
-			}
+
+	//手机端操作
+	if status.Config.IsMobile {
+		if status.Config.IsTakeJoyStick {
+			//计算新的位置
+			p.PlayerNextMovePositon(nextX, nextY, dir)
 		}
 
-		//移动
-		if p.FlagCanAction {
-			//计算新的位置
-			p.PlayerNextMovePositon(p.MouseX, p.MouseY, dir)
+	} else {
+		//PC端操作
+		if controller.MouseleftPress() || controller.IsTouch() {
+			//防止点击UI界面也移动
+			if p.MouseY < 436 {
+				p.FlagCanAction = true
+			}
+			//如果打开包裹，包裹已右位置不能点击移动
+			if status.Config.OpenBag && p.MouseX >= tools.LAYOUTX/2 {
+				p.FlagCanAction = false
+			}
+			//如果打开MINi板子，并且没有打开包裹 以下坐标不可以点击移动
+			if status.Config.OpenMiniPanel && !status.Config.OpenBag && p.MouseX >= 305 && p.MouseX <= 475 && p.MouseY > 407 {
+				p.FlagCanAction = false
+			}
+			//如果打开MINi板子，并且打开包裹 以下坐标不可以点击移动
+			if status.Config.OpenMiniPanel && status.Config.OpenBag && p.MouseX >= 205 && p.MouseX <= 377 && p.MouseY > 407 {
+				p.FlagCanAction = false
+			}
+			//如果拿起物品也不可以移动
+			if status.Config.IsTakeItem {
+				p.FlagCanAction = false
+				//这个范围内就是丢弃物品
+				if p.MouseY < 436 && p.MouseX < 390 {
+					if !status.Config.IsDropDeal {
+						status.Config.IsDropDeal = true
+						//播放掉落物品动画
+						status.Config.IsPlayDropAnmi = true
+						//音乐
+						p.music.PlayMusic("diaoluo.mp3", tools.MUSICMP3)
+						//丢弃物品
+						status.Config.DropItemName = p.uiContr.ClearTempBag()
+					}
+				}
+			}
+
+			//移动
+			if p.FlagCanAction {
+				//计算新的位置
+				p.PlayerNextMovePositon(p.MouseX, p.MouseY, dir)
+			}
 		}
-	}
-	if status.Config.IsTakeJoyStick {
-		//计算新的位置
-		p.PlayerNextMovePositon(nextX, nextY, dir)
 	}
 	//玩家移动监听
 	p.PlayerMove(count)

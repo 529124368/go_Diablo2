@@ -134,6 +134,10 @@ func (g *Game) Update() error {
 		i := ebiten.IsFullscreen()
 		ebiten.SetFullscreen(!i)
 	}
+	//手机pc模式切换
+	if inpututil.IsKeyJustPressed(ebiten.KeyQ) {
+		status.Config.IsMobile = !status.Config.IsMobile
+	}
 	//Debug 信息显示控制
 	if inpututil.IsKeyJustPressed(ebiten.KeyD) {
 		status.Config.DisPlayDebugInfo = !status.Config.DisPlayDebugInfo
@@ -155,8 +159,12 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			g.ChangeScenceLoginDraw(screen)
 		}
 	}
-	//绘制鼠标ICON
-	g.ui.DrawMouseIcon(screen, mouseX, mouseY)
+
+	//PC的场合
+	if !status.Config.IsMobile {
+		//绘制鼠标ICON
+		g.ui.DrawMouseIcon(screen, mouseX, mouseY)
+	}
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {

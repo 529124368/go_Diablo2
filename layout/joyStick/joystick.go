@@ -13,6 +13,19 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
+// 摇杆外圈坐标 jmx jmy
+// 摇杆内圈坐标 jbx jby
+var jmx, jbx, jmy, jby int = 0, 0, 0, 0
+var R float64 = 0
+
+func Init(x1, y1, x2, y2 int, r float64) {
+	jmx = x1
+	jmy = y1
+	jbx = x2
+	jby = y2
+	R = r
+}
+
 // Sprite represents an image.
 type Sprite struct {
 	image *ebiten.Image
@@ -37,17 +50,17 @@ func (s *Sprite) In(x, y int) bool {
 func (s *Sprite) MoveBy(x, y int) (int, int) {
 	ddx := x
 	ddy := y
-	dx := float64(s.x + x - 91)
-	dy := float64(s.y + y - 326)
+	dx := float64(s.x + x - jbx)
+	dy := float64(s.y + y - jby)
 	rad := math.Atan2(dy, dx)
 	s.dir = rad * 180 / math.Pi
-	max := 50 * math.Cos(rad)
-	may := 50 * math.Sin(rad)
+	max := R * math.Cos(rad)
+	may := R * math.Sin(rad)
 	if math.Abs(dx) > math.Abs(max) {
-		ddx = int(max) + 91 - s.x
+		ddx = int(max) + jbx - s.x
 	}
 	if math.Abs(dy) > math.Abs(may) {
-		ddy = int(may) + 326 - s.y
+		ddy = int(may) + jby - s.y
 	}
 	return ddx, ddy
 }
@@ -62,8 +75,8 @@ func (s *Sprite) GetDir() float64 {
 }
 
 func (s *Sprite) Back() {
-	s.x = 91
-	s.y = 326
+	s.x = jbx
+	s.y = jby
 }
 
 // Draw draws the sprite.
@@ -198,8 +211,8 @@ func NewJoyStick(asset *embed.FS) *JoyStickBase {
 	// Initialize the game.
 	return &JoyStickBase{
 		strokes:   map[*Stroke]struct{}{},
-		JoyStickM: New(ebitenImage, 91, 326),
-		JoyStickB: New(JoyStick, 73, 308),
+		JoyStickM: New(ebitenImage, jbx, jby),
+		JoyStickB: New(JoyStick, jmx, jmy),
 		Dir:       -1,
 	}
 }
