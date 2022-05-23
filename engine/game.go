@@ -161,10 +161,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 
 	//PC的场合
-	if !status.Config.IsMobile {
-		//绘制鼠标ICON
-		g.ui.DrawMouseIcon(screen, mouseX, mouseY)
-	}
+	//if !status.Config.IsMobile {
+	//绘制鼠标ICON
+	g.ui.DrawMouseIcon(screen, mouseX, mouseY)
+	//}
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {

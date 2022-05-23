@@ -216,17 +216,20 @@ func (p *Player) ChangeDir() {
 //玩家到新位置的预算
 func (p *Player) PlayerNextMovePositon(mouseX, mouseY int, dir uint8) {
 	p.NewDir = dir
-	switch p.NewDir {
-	case 5, 7:
-		p.NewpositonX = p.X + float64(mouseX) - float64(status.Config.PLAYERCENTERX)
-		p.NewpositonY = p.Y
-	case 4, 6:
-		p.NewpositonX = p.X
-		p.NewpositonY = p.Y + float64(mouseY) - float64(status.Config.PLAYERCENTERY)
-	default:
-		p.NewpositonX = p.X + float64(mouseX) - float64(status.Config.PLAYERCENTERX)
-		p.NewpositonY = p.Y + float64(mouseY) - float64(status.Config.PLAYERCENTERY)
+	if mouseX != 0 || mouseY != 0 {
+		switch p.NewDir {
+		case 5, 7:
+			p.NewpositonX = p.X + float64(mouseX) - float64(status.Config.PLAYERCENTERX)
+			p.NewpositonY = p.Y
+		case 4, 6:
+			p.NewpositonX = p.X
+			p.NewpositonY = p.Y + float64(mouseY) - float64(status.Config.PLAYERCENTERY)
+		default:
+			p.NewpositonX = p.X + float64(mouseX) - float64(status.Config.PLAYERCENTERX)
+			p.NewpositonY = p.Y + float64(mouseY) - float64(status.Config.PLAYERCENTERY)
+		}
 	}
+
 }
 
 //角色控制

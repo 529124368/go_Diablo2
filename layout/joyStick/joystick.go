@@ -13,32 +13,24 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
-// 摇杆外圈坐标 jmx jmy
-// 摇杆内圈坐标 jbx jby
-var jmx, jbx, jmy, jby int = 0, 0, 0, 0
-var R float64 = 0
-
-func Init(x1, y1, x2, y2 int, r float64) {
-	jmx = x1
-	jmy = y1
-	jbx = x2
-	jby = y2
-	R = r
-}
-
 // Sprite represents an image.
 type Sprite struct {
-	image *ebiten.Image
-	x     int
-	y     int
-	dir   float64
+	image                *ebiten.Image
+	x                    int
+	y                    int
+	dir                  float64
+	JoyStickx, JoySticky int
+	R                    float64
 }
 
-func New(m *ebiten.Image, x, y int) *Sprite {
+func New(m *ebiten.Image, x, y int, r float64) *Sprite {
 	s := &Sprite{
-		image: m,
-		x:     x,
-		y:     y,
+		image:     m,
+		x:         x,
+		y:         y,
+		JoyStickx: x,
+		JoySticky: y,
+		R:         r,
 	}
 	return s
 }
@@ -50,17 +42,17 @@ func (s *Sprite) In(x, y int) bool {
 func (s *Sprite) MoveBy(x, y int) (int, int) {
 	ddx := x
 	ddy := y
-	dx := float64(s.x + x - jbx)
-	dy := float64(s.y + y - jby)
+	dx := float64(s.x + x - s.JoyStickx)
+	dy := float64(s.y + y - s.JoySticky)
 	rad := math.Atan2(dy, dx)
 	s.dir = rad * 180 / math.Pi
-	max := R * math.Cos(rad)
-	may := R * math.Sin(rad)
+	max := s.R * math.Cos(rad)
+	may := s.R * math.Sin(rad)
 	if math.Abs(dx) > math.Abs(max) {
-		ddx = int(max) + jbx - s.x
+		ddx = int(max) + s.JoyStickx - s.x
 	}
 	if math.Abs(dy) > math.Abs(may) {
-		ddy = int(may) + jby - s.y
+		ddy = int(may) + s.JoySticky - s.y
 	}
 	return ddx, ddy
 }
@@ -75,8 +67,8 @@ func (s *Sprite) GetDir() float64 {
 }
 
 func (s *Sprite) Back() {
-	s.x = jbx
-	s.y = jby
+	s.x = s.JoyStickx
+	s.y = s.JoySticky
 }
 
 // Draw draws the sprite.
@@ -189,9 +181,11 @@ type JoyStickBase struct {
 	strokes              map[*Stroke]struct{}
 	JoyStickM, JoyStickB *Sprite
 	Dir                  float64
+	jmx, jbx, jmy, jby   int
+	R                    float64
 }
 
-func NewJoyStick(asset *embed.FS) *JoyStickBase {
+func NewJoyStick(asset *embed.FS, x1, y1, x2, y2 int, r float64) *JoyStickBase {
 
 	ss, _ := asset.ReadFile("resource/UI/stick_o.png")
 	img, _, err := image.Decode(bytes.NewReader(ss))
@@ -211,9 +205,14 @@ func NewJoyStick(asset *embed.FS) *JoyStickBase {
 	// Initialize the game.
 	return &JoyStickBase{
 		strokes:   map[*Stroke]struct{}{},
-		JoyStickM: New(ebitenImage, jbx, jby),
-		JoyStickB: New(JoyStick, jmx, jmy),
+		JoyStickM: New(ebitenImage, x2, y2, r),
+		JoyStickB: New(JoyStick, x1, y1, 0),
 		Dir:       -1,
+		jmx:       x1,
+		jmy:       y1,
+		jbx:       x2,
+		jby:       y2,
+		R:         r,
 	}
 }
 func (j *JoyStickBase) spriteAt(x, y int) *Sprite {

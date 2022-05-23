@@ -43,21 +43,20 @@ var (
 
 //UI类
 type UI struct {
-	image             *embed.FS
-	Compents          []*Sprite       //普通UI存放集合
-	HiddenCompents    []*Sprite       //可以被隐藏的UI组件集合
-	MiniPanelCompents []*Sprite       //MINI板的UI集合
-	ItemsCompents     []*SpriteItems  //Items的UI集合
-	tempBag           [1]*SpriteItems //临时Items存放
-	fCont             *fonts.FontBase
-	mapManage         interfaces.MapInterface
-	bag               *storage.Bag
-	JoyStick          *joystick.JoyStickBase //摇杆
+	image                       *embed.FS
+	Compents                    []*Sprite       //普通UI存放集合
+	HiddenCompents              []*Sprite       //可以被隐藏的UI组件集合
+	MiniPanelCompents           []*Sprite       //MINI板的UI集合
+	ItemsCompents               []*SpriteItems  //Items的UI集合
+	tempBag                     [1]*SpriteItems //临时Items存放
+	fCont                       *fonts.FontBase
+	mapManage                   interfaces.MapInterface
+	bag                         *storage.Bag
+	JoyStickleft, JoyStickright *joystick.JoyStickBase //摇杆
 }
 
 func NewUI(images *embed.FS, f *fonts.FontBase, m interfaces.MapInterface, b *storage.Bag) *UI {
 	//初始化摇杆坐标和移动半径
-	joystick.Init(58, 270, 76, 288, 50)
 	ui := &UI{
 		image:             images,
 		Compents:          make([]*Sprite, 0, 12),
@@ -67,7 +66,8 @@ func NewUI(images *embed.FS, f *fonts.FontBase, m interfaces.MapInterface, b *st
 		fCont:             f,
 		mapManage:         m,
 		bag:               b,
-		JoyStick:          joystick.NewJoyStick(images),
+		JoyStickleft:      joystick.NewJoyStick(images, 58, 270, 76, 288, 50),
+		JoyStickright:     joystick.NewJoyStick(images, 658, 270, 676, 288, 50),
 	}
 	//鼠标Icon设置
 	opMouse = &ebiten.DrawImageOptions{}
@@ -273,18 +273,19 @@ func (u *UI) DrawUI(screen *ebiten.Image, mouseX, mouseY int) {
 		// 	screen.DrawImage(SkillIcon, hop)
 
 		// }
-		if u.JoyStick.Dir != -1 {
+		if u.JoyStickright.Dir != -1 {
 			hop := new(ebiten.DrawImageOptions)
 			hop.GeoM.Scale(0.15, 0.15)
 			w, h := SkillIcon.Size()
 			hop.GeoM.Translate(-float64(w)*0.15/2, -float64(h)*0.15)
-			hop.GeoM.Rotate(u.JoyStick.Dir * math.Pi / 180)
+			hop.GeoM.Rotate(u.JoyStickright.Dir * math.Pi / 180)
 			hop.GeoM.Translate(float64(tools.LAYOUTX/2), float64(tools.LAYOUTY/2))
 			screen.DrawImage(SkillIcon, hop)
 		}
 
 		//摇杆
-		u.JoyStick.Draw(screen)
+		u.JoyStickleft.Draw(screen)
+		u.JoyStickright.Draw(screen)
 	}
 
 }

@@ -91,10 +91,11 @@ func (g *Game) changeScenceGameUpdate() {
 	var dir uint8
 	//手机端
 	if status.Config.IsMobile {
-		g.ui.JoyStick.Update()
-		if g.ui.JoyStick.Dir != -1 {
-			dir = tools.CaluteDir(g.ui.JoyStick.Dir)
-			nextx, nexty = tools.CaluteDisXY(10, g.ui.JoyStick.Dir)
+		g.ui.JoyStickright.Update()
+		g.ui.JoyStickleft.Update()
+		if g.ui.JoyStickleft.Dir != -1 {
+			dir = tools.CaluteDir(g.ui.JoyStickleft.Dir)
+			nextx, nexty = tools.CaluteDisXY(10, g.ui.JoyStickleft.Dir)
 		} else {
 			dir = g.player.Direction
 			g.player.StopMove()
