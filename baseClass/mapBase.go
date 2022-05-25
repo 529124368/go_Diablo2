@@ -78,8 +78,6 @@ func (m *MapBase) RenderFloor(screen *ebiten.Image, offsetX, offsetY float64) {
 					op.GeoM.Translate(3280+float64(i)*(-80)+float64(sumX)+offsetX, float64(startY)+float64(j)*40+offsetY)
 					op.GeoM.Scale(Scale, Scale)
 					screen.DrawImage(s, op)
-					// debug  info
-					//ebitenutil.DebugPrintAt(screen, "·"+strconv.Itoa(j)+","+strconv.Itoa(i), i*(-80)+sumX+int(offsetX)+74, startY+j*40+int(offsetY)+m.Img3[i][j].h+37)
 				}
 			}
 		}

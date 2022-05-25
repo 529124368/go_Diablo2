@@ -21,6 +21,7 @@ type Sprite struct {
 	dir                  float64
 	JoyStickx, JoySticky int
 	R                    float64
+	op                   *ebiten.DrawImageOptions
 }
 
 func New(m *ebiten.Image, x, y int, r float64) *Sprite {
@@ -31,6 +32,7 @@ func New(m *ebiten.Image, x, y int, r float64) *Sprite {
 		JoyStickx: x,
 		JoySticky: y,
 		R:         r,
+		op:        new(ebiten.DrawImageOptions),
 	}
 	return s
 }
@@ -73,11 +75,11 @@ func (s *Sprite) Back() {
 
 // Draw draws the sprite.
 func (s *Sprite) Draw(screen *ebiten.Image, x, y int) {
-	op := &ebiten.DrawImageOptions{}
-	op.Filter = ebiten.FilterLinear
+	s.op.GeoM.Reset()
+	s.op.Filter = ebiten.FilterLinear
 	xx, yy := s.MoveBy(x, y)
-	op.GeoM.Translate(float64(s.x+xx), float64(s.y+yy))
-	screen.DrawImage(s.image, op)
+	s.op.GeoM.Translate(float64(s.x+xx), float64(s.y+yy))
+	screen.DrawImage(s.image, s.op)
 }
 
 // StrokeSource represents a input device to provide strokes.
