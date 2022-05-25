@@ -3,6 +3,7 @@ package human
 import (
 	"embed"
 	"game/baseClass"
+	"game/shader"
 	"game/status"
 	"game/tools"
 	"strconv"
@@ -16,6 +17,8 @@ type PlayerAI struct {
 	PlayerName           string            //玩家名字
 	SkillName            string            //技能名称
 	imgOffset            [4]tools.OffsetXY //动作图片偏移
+	Op                   *ebiten.DrawRectShaderOptions
+	IsOutLine            float32
 }
 
 //创建玩家
@@ -30,7 +33,7 @@ func NewPlayerAI(x, y float64, state, dir uint8, images *embed.FS) *PlayerAI {
 	play.Direction = dir
 	play.Asset = images
 	play.OpS = &ebiten.DrawImageOptions{}
-	play.Op = &ebiten.DrawImageOptions{}
+	play.Op = &ebiten.DrawRectShaderOptions{}
 	return play
 }
 
@@ -59,6 +62,21 @@ func (p *PlayerAI) UpdatePlayerState(s uint8) {
 		p.Counts = 0
 	}
 	p.State = s
+}
+
+//是否被选中
+func (p *PlayerAI) In(mousex, mousey, playX, playY int) {
+	x, y, err := tools.CalculateWorldToScreen(int(p.X), int(p.Y), playX, playY)
+	if err == nil {
+		if tools.Distance(int64(x), int64(y), int64(mousex), int64(mousey)) <= 10 {
+			if p.IsOutLine == 1 {
+				p.IsOutLine = 0
+			} else {
+				p.IsOutLine = 1
+			}
+
+		}
+	}
 }
 
 //渲染角色
@@ -131,7 +149,11 @@ func (p *PlayerAI) Render(screen *ebiten.Image) {
 	screen.DrawImage(imagess, p.OpS)
 	//Draw Player
 	p.Op.GeoM.Reset()
+	p.Op.Uniforms = map[string]interface{}{
+		"IsOutLine": float32(p.IsOutLine),
+	}
+	p.Op.Images[0] = imagess
 	p.Op.GeoM.Translate(float64(int(p.X)+x-25)+status.Config.CamerOffsetX, float64(int(p.Y)+y-30)+status.Config.CamerOffsetY)
-	p.Op.Filter = ebiten.FilterLinear
-	screen.DrawImage(imagess, p.Op)
+	w, h := imagess.Size()
+	screen.DrawRectShader(w, h, shader.Shader, p.Op)
 }

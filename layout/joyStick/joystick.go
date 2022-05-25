@@ -13,6 +13,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
+var JoyStick_o, JoyStick_base *ebiten.Image = nil, nil
+
 // Sprite represents an image.
 type Sprite struct {
 	image                *ebiten.Image
@@ -186,27 +188,28 @@ type JoyStickBase struct {
 }
 
 func NewJoyStick(asset *embed.FS, x1, y1, x2, y2 int, r float64) *JoyStickBase {
-
-	ss, _ := asset.ReadFile("resource/UI/stick_o.png")
-	img, _, err := image.Decode(bytes.NewReader(ss))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	ebitenImage := ebiten.NewImageFromImage(img)
-	ss, _ = asset.ReadFile("resource/UI/stick_base.png")
-	img, _, err = image.Decode(bytes.NewReader(ss))
-	if err != nil {
-		log.Fatal(err)
-	}
-	JoyStick := ebiten.NewImageFromImage(img)
 	// Initialize the sprites.
+	if JoyStick_o == nil {
+		ss, _ := asset.ReadFile("resource/UI/stick_o.png")
+		img, _, err := image.Decode(bytes.NewReader(ss))
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		JoyStick_o = ebiten.NewImageFromImage(img)
+		ss, _ = asset.ReadFile("resource/UI/stick_base.png")
+		img, _, err = image.Decode(bytes.NewReader(ss))
+		if err != nil {
+			log.Fatal(err)
+		}
+		JoyStick_base = ebiten.NewImageFromImage(img)
+	}
 
 	// Initialize the game.
 	return &JoyStickBase{
 		strokes:   map[*Stroke]struct{}{},
-		JoyStickM: New(ebitenImage, x2, y2, r),
-		JoyStickB: New(JoyStick, x1, y1, 0),
+		JoyStickM: New(JoyStick_o, x2, y2, r),
+		JoyStickB: New(JoyStick_base, x1, y1, 0),
 		Dir:       -1,
 		jmx:       x1,
 		jmy:       y1,
@@ -219,7 +222,6 @@ func (j *JoyStickBase) spriteAt(x, y int) *Sprite {
 	if j.JoyStickM.In(x, y) {
 		return j.JoyStickM
 	}
-
 	return nil
 }
 

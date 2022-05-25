@@ -3,6 +3,7 @@ package tools
 import (
 	"bytes"
 	"container/ring"
+	"errors"
 	"fmt"
 	"game/engine/ws/pb"
 	"game/status"
@@ -161,6 +162,19 @@ func CalculateScreenToWorld(mx, my, px, py int) (int, int) {
 	dx := mx - int(status.Config.PLAYERCENTERX)
 	dy := my - int(status.Config.PLAYERCENTERY)
 	return dx + px, dy + py
+}
+
+//计算世界坐标到屏幕坐标
+func CalculateWorldToScreen(px, py, pbx, pby int) (int, int, error) {
+	chax := px - pbx
+	chay := py - pby
+	screenx := chax + int(status.Config.PLAYERCENTERX)
+	screeny := chay + int(status.Config.PLAYERCENTERY)
+	if screenx >= 0 && screenx <= LAYOUTX && screeny >= 0 && screeny <= LAYOUTY {
+		return screenx, screeny, nil
+	} else {
+		return 0, 0, errors.New("不在屏幕内")
+	}
 }
 
 //计算转头角度一栏

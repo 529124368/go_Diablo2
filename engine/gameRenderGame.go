@@ -2,6 +2,7 @@ package engine
 
 import (
 	"fmt"
+	"game/controller"
 	"game/engine/ws"
 	"game/role/human"
 	"game/status"
@@ -83,7 +84,6 @@ func (g *Game) changeScenceGameUpdate() {
 	if _, x := ebiten.Wheel(); x != 0 {
 		status.Config.MapZoom += int(x)
 	}
-	//计算鼠标位置
 
 	//控制玩家
 	nextx := 0
@@ -103,6 +103,16 @@ func (g *Game) changeScenceGameUpdate() {
 	} else {
 		//pc端
 		dir = tools.CaluteDir(tools.CaluteDirAtan2(status.Config.PLAYERCENTERX, status.Config.PLAYERCENTERY, int64(mouseX), int64(mouseY)))
+
+		//网络
+		if status.Config.IsNetPlay && len(g.playerAI) > 0 {
+			if controller.MouseOnceLeftPress() || controller.MouseOnceRightPress() {
+				for _, v := range g.playerAI {
+					v.In(mouseX, mouseY, int(g.player.X), int(g.player.Y))
+				}
+			}
+		}
+
 	}
 	//主机玩家控制
 	g.player.PlayerContr(nextx, nexty, dir, &g.count)
