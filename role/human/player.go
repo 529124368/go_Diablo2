@@ -36,7 +36,7 @@ type Player struct {
 	imgOffset            [4]tools.OffsetXY //动作图片偏移
 }
 
-//创建玩家
+// 创建玩家
 func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m interfaces.MapInterface, con *ws.WsNetManage, ui *layout.UI, ms interfaces.MusicInterface) *Player {
 	play := &Player{
 		PlayerName: "",
@@ -60,13 +60,13 @@ func NewPlayer(x, y float64, state, dir uint8, mx, my int, images *embed.FS, m i
 	return play
 }
 
-//加載玩家素材
+// 加載玩家素材
 func (p *Player) LoadImages(name, path string, num uint8) {
 	p.PlayerBase.LoadImages(name, path, num)
 	p.imgOffset = tools.GetOffetByAction(name)
 }
 
-//暗黑破坏神 16方位 移动 鼠标控制
+// 暗黑破坏神 16方位 移动 鼠标控制
 func (p *Player) GetMouseController(dir uint8, dx, dy, dis float64, count *int) {
 	if p.FlagCanAction {
 		speed := 0.0
@@ -115,7 +115,7 @@ func (p *Player) GetMouseController(dir uint8, dx, dy, dis float64, count *int) 
 	}
 }
 
-//判断是否可以行走
+// 判断是否可以行走
 func (p *Player) CanWalk(xS, yS float64, dir uint8) bool {
 	x, y := tools.GetFloorPositionAt(p.X+xS-110, p.Y+yS+70)
 	if x >= status.Config.ReadMapSizeWidth || y >= status.Config.ReadMapSizeHeight || x < 0 || y < 0 {
@@ -130,7 +130,7 @@ func (p *Player) CanWalk(xS, yS float64, dir uint8) bool {
 	return false
 }
 
-//本机玩家移动
+// 本机玩家移动
 func (p *Player) PlayerMove(count *int) {
 	//判断人物方位
 	if p.OldDirection != p.Direction {
@@ -167,14 +167,14 @@ func (p *Player) PlayerMove(count *int) {
 	}
 }
 
-//停止玩家
+// 停止玩家
 func (p *Player) StopMove() {
 	p.FlagCanAction = false
 	p.NewpositonX = 0
 	p.NewpositonY = 0
 }
 
-//改变方向
+// 改变方向
 func (p *Player) ChangeDir() {
 	//非攻击和放技能的情况下需要进行转体动画
 	if p.State != tools.ATTACK && p.State != tools.SkILL {
@@ -213,7 +213,7 @@ func (p *Player) ChangeDir() {
 
 }
 
-//玩家到新位置的预算
+// 玩家到新位置的预算
 func (p *Player) PlayerNextMovePositon(mouseX, mouseY int, dir uint8) {
 	p.NewDir = dir
 	if mouseX != 0 || mouseY != 0 {
@@ -232,7 +232,7 @@ func (p *Player) PlayerNextMovePositon(mouseX, mouseY int, dir uint8) {
 
 }
 
-//角色控制
+// 角色控制
 func (p *Player) PlayerContr(nextX, nextY int, dir uint8, count *int) {
 
 	//手机端操作
@@ -322,7 +322,7 @@ func (p *Player) PlayerContr(nextX, nextY int, dir uint8, count *int) {
 	}
 }
 
-//渲染角色
+// 渲染角色
 func (p *Player) Render(screen *ebiten.Image) {
 	//改变帧数
 	p.ChangeFrame()

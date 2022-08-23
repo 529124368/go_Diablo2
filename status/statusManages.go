@@ -50,13 +50,13 @@ func NewStatusManage() *StatusManage {
 		MapZoom:           8,
 		CurrentGameScence: 1,
 		Queue:             make(chan []byte),
-		IsNetPlay:         true, //是否联网
-		IsMobile:          false,
+		//IsNetPlay:         true, //是否联网
+		IsMobile: false,
 	}
 	return n
 }
 
-//初始化
+// 初始化
 func init() {
 	Config = NewStatusManage()
 }

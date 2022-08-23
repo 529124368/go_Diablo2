@@ -48,8 +48,9 @@ const (
 	PlistR              uint8         = 2
 )
 
-//Calculate Angle
+// Calculate Angle
 func CaluteDirAtan2(x, y, x_tar, y_tar int64) float64 {
+
 	dx := float64(x_tar - x)
 	dy := float64(y_tar - y)
 	j := math.Atan2(dy, dx) * 180 / math.Pi
@@ -61,14 +62,14 @@ func CaluteDirAtan2(x, y, x_tar, y_tar int64) float64 {
 	return j
 }
 
-//Calculate Angle
+// Calculate Angle
 func CaluteDisXY(dis, d float64) (int, int) {
 	x := math.Sin(d*math.Pi/180) * dis
 	y := math.Cos(d*math.Pi/180) * dis
 	return int(math.Floor(395 + x)), int(math.Floor(240 - y))
 }
 
-//Calculate Direction
+// Calculate Direction
 func CaluteDir(d float64) uint8 {
 	if d >= 0 && d < 15 || d >= 345 && d < 360 {
 		return 6
@@ -123,7 +124,7 @@ func CaluteDir(d float64) uint8 {
 	return 0
 }
 
-//Get Images From Byte
+// Get Images From Byte
 func GetEbitenImage(data []byte) *ebiten.Image {
 	img, _, err := image.Decode(bytes.NewReader(data))
 	if err != nil {
@@ -132,7 +133,7 @@ func GetEbitenImage(data []byte) *ebiten.Image {
 	return ebiten.NewImageFromImage(img)
 }
 
-//Get NRGBA Plist Images
+// Get NRGBA Plist Images
 func GetImageFromPlist(s []byte, json []byte) (*texturepacker.SpriteSheet, *image.NRGBA) {
 	sheet, _ := texturepacker.SheetFromData(json, texturepacker.FormatJSONHash{})
 
@@ -141,7 +142,7 @@ func GetImageFromPlist(s []byte, json []byte) (*texturepacker.SpriteSheet, *imag
 	return sheet, sheetImage
 }
 
-//Get Paletted Plist Images
+// Get Paletted Plist Images
 func GetImageFromPlistPaletted(s []byte, json []byte) (*texturepacker.SpriteSheet, *image.Paletted) {
 	sheet, _ := texturepacker.SheetFromData(json, texturepacker.FormatJSONHash{})
 
@@ -150,21 +151,21 @@ func GetImageFromPlistPaletted(s []byte, json []byte) (*texturepacker.SpriteShee
 	return sheet, sheetImage
 }
 
-//Calculate Distance
+// Calculate Distance
 func Distance(xa, ya, xb, yb int64) float64 {
 	x := math.Abs(float64(xa - xb))
 	y := math.Abs(float64(ya - yb))
 	return math.Sqrt(x*x + y*y)
 }
 
-//计算屏幕坐标到世界坐标
+// 计算屏幕坐标到世界坐标
 func CalculateScreenToWorld(mx, my, px, py int) (int, int) {
 	dx := mx - int(status.Config.PLAYERCENTERX)
 	dy := my - int(status.Config.PLAYERCENTERY)
 	return dx + px, dy + py
 }
 
-//计算世界坐标到屏幕坐标
+// 计算世界坐标到屏幕坐标
 func CalculateWorldToScreen(px, py, pbx, pby int) (int, int, error) {
 	chax := px - pbx
 	chay := py - pby
@@ -177,7 +178,7 @@ func CalculateWorldToScreen(px, py, pbx, pby int) (int, int, error) {
 	}
 }
 
-//计算转头角度一栏
+// 计算转头角度一栏
 func CalculateDirPath(oldDir, newDir uint8) []uint8 {
 	pathList := ring.New(16)
 	dirList := []uint8{1, 11, 6, 12, 2, 13, 7, 14, 3, 15, 4, 8, 0, 9, 5, 10}
@@ -215,7 +216,7 @@ func CalculateDirPath(oldDir, newDir uint8) []uint8 {
 	}
 }
 
-//获取物品的尺寸
+// 获取物品的尺寸
 func GetItemsCellSize(name string) (int, int) {
 	type1 := "HP0,MP0,neck,ring"
 	type2 := "book"
@@ -262,7 +263,7 @@ func MaxInt32(a, b int32) int32 {
 	return b
 }
 
-//计算玩家在所在地砖的逻辑坐标
+// 计算玩家在所在地砖的逻辑坐标
 func GetFloorPositionAt(x, y float64) (int, int) {
 	//当前菱形地图 0,0 点坐标世界坐标是 （3280,0）
 	M_Minus_N := (x - 3280) / 80
@@ -272,13 +273,14 @@ func GetFloorPositionAt(x, y float64) (int, int) {
 	return int(xx), int(yy)
 }
 
-//根据瓦片坐标计算世界坐标
+// 根据瓦片坐标计算世界坐标
 func TileToWorld(Tilex, Tiley int) (float64, float64) {
 	return float64(3280 + (Tilex-Tiley)*80), float64((Tilex + Tiley) * 40)
 }
 
-//根据方向计算偏移距离
+// 根据方向计算偏移距离
 func CalculateSpeed(dir uint8, speed, dx, dy, s float64) (float64, float64) {
+
 	// 1/60 is dt 1s 内刷新帧数
 	moveX, moveY := 0.0, 0.0
 	switch dir {
@@ -306,7 +308,7 @@ type OffsetXY struct {
 	X, Y int
 }
 
-//根据玩家动作和加载的资源获取偏移
+// 根据玩家动作和加载的资源获取偏移
 func GetOffetByAction(name string) [4]OffsetXY {
 
 	var box [4]OffsetXY
@@ -325,7 +327,7 @@ func GetOffetByAction(name string) [4]OffsetXY {
 	return box
 }
 
-//消息对象复用
+// 消息对象复用
 var PmPool = sync.Pool{
 	New: func() interface{} { return new(pb.Message) },
 }
@@ -334,7 +336,7 @@ var dataPool = sync.Pool{
 	New: func() interface{} { return new(pb.Datas) },
 }
 
-//解包
+// 解包
 func Unpack(msg []byte) *pb.Message {
 	m := PmPool.Get().(*pb.Message)
 	err := proto.Unmarshal(msg, m)
@@ -344,7 +346,7 @@ func Unpack(msg []byte) *pb.Message {
 	return m
 }
 
-//消息打包
+// 消息打包
 func Pack(s bool, f, datas, msg string, p *pb.Player) []byte {
 	m := PmPool.Get().(*pb.Message)
 	pp := dataPool.Get().(*pb.Datas)

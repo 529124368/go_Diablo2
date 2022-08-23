@@ -4,6 +4,7 @@ import (
 	"game/engine"
 	"log"
 	"os"
+	"runtime/debug"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -14,6 +15,7 @@ const (
 )
 
 func main() {
+	debug.SetMemoryLimit(300 * 1024 * 1024)
 	//设置log级别
 	log.SetFlags(log.Llongfile)
 	//设置渲染方法

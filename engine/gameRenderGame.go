@@ -15,7 +15,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
-//切换游戏场景
+// 切换游戏场景
 func (g *Game) ChangeScene(name string) {
 	//角色选择场景
 	if name == "select" {
@@ -63,7 +63,7 @@ func (g *Game) ChangeScene(name string) {
 	}
 }
 
-//Draw Game Update
+// Draw Game Update
 func (g *Game) changeScenceGameUpdate() {
 	g.count++
 	g.count %= 100
@@ -121,7 +121,7 @@ func (g *Game) changeScenceGameUpdate() {
 	g.ui.EventLoop(mouseX, mouseY)
 }
 
-//Draw Game Scence
+// Draw Game Scence
 func (g *Game) ChangeScenceGameDraw(screen *ebiten.Image) {
 	defer func() {
 		if r := recover(); r != nil {
