@@ -6,6 +6,12 @@
 
 1.18·版本可以手动修改下go mod里的golang版本
 
+```golang
+
+//1.18运行的情况下 把main.go的下面代码注释掉
+debug.SetMemoryLimit(300 * 1024 * 1024)
+```
+
 
 ## 游戏运行方法
 ```
