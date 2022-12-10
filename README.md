@@ -1,23 +1,52 @@
-# 通过golang开发的《暗黑破怀神2_Demo》  Diablo2_Demo
+# golang开发的《暗黑破怀神2 Demo》  Diablo2_Demo
 
 ！转载请注明来源
 
+### golang版本要求 1.19
+
 ```
-1. 下载源码
-2. go mod vendor 
-3. go run main.go  或   go build
+1. git clone
+2. go get 或 go mod vendor 
+3. go run main.go  或  go build
 ```
 ## 控制说明
-  1.目前demo 支持 鼠标左键点击移动 ，右键攻击
+
+  1.键盘F键
+    全局画面切换
   
-### 更新履历
-  1. 第一次提交
+  2.键盘Q键
+    手机PC操作切换
+    
+  3.键盘D键
+    显示Debug信息
+       
+  4.F1键
+    野蛮人呐喊
+    
+  5.鼠标左键
+    移动
+    
+  6.鼠标右键
+    攻击
   
-  
-  ios build
-  ebitenmobile bind -target ios -o Mobile.framework ./mobile
-  
-  apk build
-  ebitenmobile bind -target android -javapkg golang.diablo2.mobile  -o mobile.aar .\mobile\
+    
+   
+## 截图
+
+![image](https://user-images.githubusercontent.com/22612129/206830882-bb40e960-2a99-442c-9d1f-841eca3c1ca5.png)
+
+![image](https://user-images.githubusercontent.com/22612129/206830890-f60843f5-238c-40d7-a2ef-c02a89c825fb.png)
+
+![image](https://user-images.githubusercontent.com/22612129/206830892-ed8c8dd5-fe98-4b18-9141-5848b1d8132f.png)
+
+![image](https://user-images.githubusercontent.com/22612129/206830944-bb33f3c2-b7ee-46c7-a01b-c8dbf35c8c3a.png)
+
+![image](https://user-images.githubusercontent.com/22612129/206830973-0f2e1cbf-cdae-4180-9d77-378a430d5c29.png)
+
+
+
+
+
+    
 
 
