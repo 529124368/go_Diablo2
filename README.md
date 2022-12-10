@@ -4,11 +4,13 @@
 
 ### golang版本要求 1.19
 
+## 游戏运行方法
 ```
 1. git clone
 2. go get 或 go mod vendor 
 3. go run main.go  或  go build
 ```
+
 ## 控制说明
 
   1.键盘F键
