@@ -13,7 +13,7 @@ debug.SetMemoryLimit(300 * 1024 * 1024)
 ```
 
 
-## 游戏运行方法
+## 本代码是游戏客户端代码，不是服务器端代码，游戏运行方法
 ```
 1. git clone
 2. go get 或 go mod vendor 
