@@ -27,7 +27,7 @@ func main() {
 	//title
 	ebiten.SetWindowTitle("Golang_DibaloⅡ")
 	//TPS
-	ebiten.SetMaxTPS(80)
+	ebiten.SetTPS(60)
 	gameStart := engine.NewGame()
 	defer func() {
 		if gameStart.Ws != nil {
