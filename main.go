@@ -4,7 +4,9 @@ import (
 	"game/engine"
 	"log"
 	"os"
+	"runtime"
 	"runtime/debug"
+	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -15,7 +17,9 @@ const (
 )
 
 func main() {
-	debug.SetMemoryLimit(300 * 1024 * 1024)
+	if strings.Compare(runtime.Version(), "go1.19.5") >= 0 {
+		debug.SetMemoryLimit(300 * 1024 * 1024)
+	}
 	//设置log级别
 	log.SetFlags(log.Llongfile)
 	//设置渲染方法
