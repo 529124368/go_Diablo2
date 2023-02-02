@@ -1,6 +1,6 @@
 # golang开发的《暗黑破怀神2 Demo》  Diablo2_Demo
 
-！转载请注明来源
+写着玩 Just For Fun
 
 
 ## 本代码是游戏客户端代码，不是服务器端代码，游戏运行方法
