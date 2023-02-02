@@ -23,7 +23,7 @@ type NpcAI struct {
 	AIpath                            []AIEndPoint
 }
 
-//创建NPC
+// 创建NPC
 func NewPlayerAI(x, y float64, state, dir uint8, images *embed.FS) *NpcAI {
 	play := &NpcAI{
 		PlayerName: "",
@@ -41,7 +41,7 @@ func NewPlayerAI(x, y float64, state, dir uint8, images *embed.FS) *NpcAI {
 	return play
 }
 
-//暗黑破坏神 16方位 移动 AI
+// 暗黑破坏神 16方位 移动 AI
 func (p *NpcAI) GetMouseControllerAI(dir uint8, dx, dy, std float64) {
 	if p.FlagCanAction {
 		speed := 0.0
@@ -55,13 +55,13 @@ func (p *NpcAI) GetMouseControllerAI(dir uint8, dx, dy, std float64) {
 	}
 }
 
-//停止AI NPC移动
+// 停止AI NPC移动
 func (p *NpcAI) StopPlayerMoveAI() {
 	p.NewpositonX = 0
 	p.NewpositonY = 0
 }
 
-//控制AI NPC新位置的预算
+// 控制AI NPC新位置的预算
 func (p *NpcAI) UpdatePlayerNextMovePositonAI(NewpositonX, NewpositonY float64, dir uint8) {
 	p.AICount = 0
 	p.NewDir = dir
@@ -70,7 +70,7 @@ func (p *NpcAI) UpdatePlayerNextMovePositonAI(NewpositonX, NewpositonY float64, 
 	p.AIf++
 }
 
-//渲染NPC
+// 渲染NPC
 func (p *NpcAI) Render(screen *ebiten.Image) {
 	p.PlayerMoveAI()
 	p.ChangeFrame()
@@ -105,7 +105,7 @@ func (p *NpcAI) Render(screen *ebiten.Image) {
 	screen.DrawImage(imagess, p.Op)
 }
 
-//控制AI NPC移动
+// 控制AI NPC移动
 func (p *NpcAI) PlayerMoveAI() {
 	//AI 移动判断
 	p.AIMove()
@@ -129,7 +129,7 @@ func (p *NpcAI) PlayerMoveAI() {
 	}
 }
 
-//AI 移动判断
+// AI 移动判断
 func (p *NpcAI) AIMove() {
 	p.AICount++
 	p.AIf %= p.AIPathCount
@@ -149,7 +149,7 @@ func (p *NpcAI) SetAIPath(path []AIEndPoint, speed int) {
 	p.AIWait = speed
 }
 
-//改变帧数
+// 改变帧数
 func (p *NpcAI) ChangeFrame() {
 	//根据状态改变帧数
 	if p.State == tools.IDLE {

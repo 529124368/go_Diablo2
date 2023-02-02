@@ -71,57 +71,41 @@ func CaluteDisXY(dis, d float64) (int, int) {
 
 // Calculate Direction
 func CaluteDir(d float64) uint8 {
-	if d >= 0 && d < 15 || d >= 345 && d < 360 {
+	res := math.Floor(d/22.5 + 0.5)
+	switch int(res) % 15 {
+	case 0:
 		return 6
-	}
-	if d >= 15 && d < 35 {
+	case 1:
 		return 12
-	}
-	if d >= 35 && d < 55 {
+	case 2:
 		return 2
-	}
-	if d >= 55 && d < 75 {
+	case 3:
 		return 13
-	}
-	if d >= 75 && d < 105 {
+	case 4:
 		return 7
-	}
-	if d >= 105 && d < 125 {
+	case 5:
 		return 14
-	}
-	if d >= 125 && d < 145 {
+	case 6:
 		return 3
-	}
-	if d >= 145 && d < 165 {
+	case 7:
 		return 15
-	}
-	if d >= 165 && d < 195 {
+	case 8:
 		return 4
-	}
-	if d >= 195 && d < 215 {
+	case 9:
 		return 8
-	}
-	if d >= 215 && d < 235 {
+	case 10:
 		return 0
-	}
-
-	if d >= 235 && d < 255 {
+	case 11:
 		return 9
-	}
-	if d >= 255 && d < 285 {
+	case 12:
 		return 5
-	}
-	if d >= 285 && d < 305 {
+	case 13:
 		return 10
-	}
-	if d >= 305 && d < 325 {
+	case 14:
 		return 1
-	}
-	if d >= 325 && d < 345 {
+	default:
 		return 11
 	}
-
-	return 0
 }
 
 // Get Images From Byte
@@ -145,7 +129,6 @@ func GetImageFromPlist(s []byte, json []byte) (*texturepacker.SpriteSheet, *imag
 // Get Paletted Plist Images
 func GetImageFromPlistPaletted(s []byte, json []byte) (*texturepacker.SpriteSheet, *image.Paletted) {
 	sheet, _ := texturepacker.SheetFromData(json, texturepacker.FormatJSONHash{})
-
 	img, _, _ := image.Decode(bytes.NewReader(s))
 	sheetImage := img.(*image.Paletted)
 	return sheet, sheetImage

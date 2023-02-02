@@ -9,7 +9,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-//基础类
+// 基础类
 type PlayerBase struct {
 	FlagCanAction                        bool      //是否可以移动标志
 	X                                    float64   //玩家世界坐标X
@@ -26,7 +26,7 @@ type PlayerBase struct {
 	OpS, Op                              *ebiten.DrawImageOptions
 }
 
-//加載素材
+// 加載素材
 func (p *PlayerBase) LoadImages(name, path string, num uint8) {
 	//写入缓存
 	var st strings.Builder
@@ -66,19 +66,19 @@ func (p *PlayerBase) LoadImages(name, path string, num uint8) {
 	p.SetPlayerState(0, 0)
 }
 
-//复用素材
+// 复用素材
 func (p *PlayerBase) RepeatedImages(s *texturepacker.SpriteSheet, m *ebiten.Image) {
 	p.Plist_png = m
 	p.Plist_sheet = s
 }
 
-//设置玩家状态
+// 设置玩家状态
 func (p *PlayerBase) SetPlayerState(s, d uint8) {
 	p.State = s
 	p.Direction = d
 }
 
-//获取图片
+// 获取图片
 func (p *PlayerBase) GetAnimator(flg, name string, block uint8) (*ebiten.Image, int, int) {
 	if flg == "man" {
 		//判断加载素材的第几部分
@@ -92,7 +92,7 @@ func (p *PlayerBase) GetAnimator(flg, name string, block uint8) (*ebiten.Image, 
 	}
 }
 
-//渲染角色
+// 渲染角色
 func (p *PlayerBase) Render() {
 	p.Count++
 	//Change player Frame
@@ -106,7 +106,7 @@ func (p *PlayerBase) Render() {
 	}
 }
 
-//GC
+// GC
 func (p *PlayerBase) GC() {
 	p.Plist_sheet = nil
 	p.Plist_sheet_2 = nil
@@ -114,7 +114,7 @@ func (p *PlayerBase) GC() {
 	p.Plist_png_2 = nil
 }
 
-//改变帧数
+// 改变帧数
 func (p *PlayerBase) ChangeFrame() {
 	//根据状态改变帧数
 	if p.State == tools.IDLE {

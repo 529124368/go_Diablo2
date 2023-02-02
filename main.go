@@ -17,6 +17,7 @@ const (
 )
 
 func main() {
+
 	if strings.Compare(runtime.Version(), "go1.19.5") >= 0 {
 		debug.SetMemoryLimit(300 * 1024 * 1024)
 	}

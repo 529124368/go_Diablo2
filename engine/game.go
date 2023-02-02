@@ -110,19 +110,15 @@ func (g *Game) Update() error {
 		case tools.GAMESCENESTART:
 			//进入游戏场景逻辑
 			g.changeScenceGameUpdate()
-			break
 		case tools.GAMESCENEOPENDOOR:
 			//游戏加载逻辑
 			g.ChangeScenceOpenDoorUpdate()
-			break
 		case tools.GAMESCENESELECTROLE:
 			//进入游戏选择界面逻辑
 			g.ChangeScenceSelectUpdate()
-			break
 		default:
 			//进入游戏登录界面逻辑
 			g.ChangeScenceLoginUpdate()
-			break
 		}
 	}
 	//全屏显示控制
