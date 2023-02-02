@@ -33,12 +33,12 @@ func main() {
 	//TPS
 	ebiten.SetTPS(60)
 	gameStart := engine.NewGame()
+	if err := ebiten.RunGame(gameStart); err != nil {
+		log.Fatal(err)
+	}
 	defer func() {
 		if gameStart.Ws != nil {
 			gameStart.CloseCon()
 		}
 	}()
-	if err := ebiten.RunGame(gameStart); err != nil {
-		log.Fatal(err)
-	}
 }

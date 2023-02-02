@@ -13,14 +13,13 @@ import (
 	"game/storage"
 	"game/tools"
 	"runtime"
-	"sync"
 
 	"github.com/gorilla/websocket"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
-//配置信息
+// 配置信息
 const (
 	SCREENWIDTH  int = 490
 	SCREENHEIGHT int = 300
@@ -52,33 +51,33 @@ var (
 //go:embed resource
 var asset embed.FS
 
-//GameEngine
+// GameEngine
 func NewGame() *Game {
 	bag := storage.New()
 	//字体
-	f := fonts.NewFont(&asset)
+	font := fonts.NewFont(&asset)
 	//场景
-	m := mapManage.NewE1(&asset, bag, f)
+	scence := mapManage.NewE1(&asset, bag, font)
 	//UI
-	u := layout.NewUI(&asset, f, m, bag)
-	bag.UI = u
+	ui := layout.NewUI(&asset, font, scence, bag)
+	bag.UI = ui
 	//BGM
 	bgm := music.NewMusicBGM(&asset)
 
 	gameEngine := &Game{
 		count:       0,
 		countForMap: 0,
-		ui:          u,
+		ui:          ui,
 		music:       bgm,
-		mapManage:   m,
-		font_style:  f,
+		mapManage:   scence,
+		font_style:  font,
 	}
 	//启动游戏
 	gameEngine.StartEngine()
 	return gameEngine
 }
 
-//引擎启动
+// 引擎启动
 func (g *Game) StartEngine() {
 	if status.Config.IsNetPlay {
 		//网络监听消息
@@ -86,20 +85,13 @@ func (g *Game) StartEngine() {
 	}
 	//隐藏鼠标系统的ICON
 	ebiten.SetCursorMode(ebiten.CursorModeHidden)
-	w := sync.WaitGroup{}
-	w.Add(1)
-	//UI Init
-	go func() {
-		//加载字体
-		g.font_style.LoadFont("resource/font/pf_normal.ttf")
-		g.ui.LoadGameLoginImages()
-		runtime.GC()
-		w.Done()
-	}()
-	w.Wait()
+	//UI 初始化
+	g.font_style.LoadFont("resource/font/pf_normal.ttf")
+	g.ui.LoadGameLoginImages()
+	runtime.GC()
 }
 
-//关闭所有连接
+// 关闭所有连接
 func (g *Game) CloseCon() {
 	g.Ws.Close()
 	close(status.Config.Queue)
@@ -112,21 +104,25 @@ func (g *Game) Update() error {
 		mouseX, mouseY = controller.GetTouchDefaultXY()
 	}
 
-	//切换场景逻辑
+	//切换场景状态机
 	if !status.Config.ChangeScenceFlg {
 		switch status.Config.CurrentGameScence {
 		case tools.GAMESCENESTART:
 			//进入游戏场景逻辑
 			g.changeScenceGameUpdate()
+			break
 		case tools.GAMESCENEOPENDOOR:
 			//游戏加载逻辑
 			g.ChangeScenceOpenDoorUpdate()
+			break
 		case tools.GAMESCENESELECTROLE:
 			//进入游戏选择界面逻辑
 			g.ChangeScenceSelectUpdate()
+			break
 		default:
 			//进入游戏登录界面逻辑
 			g.ChangeScenceLoginUpdate()
+			break
 		}
 	}
 	//全屏显示控制
